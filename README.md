@@ -15,7 +15,7 @@ Contact: simon@cerelog.com
 
 Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
 
-Product Usage Guide (Full Usage Instructions and info on Brainflow usage to collect data): [Here](https://www.cerelog.com/eeg_researchers_guide.html)
+Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html)
 
 Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
 
@@ -23,7 +23,7 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 
 # Software and Data Collection:
 
-Product Usage Guide (Full Usage Instructions and info on Brainflow usage to collect data): [Here](https://www.cerelog.com/eeg_researchers_guide.html)
+Instructions on how to collect data from device with Brainflow API custom instance: [Here](https://www.cerelog.com/eeg_researchers_guide.html)
 
 and
 

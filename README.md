@@ -40,3 +40,17 @@ Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared
 (Note: Test script to view plot and aquire data -> ( Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py ) from in above repo. Must download full Brainflow instance to use
 
 
+
+
+# Important Notice
+This product is intended for research, engineering, and educational purposes only. It is not a medical device and has not been evaluated by the FDA. The product is not UL or FCC certified.
+
+This evaluation board/kit is intended for use for ENGINEERING DEVELOPMENT, DEMONSTRATION, OR EVALUATION PURPOSES ONLY and is not considered by Cerelog Inc. to be a finished end-product fit for general consumer use.
+
+We expressly disclaim any liability whatsoever for any direct, indirect, consequential, incidental or special damages, including, without limitation, lost revenues, lost profits, losses resulting from business interruption or loss of data, arising from the use of this product.
+
+Only plug this device into a computer running off of battery power such as a Laptop running on its own battery supply or a raspberry pi powered by a portable battery bank. Do not connect to a mains powered device such as a PC because it is not isolated in the event of a power surge. 
+
+Cerelog Inc. assumes no liability for the performance, suitability, or use of any third-party products linked or recommended on this website.
+
+

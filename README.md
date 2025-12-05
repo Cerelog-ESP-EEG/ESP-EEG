@@ -9,7 +9,8 @@ High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain 
 
 
 
-#Helpful Links
+# Helpful Links
+
 Contact: simon@cerelog.com
 
 Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
@@ -20,7 +21,12 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 
 
 
-# Software: 
+# Software and Data Collection:
+
+Product Usage Guide (Full Usage Instructions and info on Brainflow usage to collect data): [Here](https://www.cerelog.com/eeg_researchers_guide.html)
+
+and
+
 Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared_brainflow-cerelog) for collecting data with the device. 
 
 Can Visualize and aquire data by running from above this this python test script Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py 

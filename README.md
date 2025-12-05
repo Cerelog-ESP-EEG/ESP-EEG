@@ -1,6 +1,7 @@
 # Cerelog ESP-EEG 
 
 www.cerelog.com
+Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d)
 
 High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications.
 

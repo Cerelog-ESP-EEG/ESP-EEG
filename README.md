@@ -30,6 +30,10 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 
 ![Cerelog Board](product_EEG.png)
 
+
+
+View hardware folder for device schematic
+
 ## 🔌 Hardware Pinout & Indicators
 *   **Status LED (GPIO 17):**
     *   🟢 **Solid On:** Firmware loaded, ready to stream.
@@ -68,7 +72,9 @@ Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared
 (Note: Test script to view plot and aquire data -> ( Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py ) from in above repo. Must download full Brainflow instance to use
 
 
+# Firmware
 
+View firmware folder for firmware and modification instructions
 
 # Important Notice
 This product is intended for research, engineering, and educational purposes only. It is not a medical device and has not been evaluated by the FDA. The product is not UL or FCC certified.

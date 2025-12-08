@@ -112,7 +112,7 @@ cmake --build . --config Release --clean-first -j4
 
 ---
 
-## Step 5: Install the Python Package
+## Step 4: Install the Python Package
 With the core library built, you must install the Python bindings to link your scripts to the C++ core.
 
 **1. Navigate to the python package folder:**
@@ -133,7 +133,7 @@ This links the package to the source files, so you don't need to reinstall the p
     ```bash
     pip3 install -e .
     ```
-# Step 6: Dependencies
+## Step 5: Dependencies
 Ensure you have the required Python packages installed:
 ```bash
 pip install numpy matplotlib
@@ -141,7 +141,7 @@ pip install numpy matplotlib
 ```
 
 
-# Step 7   Run Test Script
+## Step 6   Run Test Script
 
 The script below (`filtered_plot.py`) relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
 

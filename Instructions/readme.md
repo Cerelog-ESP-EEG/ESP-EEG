@@ -50,7 +50,93 @@ The ESP EEG requires a specific version of BrainFlow to handle its high-fidelity
     Clone or download the custom BrainFlow repository here:
     👉 **[Cerelog Shared BrainFlow Repository](https://github.com/shakimiansky/Shared_brainflow-cerelog)**
 
-2.  **Environment Setup:**
+**Seting up the brainflow repo on new computers:**
+
+*   **One-Time Setup:** This compilation is a one-time setup for your computer.
+*   **Why compile?** Because the core library is written in C++, it must be compiled specifically for your operating system (Windows, Mac, or Linux).
+*   **When to repeat:** You only need to repeat the build process (Step 2) if you modify the underlying C++ source code files (`.cpp`, `.h`). Creating new Python scripts does **not** require a rebuild but it does require running pip install -e. (the last step) before running new python scripts
+
+---
+
+## Step A: Get the Custom BrainFlow Fork
+Our board requires a specific fork of BrainFlow. Clone it and navigate into the new directory.
+
+> **⚠️ IMPORTANT: Use This Specific Repository**
+> This version of BrainFlow contains code specific to the Cerelog board. This code has not yet been merged into the official, main BrainFlow repository. You **must** use the link provided below.
+
+```bash
+git clone https://github.com/shakimiansky/Shared_brainflow-cerelog.git
+cd Shared_brainflow-cerelog
+```
+
+---
+
+## Step B: Build the Library from Source
+This crucial step compiles the C++ core of the library.
+*Tip: If you make a mistake, manually delete the `build` folder and start this step over.*
+
+### 🍎 macOS Users: Install Build Tools First
+Before proceeding, you need to install Homebrew (a package manager) and CMake. Open a terminal and run these commands one by one:
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install cmake
+```
+
+### 🛠️ Compilation Steps (All OS)
+
+**1. Create the build directory:**
+Create a new directory named `build` inside the `Shared_brainflow-cerelog` folder and navigate into it.
+```bash
+mkdir build
+cd build
+```
+
+**2. Prepare build files (Choose your OS):**
+Run the correct `cmake` command for your operating system.
+
+*   **For Windows (with Visual Studio 2022):**
+    ```bash
+    cmake .. -G "Visual Studio 17 2022" -A x64
+    ```
+
+*   **For macOS / Linux:**
+    ```bash
+    cmake ..
+    ```
+
+**3. Run the Build Command:**
+This uses 4 processor cores (`-j4`) for faster compilation.
+```bash
+cmake --build . --config Release --clean-first -j4
+```
+
+---
+
+## Step C: Install the Python Package
+With the core library built, you must install the Python bindings to link your scripts to the C++ core.
+
+**1. Navigate to the python package folder:**
+(Move up from the `build` folder and into `python_package`)
+```bash
+cd ..
+cd python_package
+```
+
+**2. Install in "Editable" Mode:**
+This links the package to the source files, so you don't need to reinstall the pip package if you change python files later. This command only needs to be run once.
+
+*   **Windows / Linux:**
+    ```bash
+    pip install -e .
+    ```
+*   **macOS:**
+    ```bash
+    pip3 install -e .
+    ```
+``` 
+
+
+#Part 3 **Environment Setup:**
     The script below (`filtered_plot.py`) relies on the bindings found in that repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
 
 ## Step 2: Run the Script

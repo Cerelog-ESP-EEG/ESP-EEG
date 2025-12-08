@@ -4,7 +4,6 @@
 
 
 Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d) 
-
 or email simon@cerelog.com 
 ---
 

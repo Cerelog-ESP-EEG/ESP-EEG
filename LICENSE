@@ -34,3 +34,16 @@ This repository contains two distinct components with different licenses:
    * PCB Layout Files (Gerber, KiCad, Eagle) are proprietary and are NOT
      included in this license. Reverse engineering for commercial manufacturing
      is prohibited.
+
+
+--------------------------------------------------------------------------------
+Important Notice
+This product is intended for research, engineering, and educational purposes only. It is not a medical device and has not been evaluated by the FDA. The product is not UL or FCC certified.
+
+This evaluation board/kit is intended for use for ENGINEERING DEVELOPMENT, DEMONSTRATION, OR EVALUATION PURPOSES ONLY and is not considered by Cerelog Inc. to be a finished end-product fit for general consumer use.
+
+We expressly disclaim any liability whatsoever for any direct, indirect, consequential, incidental or special damages, including, without limitation, lost revenues, lost profits, losses resulting from business interruption or loss of data, arising from the use of this product.
+
+Cerelog Inc. assumes no liability for the performance, suitability, or use of any third-party products linked or recommended on this website.
+
+*Wireless data transmission may be subject to bandwidth limitations and environmental factors. By ordering or using these files, you acknowledge and agree to our Terms of Service, Privacy Policy, and Legal Disclaimer her: https://www.cerelog.com/legal.html

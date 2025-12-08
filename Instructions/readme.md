@@ -3,7 +3,8 @@
 *Note: Full instructions for the device are included in the PDF manual 'Cerelog BCI_EEG Board - Product Usage Guide.pdf' and I reccomend you read them as they are very detailed. This guide provides the essential steps to quickly get the device running, connected, and plotting data.*
 
 
-Need Help or have a question? 
+# Need Help or have a question? 
+
 [Discord Chat Community](https://discord.gg/2wXQW3Uy4d) 
 or email simon@cerelog.com 
 ---

@@ -7,6 +7,24 @@ Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3
 
 High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications.
 
+# Helpful Links
+
+Contact: simon@cerelog.com
+
+Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d)
+
+Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
+
+
+Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html)
+
+Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
+
+
+
+
+
+
 
 # Hardware Overview
 
@@ -30,24 +48,6 @@ High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain 
 | **Processor** | ESP32-WROOM-DA (Dual Core, WiFi/BT capable) |
 | **Connectivity** | USB-C (Data/Power) & WiFi/Bluetooth (Hardware Ready) |
 | **Montage** | Referential (SRB1 = Ref) by default. Configurable to Sequential. See firmware folder for more information|
-
-
-
-# Helpful Links
-
-Contact: simon@cerelog.com
-
-Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d)
-
-Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
-
-
-Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html)
-
-Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
-
-
-
 
 
 

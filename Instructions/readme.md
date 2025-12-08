@@ -104,7 +104,7 @@ Run the correct `cmake` command for your operating system.
     cmake ..
     ```
 
-**Step 4. Run the Build Command:**
+** Run the Build Command:**
 This uses 4 processor cores (`-j4`) for faster compilation.
 ```bash
 cmake --build . --config Release --clean-first -j4
@@ -133,14 +133,19 @@ This links the package to the source files, so you don't need to reinstall the p
     ```bash
     pip3 install -e .
     ```
+# Step 6: Dependencies
+Ensure you have the required Python packages installed:
+```bash
+pip install numpy matplotlib
+# Note: brainflow must be installed/referenced from the custom repo above
+```
 
 
-
-# Step 6 Run Test Script
+# Step 7   Run Test Script
 
 The script below (`filtered_plot.py`) relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
 
-## Step 2: Run the Script
+##  Run the Script
 Below is the complete Python script for robust, real-time plotting. Save this code as `filtered_plot.py` inside your custom BrainFlow folder.
 
 **Scroll down past the code to learn how it works.**
@@ -322,14 +327,8 @@ if __name__ == "__main__":
     main()
 ```
 
-## Step 3: Dependencies
-Ensure you have the required Python packages installed:
-```bash
-pip install numpy matplotlib
-# Note: brainflow must be installed/referenced from the custom repo above
-```
 
----
+
 
 # 📘 Part 3: How It Works (High-Level Overview)
 

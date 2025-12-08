@@ -12,6 +12,18 @@ High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain 
 
 ![Cerelog Board](product_EEG.png)
 
+## 🔌 Hardware Pinout & Indicators
+*   **Status LED (GPIO 17):**
+    *   🟢 **Solid On:** Firmware loaded, ready to stream.
+    *   ⚫ **Off:** Board not powered or boot failure.
+*   **Battery LED:**
+    *   🔴 **Red:** Charging.
+    *   🟢 **Green:** Fully Charged.
+*   **Battery Connector:** JST-PH 2.0mm (Red = +, Black = -). *Supports 3.7V LiPo.*
+*   **Electrodes:** Standard touch-proof headers. (Pins 1-8 = Signal, SRB1 = Reference).
+
+
+
 
 # Helpful Links
 

@@ -21,7 +21,15 @@ High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain 
     *   🟢 **Green:** Fully Charged.
 *   **Battery Connector:** JST-PH 2.0mm (Red = +, Black = -). *Supports 3.7V LiPo.*
 *   **Electrodes:** Standard touch-proof headers. (Pins 1-8 = Signal, SRB1 = Reference).
-
+## ⚡ Technical Specifications
+| Feature | Specification |
+| :--- | :--- |
+| **ADC** | Texas Instruments ADS1299 (24-bit, Research Grade) |
+| **Channels** | 8 Differential Channels + 1 Active Bias (Noise Cancellation) |
+| **Sample Rate** | 250 SPS (Default)  |
+| **Processor** | ESP32-WROOM-DA (Dual Core, WiFi/BT capable) |
+| **Connectivity** | USB-C (Data/Power) & WiFi/Bluetooth (Hardware Ready) |
+| **Montage** | Referential (SRB1 = Ref) by default. Configurable to Sequential. See firmware folder for more information|
 
 
 

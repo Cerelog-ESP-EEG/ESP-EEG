@@ -20,7 +20,12 @@ Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html)
 
 Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
 
+## Why Cerelog's ESP-EEG? 📉 Superior Noise Reduction (Closed-Loop Bias)
+Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).
 
+*   **The Problem:** Many competitors leave the bias feedback loop open, rendering the noise cancellation ineffective against movement artifacts and 50/60Hz hum.
+*   **Our Solution:** We utilize the full capability of the ADS1299 to measure the common-mode signal, invert it, and actively drive it back into the body.
+*   **The Result:** A significantly lower noise floor and fewer artifacts, allowing for research-grade data capture even in non-shielded environments.
 
 
 
@@ -75,6 +80,19 @@ Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared
 # Firmware
 
 View firmware folder for firmware and modification instructions
+
+
+
+# ⚠️ CRITICAL SAFETY WARNING
+**NON-ISOLATED DEVICE: BATTERY OPERATION REQUIRED**
+
+This device **does not** contain galvanic isolation circuitry. To ensure user safety and prevent ground loops:
+1.  **ALWAYS** use this device with a laptop running on **BATTERY POWER**.
+2.  **NEVER** connect this device to a computer that is plugged into a wall outlet (Mains Power).
+3.  **NEVER** use this device on a desktop computer.
+
+Failure to follow these instructions introduces a risk of electric shock in the event of a mains surge and will significantly degrade signal quality due to ground noise.
+
 
 # Important Notice
 This product is intended for research, engineering, and educational purposes only. It is not a medical device and has not been evaluated by the FDA. The product is not UL or FCC certified.

@@ -133,12 +133,12 @@ This links the package to the source files, so you don't need to reinstall the p
     ```bash
     pip3 install -e .
     ```
-``` 
 
 
-# Part 3: **Environment Setup:**
 
-The script below (`filtered_plot.py`) relies on the bindings found in that repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
+# Run Test Script
+
+The script below (`filtered_plot.py`) relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
 
 ## Step 2: Run the Script
 Below is the complete Python script for robust, real-time plotting. Save this code as `filtered_plot.py` inside your custom BrainFlow folder.
@@ -331,7 +331,7 @@ pip install numpy matplotlib
 
 ---
 
-# 📘 Part 4: How It Works (High-Level Overview)
+# 📘 Part 3: How It Works (High-Level Overview)
 
 *Please view full setup instructions PDF for more detailed instructions on scripting.*
 

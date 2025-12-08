@@ -58,7 +58,7 @@ The ESP EEG requires a specific version of BrainFlow to handle its high-fidelity
 
 ---
 
-## Step A: Get the Custom BrainFlow Fork
+## Step 2: Get the Custom BrainFlow Fork
 Our board requires a specific fork of BrainFlow. Clone it and navigate into the new directory.
 
 > **⚠️ IMPORTANT: Use This Specific Repository**
@@ -71,7 +71,7 @@ cd Shared_brainflow-cerelog
 
 ---
 
-## Step B: Build the Library from Source
+## Step 3: Build the Library from Source
 This crucial step compiles the C++ core of the library.
 *Tip: If you make a mistake, manually delete the `build` folder and start this step over.*
 
@@ -104,7 +104,7 @@ Run the correct `cmake` command for your operating system.
     cmake ..
     ```
 
-**3. Run the Build Command:**
+**Step 4. Run the Build Command:**
 This uses 4 processor cores (`-j4`) for faster compilation.
 ```bash
 cmake --build . --config Release --clean-first -j4
@@ -112,7 +112,7 @@ cmake --build . --config Release --clean-first -j4
 
 ---
 
-## Step C: Install the Python Package
+## Step 5: Install the Python Package
 With the core library built, you must install the Python bindings to link your scripts to the C++ core.
 
 **1. Navigate to the python package folder:**
@@ -136,7 +136,7 @@ This links the package to the source files, so you don't need to reinstall the p
 
 
 
-# Run Test Script
+# Step 6 Run Test Script
 
 The script below (`filtered_plot.py`) relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
 

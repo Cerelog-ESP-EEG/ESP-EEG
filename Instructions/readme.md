@@ -136,7 +136,7 @@ This links the package to the source files, so you don't need to reinstall the p
 ``` 
 
 
-#Part 3 **Environment Setup:**
+# Part 3 **Environment Setup:**
     The script below (`filtered_plot.py`) relies on the bindings found in that repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
 
 ## Step 2: Run the Script

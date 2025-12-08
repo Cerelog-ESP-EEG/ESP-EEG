@@ -17,6 +17,7 @@ For accurate BCI data collection, you **must** use two ear clip electrodes with 
 1.  Connect the **first ear clip** to the **BIAS** pin.
 2.  Connect the **second ear clip** to the **SRB1** pin (this acts as the Ground/Reference in the default montage).
 3.  Attach one clip to each earlobe.
+4.  4. Pick the channel you want data from, ex ch1 and connect a probe from CH1+ to your head via an electrode
 
 ## 4. Connect and Stream
 Connect the board to your computer via USB-C. Launch your chosen software or script, and start the data stream.

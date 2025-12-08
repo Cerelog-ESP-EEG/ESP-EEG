@@ -1,7 +1,8 @@
 # ESP EEG: Quick Start & Software Guide
 
-*Note: Full instructions for the device are included in the PDF manual. This guide provides the essential steps to quickly get the device running, connected, and plotting data.*
+*Note: Full instructions for the device are included in the PDF manual 'Cerelog BCI_EEG Board - Product Usage Guide.pdf' and I reccomend you read them as they are very detailed. This guide provides the essential steps to quickly get the device running, connected, and plotting data.*
 
+Please email simon@cerelog.com if you have issues
 ---
 
 # 🔌 Part 1: Connecting Hardware & Running a Session

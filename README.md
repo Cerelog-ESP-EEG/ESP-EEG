@@ -2,7 +2,8 @@
 
 ##  Open Source Firmware, Software & Schematic included on this page
 
-www.cerelog.com
+www.cerelog.com   and    Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
+
 
 
 

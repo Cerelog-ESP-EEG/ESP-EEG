@@ -28,7 +28,7 @@ Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html)
 Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
 
 
-<img src="product_EEG.png" alt="Cerelog Board" width="500">
+<img src="product_EEG.png" alt="Cerelog Board" width="300">
 
 # Why Cerelog's ESP-EEG? 
 # Easy to use Software compatability:

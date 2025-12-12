@@ -1,6 +1,6 @@
 # **Cerelog ESP-EEG** 
 
-<img src="product_EEG.png" alt="Cerelog Board" width="400">
+<img src="product_EEG.png" alt="Cerelog Board" width="450">
 
 ##  High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications
 
@@ -33,7 +33,8 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 
 
 # Why Cerelog's ESP-EEG? 
-# Easy to use Software compatability:
+
+## Easy to use Software compatability:
 
 ## Compatable with **OpenBCI Gui (Custom fork)** via **Lab Streaming Layer** protocol [(LSL)](https://labstreaminglayer.org/#/) 
 

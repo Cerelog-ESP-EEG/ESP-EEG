@@ -34,8 +34,12 @@ Unlike many consumer EEG devices that use "open-loop" or passive grounding strat
 
 # Easy to use Software compatability:
 
-## Compatable **OpenBCI Gui (Custom fork)** via **Lab Streaming layer [(LSL)](https://labstreaminglayer.org/#/) (Custom Python connection script provided below) ** 
+## Compatable **OpenBCI Gui (Custom fork)** via **Lab Streaming layer [(LSL)](https://labstreaminglayer.org/#/) ** 
+
+(Custom Python connection script provided below) 
+
 <img src="IMG_3756.jpg" alt="Demo" width="500">
+
 
 Setup instructions:  [Here](https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork)
 

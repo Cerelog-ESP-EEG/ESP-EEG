@@ -36,7 +36,7 @@ Unlike many consumer EEG devices that use "open-loop" or passive grounding strat
 
 ## Compatable **OpenBCI Gui (Custom fork)** with  **Lab Streaming layer (LSL)** 
 <img src="IMG_3756.jpg" alt="Demo" width="500">
-Setup instructions: [Here](https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork)
+Setup instructions:  [Here](https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork)
 
 
 A modified OpenBCI Gui has been forked above so you can visualize data easily and stream to other platforms. This works with it's LSL streaming capability via a special python script (in link above)!

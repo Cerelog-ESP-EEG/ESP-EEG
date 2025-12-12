@@ -1,5 +1,7 @@
 # **Cerelog ESP-EEG** 
+
 <img src="product_EEG.png" alt="Cerelog Board" width="400">
+
 ##  High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications
 
 www.cerelog.com   and    Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)

@@ -41,7 +41,7 @@ A modified OpenBCI Gui has been forked above so you can visualize data easily an
 ESP-EEG’s Python client software can stream data via the standard neuroscience software communication protocol Lab Streaming Layer. This means you can stream  directly to your favorite neuroscience software or Matlab running on your laptop or remote computers, record data streams, and integrate ESP-EEG's data with other data streams.
 
 # Stream data to Brainflow API for complex data analysis :
-#<img width="139" height="55" alt="image" src="https://github.com/user-attachments/assets/ec388fc8-904d-449b-bd2b-493beb47d03b" />
+<img width="280" height="111" alt="image" src="https://github.com/user-attachments/assets/ec388fc8-904d-449b-bd2b-493beb47d03b" />
 
 Instructions on how to collect data from device with Brainflow API custom instance: [Here](https://www.cerelog.com/eeg_researchers_guide.html)
 

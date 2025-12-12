@@ -23,7 +23,9 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 
 <img src="product_EEG.png" alt="Cerelog Board" width="500">
 
-## Why Cerelog's ESP-EEG? 📉 Superior Noise Reduction (Closed-Loop Bias)
+# Why Cerelog's ESP-EEG? 
+
+## 📉 Superior Noise Reduction (Closed-Loop Bias)
 Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).
 
 *   **The Problem:** Many competitors leave the bias feedback loop open, rendering the noise cancellation ineffective against movement artifacts and 50/60Hz hum. Their bias pin effectively becomes the average of the supply rails and acts as a ground on their device making the bias pin not function as effectively intended on the ADS1299 datasheet.
@@ -33,6 +35,7 @@ Unlike many consumer EEG devices that use "open-loop" or passive grounding strat
 # Easy to use Software compatability:
 
 # Compatable **OpenBCI Gui (Custom fork)** and/ via  **Lab Streaming layer (LSL)** 
+<img src="IMG_3756.png" alt="Demo" width="500">
 Setup instructions: [Here](https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork)
 
 

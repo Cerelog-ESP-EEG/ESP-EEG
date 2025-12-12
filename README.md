@@ -34,7 +34,7 @@ Unlike many consumer EEG devices that use "open-loop" or passive grounding strat
 
 # Easy to use Software compatability:
 
-## Compatable **OpenBCI Gui (Custom fork)** via **Lab Streaming layer**  [(LSL)](https://labstreaminglayer.org/#/) 
+## Compatable with **OpenBCI Gui (Custom fork)** via **Lab Streaming layer**  [(LSL)](https://labstreaminglayer.org/#/) 
 
 
 

@@ -2,6 +2,10 @@
 
 www.cerelog.com
 
+## This page includs Links, Instructions + Open Source Firmware, Software & Schematics:
+
+
+
 
 Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d)
 

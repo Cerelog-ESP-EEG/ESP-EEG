@@ -31,14 +31,6 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 <img src="product_EEG.png" alt="Cerelog Board" width="500">
 
 # Why Cerelog's ESP-EEG? 
-
-## 📉 Superior Noise Reduction (Closed-Loop Bias)
-Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).
-
-*   **The Problem:** Many competitors leave the bias feedback loop open, rendering the noise cancellation ineffective against movement artifacts and 50/60Hz hum. Their bias pin effectively becomes the average of the supply rails and acts as a ground on their device making the bias pin not function as effectively intended on the ADS1299 datasheet.
-*   **Our Solution:** We utilize the full capability of the ADS1299 to measure the common-mode signal, invert it, and actively drive it back into the body.
-*   **The Result:** A significantly lower noise floor and fewer artifacts, allowing for research-grade data capture even in non-shielded environments.
-
 # Easy to use Software compatability:
 
 ## Compatable with **OpenBCI Gui (Custom fork)** via **Lab Streaming Layer** protocol [(LSL)](https://labstreaminglayer.org/#/) 
@@ -56,7 +48,7 @@ A modified OpenBCI Gui has been forked above so you can visualize data easily an
 
 ESP-EEG’s Python client software can stream data via the standard neuroscience software communication protocol Lab Streaming Layer. This means you can stream  directly to your favorite neuroscience software or Matlab running on your laptop or remote computers, record data streams, and integrate ESP-EEG's data with other data streams.
 
-# Stream data to Brainflow API for complex data analysis :
+## Stream data to Brainflow API for complex data analysis :
 <img width="280" height="111" alt="image" src="https://github.com/user-attachments/assets/ec388fc8-904d-449b-bd2b-493beb47d03b" />
 
 Instructions on how to collect data from device with Brainflow API custom instance: [Here](https://www.cerelog.com/eeg_researchers_guide.html)
@@ -67,6 +59,14 @@ Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared
 
 Note: Test script to quickly view plot and aquire data -> Run 'Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py' from in above repo. (Must download and run with full Brainflow instance to use)
 
+
+
+## 📉 Superior Noise Reduction (Closed-Loop Bias)
+Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).
+
+*   **The Problem:** Many competitors leave the bias feedback loop open, rendering the noise cancellation ineffective against movement artifacts and 50/60Hz hum. Their bias pin effectively becomes the average of the supply rails and acts as a ground on their device making the bias pin not function as effectively intended on the ADS1299 datasheet.
+*   **Our Solution:** We utilize the full capability of the ADS1299 to measure the common-mode signal, invert it, and actively drive it back into the body.
+*   **The Result:** A significantly lower noise floor and fewer artifacts, allowing for research-grade data capture even in non-shielded environments.
 
 
 

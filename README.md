@@ -1,4 +1,6 @@
-# Cerelog ESP-EEG (Links, Instructions + Open Source Firmware, Software & Schematic)
+# Cerelog ESP-EEG 
+
+## (Links, Instructions + Open Source Firmware, Software & Schematic)
 
 www.cerelog.com
 

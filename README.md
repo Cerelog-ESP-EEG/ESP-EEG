@@ -20,6 +20,9 @@ Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html)
 
 Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
 
+
+![Cerelog Board](product_EEG.png)
+
 ## Why Cerelog's ESP-EEG? 📉 Superior Noise Reduction (Closed-Loop Bias)
 Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).
 
@@ -27,13 +30,37 @@ Unlike many consumer EEG devices that use "open-loop" or passive grounding strat
 *   **Our Solution:** We utilize the full capability of the ADS1299 to measure the common-mode signal, invert it, and actively drive it back into the body.
 *   **The Result:** A significantly lower noise floor and fewer artifacts, allowing for research-grade data capture even in non-shielded environments.
 
+# Easy to use Software compatability:
+
+# Compatable **OpenBCI Gui (Custom fork)** and/ via  **Lab Streaming layer (LSL)** 
+Setup instructions: [Here](https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork)
+
+
+A modified OpenBCI Gui has been forked above so you can visualize data easily and stream to other platforms. This works with it's LSL streaming capability via a special python script (in link above)!
+
+ESP-EEG’s Python client software can stream data via the standard neuroscience software communication protocol Lab Streaming Layer. This means you can stream  directly to your favorite neuroscience software or Matlab running on your laptop or remote computers, record data streams, and integrate ESP-EEG's data with other data streams.
+
+# Stream data to Brainflow API for complex data analysis :
+https://brainflow.readthedocs.io/en/stable/#<img width="1392" height="557" alt="image" src="https://github.com/user-attachments/assets/ec388fc8-904d-449b-bd2b-493beb47d03b" />
+
+Instructions on how to collect data from device with Brainflow API custom instance: [Here](https://www.cerelog.com/eeg_researchers_guide.html)
+
+and
+
+Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared_brainflow-cerelog) for collecting data with the device. 
+
+(Note: Test script to view plot and aquire data -> ( Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py ) from in above repo. Must download full Brainflow instance to use
+
+
+
+
 
 
 
 
 # Hardware Overview
 
-![Cerelog Board](product_EEG.png)
+
 
 
 
@@ -65,16 +92,6 @@ View hardware folder for device schematic
 
 
 
-
-# Software and Data Collection:
-
-Instructions on how to collect data from device with Brainflow API custom instance: [Here](https://www.cerelog.com/eeg_researchers_guide.html)
-
-and
-
-Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared_brainflow-cerelog) for collecting data with the device. 
-
-(Note: Test script to view plot and aquire data -> ( Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py ) from in above repo. Must download full Brainflow instance to use
 
 
 # Firmware

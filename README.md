@@ -58,7 +58,7 @@ and
 
 Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared_brainflow-cerelog) for collecting data with the device. 
 
-(Note: Test script to view plot and aquire data -> ( Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py ) from in above repo. Must download full Brainflow instance to use
+Note: Test script to quickly view plot and aquire data -> Run 'Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py' from in above repo. (Must download and run with full Brainflow instance to use)
 
 
 

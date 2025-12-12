@@ -21,7 +21,7 @@ Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html)
 Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
 
 
-![Cerelog Board](product_EEG.png)
+<img src="product_EEG.png" alt="Cerelog Board" width="300">
 
 ## Why Cerelog's ESP-EEG? 📉 Superior Noise Reduction (Closed-Loop Bias)
 Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).

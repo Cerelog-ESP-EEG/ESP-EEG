@@ -1,6 +1,6 @@
 # **Cerelog ESP-EEG** 
 
-##  Open Source Firmware, Software & Schematic included on this page
+##  High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications
 
 www.cerelog.com   and    Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
 
@@ -12,7 +12,7 @@ www.cerelog.com   and    Product Page: [Here](https://www.cerelog.com/eeg_resear
 
 Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d)
 
-High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications.
+Open Source Firmware, Software & Schematic included on this page
 
 # Helpful Links
 

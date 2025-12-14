@@ -8,6 +8,8 @@
 https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
 
 
+# To learn how to use hardware and how to stream data to Brainflow keep reading
+
 # Need Help or have a question? 
 
 [Discord Chat Community](https://discord.gg/2wXQW3Uy4d) 

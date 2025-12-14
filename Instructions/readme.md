@@ -2,19 +2,17 @@
 
 *⚠️ Note: Full instructions for the device are included in the PDF manual 'Cerelog BCI_EEG Board - Product Usage Guide.pdf' and I reccomend you read them as they are very detailed. This guide provides the essential steps to quickly get the device running, connected, and plotting data.*
 
-
-## *⚠️ (NEW) To use with the modified version of the OpenBCI GUI  or LSL read here: 
-
-https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
-
-
-# To learn how to use hardware and how to stream data to Brainflow keep reading
-
 # Need Help or have a question? 
 
 [Discord Chat Community](https://discord.gg/2wXQW3Uy4d) 
 or email simon@cerelog.com 
 ---
+
+
+
+
+
+
 
 # 🔌 Part 1: Connecting Hardware & Running a Session
 
@@ -32,7 +30,7 @@ For accurate BCI data collection, you **must** use two ear clip electrodes with 
 4. Pick the channel you want data from, ex ch1 and connect a probe from CH1+ to your head via an electrode
 
 ## 4. Connect and Stream
-Connect the board to your computer via USB-C. Launch your chosen software or script, and start the data stream.
+Connect the board to your computer via USB-C. Wait for green LED to turn on. Sometimes you may need to turn on and off PCB for computer to detect new board
 
 ## ⚠️ CRITICAL SAFETY REMINDER
 As per the notice in Section 1, only connect the device to a laptop running on its own **battery power**.
@@ -40,12 +38,21 @@ As per the notice in Section 1, only connect the device to a laptop running on i
 *   **DO NOT** use this device if the laptop is charging.
 *   **DO NOT** connect this device to a desktop computer plugged into a wall outlet.
 
-## 5. Check Signal Quality
-Observe the incoming data. If a channel is flat or excessively noisy, check the corresponding electrode's position and consider re-applying a small amount of gel.
+
 
 ---
 
 # 💻 Part 2: Software Setup & Advanced Analysis
+
+
+
+# *⚠️Option A (NEW) Use with the modified version of the OpenBCI GUI  or Lab Stream Layer (LSL) here: 
+
+https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
+
+
+# Option B (Best) To learn how to use with Brainflow keep reading: 
+
 
 To get the best performance from the ESP EEG, we recommend using our custom BrainFlow instance. This guide covers installation, the theory behind our data stream, and provides a production-grade script for real-time filtering and plotting.
 

@@ -32,6 +32,9 @@ For accurate BCI data collection, you **must** use two ear clip electrodes with 
 ## 4. Connect and Stream
 Connect the board to your computer via USB-C. Wait for green LED to turn on. Sometimes you may need to turn on and off PCB for computer to detect new board
 
+**Don't Like USB?:  WiFI Support (Under Dev)**
+[More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
+
 ## ⚠️ CRITICAL SAFETY REMINDER
 As per the notice in Section 1, only connect the device to a laptop running on its own **battery power**.
 

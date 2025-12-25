@@ -62,7 +62,8 @@ Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared
 
 Note: Test script to quickly view plot and aquire data -> Run 'Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py' from in above repo. (Must download and run with full Brainflow instance to use)
 
-
+## WiFI Support (Under Dev)
+[More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
 
 ## 📉 Superior Noise Reduction (Closed-Loop Bias)
 Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).

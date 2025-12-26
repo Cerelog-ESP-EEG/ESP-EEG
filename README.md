@@ -64,6 +64,8 @@ Note: Test script to quickly view plot and aquire data -> Run 'Shared_brainflow-
 ## NEW: WiFI Support (Beta Testing) -  For Use With OpenBCI GUI Fork / LSL
 [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
 
+![WiFi](https://img.shields.io/badge/WiFi-Online-brightgreen?style=for-the-badge&logo=wifi&logoColor=white)
+
 
 ## 📉 Superior Noise Reduction (Closed-Loop Bias)
 Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).

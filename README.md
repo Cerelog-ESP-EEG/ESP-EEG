@@ -36,7 +36,7 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 
 ## Easy to use Software compatability:
 
-## Compatable with **OpenBCI Gui (Custom fork)** via **Lab Streaming Layer** protocol [(LSL)](https://labstreaminglayer.org/#/) 
+## Compatable with **OpenBCI Gui (Custom fork)** via **Lab Streaming Layer (LSL) ** protocol [(What is LSL?)](https://labstreaminglayer.org/#/) 
 
 
 <img src="IMG_3756.jpg" alt="Demo" width="500">

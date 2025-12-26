@@ -61,8 +61,12 @@ Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared
 Note: Test script to quickly view plot and aquire data -> Run 'Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py' from in above repo. (Must download and run with full Brainflow instance to use)
 
 
-## NEW: WiFI Support (Beta Testing) -  For Use With OpenBCI GUI Fork / LSL
-[More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/WiFi_Logo.svg/100px-WiFi_Logo.svg.png" alt="WiFi Signal Black" width="100"/>
+## NEW: WiFI Support 
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/WiFi_Logo.svg/400px-WiFi_Logo.svg.png" alt="WiFi Signal Black" width="100"/>
+
+## (Beta Testing) - For Use With OpenBCI GUI Fork / LSL
+[More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)            
 
 
 ## 📉 Superior Noise Reduction (Closed-Loop Bias)

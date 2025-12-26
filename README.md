@@ -64,7 +64,7 @@ Note: Test script to quickly view plot and aquire data -> Run 'Shared_brainflow-
 ## NEW: WiFI Support (Beta Testing) -  For Use With OpenBCI GUI Fork / LSL
 [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/WiFi_Logo_black.svg/2560px-WiFi_Logo_black.svg.png" alt="WiFi Signal Black" width="100"/>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/WiFi_Logo.svg/100px-WiFi_Logo.svg.png" alt="WiFi Signal Black" width="100"/>
 
 
 ## 📉 Superior Noise Reduction (Closed-Loop Bias)

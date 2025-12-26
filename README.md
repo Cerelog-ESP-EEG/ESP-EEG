@@ -39,12 +39,10 @@ Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_
 ## Compatable with **OpenBCI Gui (Custom fork)** via **Lab Streaming Layer** protocol [(LSL)](https://labstreaminglayer.org/#/) 
 
 
-
 <img src="IMG_3756.jpg" alt="Demo" width="500">
 
 
 Setup instructions and LSL Custom Python connection script :  [Here](https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork)
-
 
 
 A modified OpenBCI Gui has been forked above so you can visualize data easily and stream to other platforms. This works with it's LSL streaming capability via a special python script (in link above)!
@@ -62,8 +60,10 @@ Custom instance of Brainflow Repo: [Here](https://github.com/shakimiansky/Shared
 
 Note: Test script to quickly view plot and aquire data -> Run 'Shared_brainflow-cerelog/python_package/cerelog_tests/filtered_plot.py' from in above repo. (Must download and run with full Brainflow instance to use)
 
-## WiFI Support (Under Dev)
+
+## NEW: WiFI Support (Beta Testing) -  For Use With OpenBCI GUI Fork / LSL
 [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
+
 
 ## 📉 Superior Noise Reduction (Closed-Loop Bias)
 Unlike many consumer EEG devices that use "open-loop" or passive grounding strategies, the ESP EEG implements a **True Closed-Loop Active Bias** (Drive Right Leg).

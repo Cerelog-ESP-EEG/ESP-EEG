@@ -102,13 +102,10 @@ A demonstration of using the ESP-EEG bio-signal sensor to play Pong using SSVEP 
 [Instructables: Playing Pong With Your Mind – DIY Brain Computer Interface](https://www.instructables.com/Playing-Pong-With-Your-Mind-DIY-Brain-Computer-Int/)
 
 
-## NEW: WiFI Support - (Beta Testing) - For Use With OpenBCI GUI Fork / LSL
+## NEW: WiFi Support - (Beta Testing) - For Use With OpenBCI GUI Fork / LSL
+<img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/WiFi_Logo.svg" alt="WiFi Logo" width="100"/>
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/WiFi_Logo.svg/400px-WiFi_Logo.svg.png" alt="WiFi Signal Black" width="100"/>
-
-
-[More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)            
-
+[More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
 
 
 

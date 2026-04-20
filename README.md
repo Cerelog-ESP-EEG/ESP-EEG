@@ -1,6 +1,7 @@
 # **Cerelog ESP-EEG** 
 
-<img src="product_EEG.png" alt="Cerelog Board" width="450">
+
+<img src="ESP_EEG_1_2_image.jpg" alt="Cerelog Board" width="450">
 
 
 

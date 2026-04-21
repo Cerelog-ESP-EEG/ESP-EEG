@@ -102,6 +102,18 @@ A demonstration of using the ESP-EEG bio-signal sensor to play Pong using SSVEP 
 [Instructables: Playing Pong With Your Mind – DIY Brain Computer Interface](https://www.instructables.com/Playing-Pong-With-Your-Mind-DIY-Brain-Computer-Int/)
 
 
+ ## PhantomLoop Integration — Browser Based Neural Decoder *(Beta Testing)*         
+                                                                                     
+  **A decoder is a small program — usually a machine-learning model — that looks at  
+  those signals and guesses what the person was thinking or trying to do.**          
+                                                                                     
+  A community-built browser-based decoder playground. Stream live EEG data from your 
+  ESP-EEG, run an ML model on it, and see predicted vs. actual outputs side by side —
+   no local install needed. Built by community member yelabbassi; third-party.       
+                                                                                     
+  [Learn more about PhantomLoop
+  →](https://www.cerelog.com/community_phantomloop.html)
+
 ## NEW: WiFi Support - (Beta Testing) - For Use With OpenBCI GUI Fork / LSL
 <img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/WiFi_Logo.svg" alt="WiFi Logo" width="100"/>
 

@@ -25,12 +25,7 @@ Connect your EEG cap cable(s) to the required touch-proof adapter(s), then plug 
 ## 2. Prepare the Subject
 Fit the EEG cap on the subject's head. Apply a small amount of conductive gel into each electrode cavity to ensure good skin contact.
 
-## 3. Connect Reference & Bias (Ear Clips)
-For accurate BCI data collection, you **must** use two ear clip electrodes with conductive gel.
-1.  Connect the **first ear clip** to the **BIAS** pin.
-2.  Connect the **second ear clip** to the **SRB1** pin (this acts as the Ground/Reference in the default montage).
-3.  Attach one clip to each earlobe.
-4. Pick the channel you want data from, ex ch1 and connect a probe from CH1+ to your head via an electrode
+## 3. How to connect the circuit board: [EEG and EMG connection setup read Here:]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )]   
 
 ## 4. Connect and Stream
 

@@ -27,7 +27,7 @@ Fit the EEG cap on the subject's head. Apply a small amount of conductive gel in
 
 ## 3. How to connect the circuit board:
 
-[EEG and EMG connection setup read Here:]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )]   
+How to connect circuit board for EEG and EMG data collection: [Read Here]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )]   
 
 ## 4. Connect and Stream
 

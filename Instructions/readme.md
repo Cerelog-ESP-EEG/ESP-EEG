@@ -179,7 +179,7 @@ The script below (`filtered_plot.py`) relies on the bindings found in the Brainf
 Below is the complete Python script for robust, real-time plotting. Save this code as `filtered_plot.py` inside your custom BrainFlow folder.
 
 <details>
-<summary>🛠️ <strong>Troubleshooting:</strong> <code>ModuleNotFoundError: No module named 'pkg_resources'</code></summary>
+<summary>🛠️ $\textcolor{red}{\textsf{Troubleshooting: }\texttt{ModuleNotFoundError: No module named 'pkg\_resources'}}$</summary>
 
 <br>
 

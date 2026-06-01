@@ -178,6 +178,26 @@ The script below (`filtered_plot.py`) relies on the bindings found in the Brainf
 ##  Run the Script
 Below is the complete Python script for robust, real-time plotting. Save this code as `filtered_plot.py` inside your custom BrainFlow folder.
 
+<details>
+<summary>🛠️ <strong>Troubleshooting:</strong> <code>ModuleNotFoundError: No module named 'pkg_resources'</code></summary>
+
+<br>
+
+This happens because newer versions of **setuptools** have removed the legacy
+`pkg_resources` module. To fix it, downgrade setuptools:
+
+**macOS / Linux**
+```bash
+python3 -m pip install "setuptools<82"
+```
+
+**Windows**
+```bash
+python -m pip install "setuptools<82"
+```
+
+</details>
+
 **Scroll down past the code to learn how it works.**
 
 ```python

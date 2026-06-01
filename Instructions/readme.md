@@ -379,16 +379,16 @@ All BrainFlow Python scripts for this board follow a similar pattern. Here is th
 ### 3. ⚠️ IMPORTANT: Data Scaling
 Unlike consumer toys, the Cerelog board provides **raw, unscaled data** to give researchers maximum fidelity. You **must** apply scaling factors to convert these raw values into standard units.
 
-**If you skip this, your graph will look flat and your time axis will be wrong.**
+**If you skip this, your graph will look flat **
 
 ```python
 # --- 1. Scale EEG Data (Vertical Axis) ---
 # The board returns data in Volts (V). Convert to microvolts (µV):
 eeg_data_microvolts = eeg_data_raw * 1e6
 
-# --- 2. Scale Timestamp Data (Horizontal Axis) ---
-# The board's timestamp is raw. Convert to seconds:
-time_axis_seconds = (timestamps_raw - timestamps_raw[0]) * 1000.0
+# --- 2. Scale Timestamp Data (Horizontal Axis) [NO CHANGE NEEDED, but read]---
+# The board's timestamp is unix seconds. (Firmware sends ms timestamp to Brainflow but no need to touch it because it internally converts to unix seconds. Below is in seconds!) To use and get back seconds from unix seconds:
+time_axis_seconds = (timestamps_raw - timestamps_raw[0]) 
 ```
 
 ### 4. Advanced Real-Time Filtering

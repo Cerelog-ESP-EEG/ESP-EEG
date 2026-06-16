@@ -16,7 +16,7 @@ I reccomend reading the TIADS1299 datasheet to understand what register changes 
 Configuring the Arduino IDE
 Before flashing esp32_firmware.ino, you must configure the IDE with the correct settings:
 
-#**Special Arduino IDE Flashing Instructions:**
+### **Special Arduino IDE Flashing Instructions:**
 
 ## **Caution!!!! You must read the below or the flash wont work**
 

@@ -7,7 +7,7 @@
 [Discord Chat Community](https://discord.gg/2wXQW3Uy4d) 
 or email simon@cerelog.com 
 
-[Troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]
+**[Troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )**
 
 
 ---

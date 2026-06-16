@@ -31,7 +31,7 @@ How to connect circuit board for EEG and EMG data collection: [Read Here]( https
 
 ## 4. Connect and Stream
 
-[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]
+##**[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
 
 Connect the board to your computer via USB-C. Wait for green LED to turn on. 
 

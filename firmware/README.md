@@ -16,6 +16,10 @@ I reccomend reading the TIADS1299 datasheet to understand what register changes 
 Configuring the Arduino IDE
 Before flashing esp32_firmware.ino, you must configure the IDE with the correct settings:
 
+## **Caution!!!! You must read the below or the flash wont work**
+
 Board: Navigate to Tools > Board > ESP32 Arduino and select **'ESP32 WROOM DA Module'**.
 Port: Navigate to Tools > Port and select the COM port corresponding to your Cerelog board.
+
+**Also, when flashing, if it doen't work, check that the serial rate setting in the Arduino IDE isnt set to the max setting, sometimes its too fast of an upload speed**
 

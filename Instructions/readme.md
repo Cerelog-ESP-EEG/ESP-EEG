@@ -35,7 +35,7 @@ How to connect circuit board for EEG and EMG data collection: [Read Here]( https
 
 ## 4. Connect and Stream
 
-##**[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
+## **[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
 
 Connect the board to your computer via USB-C. Wait for green LED to turn on. 
 
@@ -178,6 +178,8 @@ pip install numpy matplotlib pyserial plotly dash scikit-learn "setuptools<82"
 ## Step 6   Run Test Script
 
 The script below (`filtered_plot.py`) relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
+
+## **[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
 
 ##  Run the Script
 Below is the complete Python script for robust, real-time plotting. Save this code as `filtered_plot.py` inside your custom BrainFlow folder.

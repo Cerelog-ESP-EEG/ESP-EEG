@@ -1,6 +1,6 @@
 # ESP EEG: Quick Start & Software Guide
 
-**⚠️ Note: Full instructions for the device are included in the PDF manual 'product_use_guide_1_4.pdf' and I reccomend you read them as they are very detailed. This guide provides the essential steps to quickly get the device running, connected, and plotting data.**
+**⚠️ Note: Full instructions for the device are included in the PDF manual 'product_use_guide_1_4.pdf' which can also be found [here](https://www.cerelog.com/eeg_researchers_guide.html) and I reccomend you read them as they are very detailed. This guide provides the essential steps to quickly get the device running, connected, and plotting data.**
 
 # Need Help or have a question? 
 

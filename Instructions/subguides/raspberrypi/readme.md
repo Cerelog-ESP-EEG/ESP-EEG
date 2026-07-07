@@ -1,96 +1,135 @@
-1)    Install OS on Pi4b for tiger VNC, cerelog, etc:
+# DRIVER SETUP FOR Cerelog on Raspberry Pi 4B
 
+**Get a Cerelog board running on a Raspberry Pi 4B.** Installs WCH's CH341 vendor driver so the board reliably shows up as `/dev/ttyCH341USB0` — set up once, loads automatically on every boot.
 
-Get wifi password ('wireless key' on back of router.)
+![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi%204B-c51a4a)
+![OS](https://img.shields.io/badge/OS-Raspberry%20Pi%20OS%2064--bit-a22846)
+![Driver](https://img.shields.io/badge/Driver-WCH%20CH341-1f6feb)
 
-Put SD card into a card reader on USB in PC. It'll get totally overwritten, don't bother about deleting/formatting etc.
+*Tested on Raspberry Pi OS (64-bit, Debian trixie), kernel `6.18.34+rpt-rpi-v8`.*
 
-Double click imager_2.0.6_amd64.AppImage in /home/r/Downloads
+---
 
-Do what it says, if there's a bit saying 'enable ssh' and 'password authentication (not public key)'or 'networking' etc, do that, keep note of the host name and domain name and whatever passwords set up (usually end up with 'r@Pi4b' passwords all 'r'
+## What you need
 
-When finished, put card in Pi, power up (wait for green light to stay out)
+| Item | Details |
+| --- | --- |
+| **Raspberry Pi 4B** | with SD card + USB-C power supply |
+| **Monitor + USB keyboard** | monitor needs a micro-HDMI → HDMI cable/adapter |
+| **Network** | an ethernet cable **or** your WiFi name + password |
+| **Cerelog board** | + its USB cable |
+| **A computer** | with an SD card slot (for flashing only) |
 
-On PC, open terminal type 'ssh r@Pi4' then hit rtn. type in 'yes' and put in password.
-IP of pi tends to be 192.168.1.118
+---
 
-type 'sudo raspi-config' rtn
+## Step 1 · Flash the SD card
 
-Pick option 3 (interface options), click on 'VNC' and yes/OK etc to enable, close terminal.
+1. On your computer, install and open **[Raspberry Pi Imager](https://www.raspberrypi.com/software/)**.
+2. Choose **Raspberry Pi OS (64-bit)**, then select your SD card.
+3. Click the **gear icon** (Edit Settings) and set:
+   - **Username + password** — write both down
+   - **Enable SSH** → password authentication
+   - **WiFi** name + password (skip if using ethernet)
+4. Write it, then put the card in the Pi.
 
-If opening TigerVNC from start; server = IP name of pi, otherwise,if using pi4 icon on taskbar, just do what it says, and you're into pi.
+> [!IMPORTANT]
+> The username you pick here is your login for everything below. It does **not** default to `pi` — it's whatever you type.
 
+---
 
-2)    Install ch341SER driver from wch (vendor) on raspberry pi 4b:
+## Step 2 · First boot
 
+1. Plug the monitor into the Pi's **micro-HDMI port nearest the USB-C jack**, connect the keyboard, and plug in ethernet if you're using it.
+2. Plug in USB-C power **last**. It boots to a desktop in under a minute.
+3. If a setup wizard appears, finish it (language, WiFi, confirm user/password).
+4. Open a terminal — the `>_` icon in the top bar.
 
-r@Pi4:~ $ uname -r
-    6.12.75+rpt-rpi-v8
-    
-r@Pi4:~ $ ls -ld /lib/modules/$(uname -r)/build
-    lrwxrwxrwx 1 root root 45 Mar 11 15:54 /lib/modules/6.12.75+rpt-rpi-v8/build -> ../../../src/linux-headers-6.12.75+rpt-rpi-v8
-    
-r@Pi4:~ $ gcc --version
-make --version
-git --version
-    gcc (Debian 14.2.0-19) 14.2.0
-Copyright (C) 2024 Free Software Foundation, Inc.
-This is free software; see the source for copying conditions. There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-GNU Make 4.4.1
-Built for aarch64-unknown-linux-gnu
-Copyright (C) 1988-2023 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-git version 2.47.3
+Everything from here runs in that terminal.
 
-r@Pi4:~ $ git clone https://github.com/WCHSoftGroup/ch341ser_linux.git
+---
+
+## Step 3 · Build the driver
+
+Install the build tools + kernel headers (harmless if already present):
+
+```bash
+sudo apt update
+sudo apt install -y git build-essential linux-headers-rpi-v8
+```
+
+Download and build:
+
+```bash
+cd ~
+git clone https://github.com/WCHSoftGroup/ch341ser_linux.git
 cd ch341ser_linux/driver
-    make
-Cloning into 'ch341ser_linux'...
-remote: Enumerating objects: 80, done.
-remote: Counting objects: 100% (16/16), done.
-remote: Compressing objects: 100% (10/10), done.
-remote: Total 80 (delta 7), reused 10 (delta 6), pack-reused 64 (from 1)
-Receiving objects: 100% (80/80), 57.35 KiB | 2.21 MiB/s, done.
-Resolving deltas: 100% (27/27), done.
-make -C /lib/modules/6.12.75+rpt-rpi-v8/build M=/home/r/ch341ser_linux/driver modules
-make[1]: Entering directory '/usr/src/linux-headers-6.12.75+rpt-rpi-v8'
-CC [M] /home/r/ch341ser_linux/driver/ch341.o
-MODPOST /home/r/ch341ser_linux/driver/Module.symvers
-CC [M] /home/r/ch341ser_linux/driver/ch341.mod.o
-CC [M] /home/r/ch341ser_linux/driver/.module-common.o
-LD [M] /home/r/ch341ser_linux/driver/ch341.ko
-make[1]: Leaving directory '/usr/src/linux-headers-6.12.75+rpt-rpi-v8'
-=== The target driver file has been generated ===
--rw-rw-r-- 1 r r 39776 Jun 16 17:27 ch341.ko
-r@Pi4:~/ch341ser_linux/driver $
+make
+```
 
-#------------------------------------------------------------------------------------
+> [!NOTE]
+> Success ends with **"The target driver file has been generated"** and a `ch341.ko` file.
 
-#Check driver location etc:
+---
 
-r@Pi4:~ $ ls -l ~/ch341ser_linux/driver/ch341.ko
-    -rw-rw-r-- 1 r r 39776 Jun 16 17:27 /home/r/ch341ser_linux/driver/ch341.ko
+## Step 4 · Install the driver
 
-# Create the updates directory
+```bash
 sudo mkdir -p /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates
-
-# Copy and rename the driver to avoid naming clashes
 sudo cp ~/ch341ser_linux/driver/ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates/ch341-vendor.ko
-
-# Update the system's driver dependencies (it'll ask for password after this line)
 sudo depmod -a
+```
 
-#------------------------------------------------------------------------------------
+No output means it worked.
 
-Optional:    TO CHECK IF THE PI WILL CXHANGE DRIVERS WITHOUT SWITCH OFF/ON, without using python code (just a 1 off peace of mind check):
+---
 
-Plug in cerelog
-Terminal:
-ls /dev/ttyUSB* (should see /dev/ttyUSB0).
-sudo rmmod ch341
-sudo modprobe ch341-vendor
-ls /dev/ttyCH341USB* (should instantly see /dev/ttyCH341USB*)
+## Step 5 · Load it on every boot
 
+```bash
+echo "blacklist ch341" | sudo tee /etc/modprobe.d/blacklist-ch341.conf
+echo "ch341-vendor" | sudo tee /etc/modules-load.d/ch341-vendor.conf
+sudo reboot
+```
+
+This blocks the stock driver and auto-loads the vendor one at startup — so the board is ready straight from power-on, no manual steps.
+
+> [!TIP]
+> To undo later: `sudo rm /etc/modprobe.d/blacklist-ch341.conf /etc/modules-load.d/ch341-vendor.conf` then `sudo reboot`.
+
+---
+
+## Step 6 · Verify
+
+After it reboots, plug in the Cerelog and run:
+
+```bash
+ls /dev/ttyCH341USB*
+```
+
+If you see **`/dev/ttyCH341USB0`**, you're done — the board will appear there automatically from now on.
+
+---
+
+## Remote access (optional)
+
+Work on the Pi from your laptop without the monitor attached:
+
+1. On the Pi, get its address: `hostname -I` (capital **I**) → e.g. `192.168.1.118`.
+2. From your laptop: `ssh <username>@raspberrypi.local` — or use the IP: `ssh <username>@192.168.1.118`.
+3. First time, type `yes` at the fingerprint prompt, then enter the **Pi's** password.
+
+---
+
+## Troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| `make` fails about headers | Run `ls -ld /lib/modules/$(uname -r)/build` — it should point to a real path. If not, reinstall `linux-headers-rpi-v8` and retry. |
+| `Unable to locate package raspberrypi-kernel-headers` | Old package name. Use `linux-headers-rpi-v8`. |
+| SSH **Permission denied** | Wrong username — it's not `pi` by default. Run `whoami` on the Pi to see it. The password is the **Pi's**, not your laptop's. |
+| SSH address shows `127.0.1.1` | A loopback placeholder, not the Pi. Use `hostname -I` (capital **I**) for the real address. |
+| Password shows nothing as you type | Normal for terminals — just type it and press **Enter**. |
+
+---
+
+<sub>Driver source: [WCHSoftGroup/ch341ser_linux](https://github.com/WCHSoftGroup/ch341ser_linux)</sub>

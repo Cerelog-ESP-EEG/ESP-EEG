@@ -33,9 +33,9 @@ Fit the EEG cap on the subject's head. Apply a small amount of conductive gel in
 
 How to connect circuit board for EEG and EMG data collection: [Read Here]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )  
 
-## 4. Connect and Stream
+## 4. Connect the board
 
-## **[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
+## **[Note: If your device (after doing Part 2 instructions below) can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
 
 Connect the board to your computer via USB-C. Wait for green LED to turn on. 
 

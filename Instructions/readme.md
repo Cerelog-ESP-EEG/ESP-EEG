@@ -57,7 +57,7 @@ As per the notice in Section 1, only connect the device to a laptop running on i
 
 # 💻 Part 2: Software Setup & Advanced Analysis
 
-
+**If you own a Raspberry Pi you will need to do this driver setup first before doing the steps below [Read Here:](https://github.com/Cerelog-ESP-EEG/ESP-EEG/blob/main/Instructions/subguides/raspberrypi/readme.md)** 
 
 # *⚠️Option A (NEW and Easy) Use with the modified version of the OpenBCI GUI  or Lab Stream Layer (LSL) here: 
 

@@ -163,6 +163,17 @@ cmake --build . --config Release --clean-first -j4 -- -k
 ## Step 4: Install the Python Package
 With the core library built, you must install the Python bindings to link your scripts to the C++ core.
 
+## Raspberry Pi Users: Create a Virtual Environment First
+
+Raspberry Pi OS requires you to use a Python virtual environment before installing packages. Run these commands before proceeding with the steps below:
+
+​```bash
+python3 -m venv ~/cerelog-venv
+source ~/cerelog-venv/bin/activate
+​```
+
+> **Note:** You will need to re-activate the virtual environment with `source ~/cerelog-venv/bin/activate` each time you open a new terminal session.
+
 **1. Navigate to the python package folder:**
 (Move up from the `build` folder and into `python_package`)
 ```bash

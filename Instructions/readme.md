@@ -141,7 +141,7 @@ Run the correct `cmake` command for your operating system.
 ** Run the Build Command:**
 This uses 4 processor cores (`-j4`) for faster compilation.
 ```bash
-cmake --build . --config Release --clean-first -j4
+cmake --build . --config Release --clean-first -j4 -- -k
 ```
 
 ---

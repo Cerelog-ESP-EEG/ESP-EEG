@@ -118,6 +118,10 @@ This crucial step compiles the C++ core of the library.
 Before proceeding, you need to install Homebrew (a package manager) and CMake. Open a terminal and run these commands one by one:
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+macOS only: 
+```bash
 brew install cmake
 ```
 

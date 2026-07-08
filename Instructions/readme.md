@@ -205,7 +205,50 @@ pip install numpy matplotlib pyserial plotly dash scikit-learn "setuptools<82"
 
 ## Step 6   Run Test Script
 
-The script below (`filtered_plot.py`) relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
+<details>
+<summary><h2>Raspberry Pi Users: Read This First</h2></summary>
+
+### 1. Activate Your Virtual Environment
+
+Before running any test scripts, make sure your virtual environment is active. If you opened a new terminal since Step A.3, re-activate it:
+
+```bash
+source ~/cerelog-venv/bin/activate
+```
+
+### 2. Hardcode the Serial Port
+
+All BrainFlow test scripts — including `filtered_plot.py` — must have the serial port name hardcoded to run on Raspberry Pi. Automatic port detection does not work on Pi.
+
+In each script, find the line:
+
+```python
+params = BrainFlowInputParams()
+```
+
+And add the following line directly after it:
+
+```python
+params.serial_port = "/dev/ttyCH341USB0"
+```
+
+You must make this edit in **every** BrainFlow test script you want to run on the Pi.
+
+### 3. Running Test Scripts Over SSH
+
+Test scripts that display plots must be run from the Raspberry Pi's own terminal. If you are connected over SSH, the plot window cannot open on your remote machine by default. To run a script over SSH and have the plot display on the Pi's screen, prefix the command with `DISPLAY=:0`:
+
+```bash
+DISPLAY=:0 python filtered_plot.py
+```
+
+</details>
+
+## Running the first Brainflow Testscript 
+
+The script below (`filtered_plot.py`)  relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
+
+Run it by saying python filtered_plot.py or python3 filtered_plot.py inside the correct folder
 
 ## **[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
 

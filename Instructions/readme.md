@@ -205,8 +205,13 @@ pip install numpy matplotlib pyserial plotly dash scikit-learn "setuptools<82"
 
 ## Step 6   Run Test Script
 
+<table>
+<tr>
+<td>
+
 <details>
 <summary>$\Large\textcolor{red}{\textsf{Raspberry Pi Users: Read This First}}$</summary>
+
 
 ### 1. Activate Your Virtual Environment
 
@@ -243,6 +248,10 @@ DISPLAY=:0 python filtered_plot.py
 ```
 
 </details>
+
+</td>
+</tr>
+</table>
 
 ## Running the first Brainflow Testscript 
 

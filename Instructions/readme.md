@@ -122,7 +122,8 @@ brew install cmake
 ```
 
 Raspberry Pi (Linux): Raspberry Pi OS uses apt instead of Homebrew. Install CMake by running:
-```sudo apt install cmake
+```bash
+sudo apt install cmake
 ```
 
 ### 🛠️ Compilation Steps (All OS)

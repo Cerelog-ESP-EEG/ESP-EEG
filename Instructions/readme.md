@@ -206,7 +206,7 @@ pip install numpy matplotlib pyserial plotly dash scikit-learn "setuptools<82"
 ## Step 6   Run Test Script
 
 <details>
-<summary><h2>Raspberry Pi Users: Read This First</h2></summary>
+<summary>$\Large\textcolor{red}{\textsf{Raspberry Pi Users: Read This First}}$</summary>
 
 ### 1. Activate Your Virtual Environment
 
@@ -248,7 +248,7 @@ DISPLAY=:0 python filtered_plot.py
 
 The script below (`filtered_plot.py`)  relies on the bindings found in the Brainflow repository. You must run the script **inside** that repository's environment or install the Python bindings from that source.
 
-Run it by saying python filtered_plot.py or python3 filtered_plot.py inside the correct folder
+Run it by saying python filtered_plot.py or on mac OS python3 filtered_plot.py inside the correct folder
 
 ## **[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
 

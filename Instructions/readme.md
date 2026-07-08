@@ -114,11 +114,15 @@ cd Shared_brainflow-cerelog
 This crucial step compiles the C++ core of the library.
 *Tip: If you make a mistake, manually delete the `build` folder and start this step over.*
 
-### 🍎 macOS Users: Install Build Tools First
+### 🍎 macOS and Raspberry Pi/Linux Users: Install Build Tools First
 Before proceeding, you need to install Homebrew (a package manager) and CMake. Open a terminal and run these commands one by one:
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install cmake
+```
+
+Raspberry Pi (Linux): Raspberry Pi OS uses apt instead of Homebrew. Install CMake by running:
+```sudo apt install cmake
 ```
 
 ### 🛠️ Compilation Steps (All OS)

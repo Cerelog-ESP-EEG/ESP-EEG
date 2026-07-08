@@ -174,6 +174,9 @@ source ~/cerelog-venv/bin/activate
 
 > **Note:** You will need to re-activate the virtual environment with `source ~/cerelog-venv/bin/activate` each time you open a new terminal session.
 
+
+## All Users:
+
 **1. Navigate to the python package folder:**
 (Move up from the `build` folder and into `python_package`)
 ```bash

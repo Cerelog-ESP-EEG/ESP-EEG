@@ -163,7 +163,7 @@ cmake --build . --config Release --clean-first -j4 -- -k
 ## Step 4: Install the Python Package
 With the core library built, you must install the Python bindings to link your scripts to the C++ core.
 
-## Raspberry Pi Users: Create a Virtual Environment First
+# Raspberry Pi Users: Create a Virtual Environment First
 
 Raspberry Pi OS requires you to use a Python virtual environment before installing packages. Run these commands before proceeding with the steps below:
 

@@ -20,10 +20,10 @@ Before flashing esp32_firmware.ino, you must configure the IDE with the correct 
 
 ## **Caution!!!! You must read the below or the flash wont work**
 
-Board: Navigate to Tools > Board > ESP32 Arduino and select 
-<span style="color:red">
-**ESP32 WROOM DA Module**
-</span>
+Board: Navigate to **Tools > Board > ESP32 Arduino** and select `ESP32 WROOM DA Module`.
+
+> [!IMPORTANT]
+> It must be **ESP32 WROOM DA Module** — not the generic "ESP32 Dev Module". Picking the wrong one will flash but the board won't enumerate correctly.
 
 Port: Navigate to Tools > Port and select the COM port corresponding to your Cerelog board. 
 

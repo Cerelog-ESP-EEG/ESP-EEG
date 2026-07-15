@@ -1,4 +1,4 @@
-
+### **How to flash Firmware with Arduino IDE (Read Carefully!):**
 
 
 Modifying the firmware is necessary to:
@@ -20,8 +20,9 @@ Before flashing esp32_firmware.ino, you must configure the IDE with the correct 
 
 ## **Caution!!!! You must read the below or the flash wont work**
 
-Board: Navigate to Tools > Board > ESP32 Arduino and select **'ESP32 WROOM DA Module'**.
+Board: Navigate to Tools > Board > ESP32 Arduino and select <span style="color:red">.**'ESP32 WROOM DA Module'**.</span>
 Port: Navigate to Tools > Port and select the COM port corresponding to your Cerelog board. 
 
 **Any other ESP32 name and it will likely not flash! Also, check that the serial rate setting in the Arduino IDE isnt set to the max setting, sometimes its too fast of an upload speed**
 
+**Caution!!!! If not flashing, check that the baud rate setting isn't too high. An upload speed of 115200 is ok but 921600 is too high and too fast of an upload speed. Navigate to tools-> Upload speed to check**

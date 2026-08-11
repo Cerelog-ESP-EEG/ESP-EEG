@@ -223,7 +223,147 @@ void IRAM_ATTR onDRDYFalling(void);
 void print_all_ADS1299_registers_from_setup(void);
 uint32_t get_baud_rate_from_config(uint8_t config_val);
 
+// ============================================================
+// === SD CARD LOGGING SECTION - START ========================
+// ============================================================
+#include "SD_MMC.h"
+#include "SD.h"
+#include "FS.h"
 
+typedef struct {
+    uint32_t timestamp_ms;
+    uint8_t ads_data[27]; // ADS1299_TOTAL_DATA_BYTES = 3 status + 8*3 channels
+} sd_sample_t;
+
+typedef struct {
+    bool sd_available;
+    bool logging_active;
+    File file;
+    int file_number;
+    uint32_t samples_written;
+} sd_state_t;
+
+sd_state_t sd_state = {false, false, File(), 0, 0};
+fs::FS *sd_fs = NULL; // Points to whichever filesystem initialized successfully
+QueueHandle_t sd_queue = NULL;
+volatile uint32_t sd_dropped_count = 0;
+
+bool sd_init() {
+    // Try SDMMC 1-bit mode first (uses dedicated SDMMC peripheral, no conflict with ADS1299 FSPI)
+    SD_MMC.setPins(pin_SD_CLK, pin_SD_CMD, pin_SD_DAT0);
+    if (SD_MMC.begin("/sdcard", true)) {
+        DEBUG_PRINTLN("SD: SDMMC 1-bit mode OK");
+        sd_fs = &SD_MMC;
+        return true;
+    }
+    DEBUG_PRINTLN("SD: SDMMC failed, trying SPI fallback");
+
+    // Fallback: SPI mode via HSPI (SPI3) on same pins
+    SPIClass *sd_spi = new SPIClass(HSPI);
+    sd_spi->begin(pin_SD_CLK, pin_SD_DAT0, pin_SD_CMD, pin_SD_CS);
+    if (SD.begin(pin_SD_CS, *sd_spi)) {
+        DEBUG_PRINTLN("SD: SPI fallback OK");
+        sd_fs = &SD;
+        return true;
+    }
+    delete sd_spi;
+    DEBUG_PRINTLN("SD: No card detected");
+    return false;
+}
+
+void sd_get_next_filename(char *buf, size_t len) {
+    for (int i = 1; i <= 999; i++) {
+        snprintf(buf, len, "/REC_%03d.csv", i);
+        if (!sd_fs->exists(buf)) {
+            sd_state.file_number = i;
+            return;
+        }
+    }
+    // All 999 used, overwrite last
+    snprintf(buf, len, "/REC_999.csv");
+    sd_state.file_number = 999;
+}
+
+bool sd_open_new_file() {
+    char filename[20];
+    sd_get_next_filename(filename, sizeof(filename));
+    sd_state.file = sd_fs->open(filename, FILE_WRITE);
+    if (!sd_state.file) {
+        DEBUG_PRINT("SD: Failed to open "); DEBUG_PRINTLN(filename);
+        sd_state.logging_active = false;
+        return false;
+    }
+    sd_state.file.println("timestamp_ms,status,ch1,ch2,ch3,ch4,ch5,ch6,ch7,ch8");
+    sd_state.logging_active = true;
+    sd_state.samples_written = 0;
+    DEBUG_PRINT("SD: Recording to "); DEBUG_PRINTLN(filename);
+    return true;
+}
+
+static int32_t sd_convert_24bit(const uint8_t *b) {
+    int32_t val = ((int32_t)b[0] << 16) | ((int32_t)b[1] << 8) | b[2];
+    if (val & 0x800000) val |= 0xFF000000; // sign extend
+    return val;
+}
+
+void sd_log_task(void *param) {
+    sd_sample_t sample;
+    unsigned long last_flush = millis();
+    uint32_t last_logged_drops = 0;
+    char line[160];
+
+    while (true) {
+        if (xQueueReceive(sd_queue, &sample, pdMS_TO_TICKS(100)) == pdTRUE) {
+            if (!sd_state.logging_active) continue;
+
+            // Log any dropped samples as a comment
+            uint32_t drops = sd_dropped_count;
+            if (drops > last_logged_drops) {
+                uint32_t new_drops = drops - last_logged_drops;
+                last_logged_drops = drops;
+                char drop_line[48];
+                snprintf(drop_line, sizeof(drop_line), "# DROPPED %lu samples\n", (unsigned long)new_drops);
+                sd_state.file.print(drop_line);
+            }
+
+            // Extract status (3 bytes) and 8 channels
+            uint32_t status = ((uint32_t)sample.ads_data[0] << 16) |
+                              ((uint32_t)sample.ads_data[1] << 8) |
+                               (uint32_t)sample.ads_data[2];
+
+            int32_t ch[8];
+            for (int i = 0; i < 8; i++) {
+                ch[i] = sd_convert_24bit(&sample.ads_data[3 + i * 3]);
+            }
+
+            snprintf(line, sizeof(line),
+                     "%lu,0x%06lX,%ld,%ld,%ld,%ld,%ld,%ld,%ld,%ld\n",
+                     (unsigned long)sample.timestamp_ms,
+                     (unsigned long)status,
+                     (long)ch[0], (long)ch[1], (long)ch[2], (long)ch[3],
+                     (long)ch[4], (long)ch[5], (long)ch[6], (long)ch[7]);
+
+            size_t written = sd_state.file.print(line);
+            if (written == 0) {
+                // Write failed — SD removed or full
+                sd_state.logging_active = false;
+                sd_state.file.close();
+                DEBUG_PRINTLN("SD: Write failed, logging stopped");
+                continue;
+            }
+            sd_state.samples_written++;
+        }
+
+        // Flush every 1 second
+        if (sd_state.logging_active && (millis() - last_flush >= 1000)) {
+            sd_state.file.flush();
+            last_flush = millis();
+        }
+    }
+}
+// ============================================================
+// === SD CARD LOGGING SECTION - END ==========================
+// ============================================================
 
 
 
@@ -751,6 +891,21 @@ void setup() {
 
 
 
+  // --- SD Card Init ---
+  sd_state.sd_available = sd_init();
+  if (sd_state.sd_available) {
+      sd_queue = xQueueCreate(256, sizeof(sd_sample_t));
+      if (sd_queue != NULL) {
+          sd_open_new_file();
+          if (sd_state.logging_active) {
+              xTaskCreatePinnedToCore(sd_log_task, "SD_Log", 8192, NULL, 1, NULL, 0);
+          } else {
+              vQueueDelete(sd_queue);
+              sd_queue = NULL;
+          }
+      }
+  }
+
   digitalWrite(pin_LED_DEBUG, HIGH);
 }
 
@@ -893,6 +1048,16 @@ void loop() {
 
 
           Serial.write(packet, sizeof(packet));
+
+          // --- SD Card: enqueue sample (non-blocking) ---
+          if (sd_queue != NULL) {
+              sd_sample_t sample;
+              sample.timestamp_ms = millis_since_sync;
+              memcpy(sample.ads_data, raw_data, ADS1299_TOTAL_DATA_BYTES);
+              if (xQueueSend(sd_queue, &sample, 0) != pdTRUE) {
+                  sd_dropped_count++;
+              }
+          }
       }
  
 }

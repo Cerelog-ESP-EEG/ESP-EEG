@@ -256,20 +256,11 @@ bool sd_init() {
         sd_fs = &SD_MMC;
         return true;
     }
-    DEBUG_PRINTLN("SD: SDMMC failed, trying SPI fallback");
+    DEBUG_PRINTLN("SD: SDMMC failed");
 
-    // Fallback: SPI mode via HSPI (SPI3) on same pins
-    // This runs on core 0 in a background task, so even if SD.begin() blocks
-    // it cannot stall ADS1299 data streaming on core 1.
-    SPIClass *sd_spi = new SPIClass(HSPI);
-    sd_spi->begin(pin_SD_CLK, pin_SD_DAT0, pin_SD_CMD, pin_SD_CS);
-    if (SD.begin(pin_SD_CS, *sd_spi)) {
-        DEBUG_PRINTLN("SD: SPI fallback OK");
-        sd_fs = &SD;
-        return true;
-    }
-    sd_spi->end();
-    delete sd_spi;
+    // SPI fallback disabled — SD.begin() via HSPI blocks Serial.write() even
+    // from a different core, killing the USB data stream.  V2 uses SDMMC only.
+    // TODO: re-enable once the cross-core blocking is resolved.
     DEBUG_PRINTLN("SD: No card detected");
     return false;
 }

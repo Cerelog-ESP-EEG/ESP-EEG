@@ -259,6 +259,8 @@ bool sd_init() {
     DEBUG_PRINTLN("SD: SDMMC failed, trying SPI fallback");
 
     // Fallback: SPI mode via HSPI (SPI3) on same pins
+    // This runs on core 0 in a background task, so even if SD.begin() blocks
+    // it cannot stall ADS1299 data streaming on core 1.
     SPIClass *sd_spi = new SPIClass(HSPI);
     sd_spi->begin(pin_SD_CLK, pin_SD_DAT0, pin_SD_CMD, pin_SD_CS);
     if (SD.begin(pin_SD_CS, *sd_spi)) {
@@ -266,6 +268,7 @@ bool sd_init() {
         sd_fs = &SD;
         return true;
     }
+    sd_spi->end();
     delete sd_spi;
     DEBUG_PRINTLN("SD: No card detected");
     return false;
@@ -360,6 +363,23 @@ void sd_log_task(void *param) {
             last_flush = millis();
         }
     }
+}
+// --- SD background init task: runs entirely on core 0 so it never blocks loop() ---
+void sd_setup_task(void *param) {
+    if (sd_init()) {
+        sd_state.sd_available = true;
+        sd_queue = xQueueCreate(256, sizeof(sd_sample_t));
+        if (sd_queue != NULL) {
+            sd_open_new_file();
+            if (sd_state.logging_active) {
+                xTaskCreatePinnedToCore(sd_log_task, "SD_Log", 8192, NULL, 1, NULL, 0);
+            } else {
+                vQueueDelete(sd_queue);
+                sd_queue = NULL;
+            }
+        }
+    }
+    vTaskDelete(NULL); // self-delete when done
 }
 // ============================================================
 // === SD CARD LOGGING SECTION - END ==========================
@@ -847,10 +867,13 @@ void setup() {
 
 
 
+  // --- SD Card Init: runs on core 0 in background so it never blocks data streaming ---
+  xTaskCreatePinnedToCore(sd_setup_task, "SD_Init", 8192, NULL, 1, NULL, 0);
+
   // --- FIX #2: Corrected Startup Sequence ---
   DEBUG_PRINTLN("Setup complete.");
   digitalWrite(pin_START_NUM, HIGH);
- 
+
   // Add a brief delay BEFORE the START command to allow the chip to settle.
   delay(10);
   ADS1299_START();
@@ -890,21 +913,6 @@ void setup() {
 
 
 
-
-  // --- SD Card Init ---
-  sd_state.sd_available = sd_init();
-  if (sd_state.sd_available) {
-      sd_queue = xQueueCreate(256, sizeof(sd_sample_t));
-      if (sd_queue != NULL) {
-          sd_open_new_file();
-          if (sd_state.logging_active) {
-              xTaskCreatePinnedToCore(sd_log_task, "SD_Log", 8192, NULL, 1, NULL, 0);
-          } else {
-              vQueueDelete(sd_queue);
-              sd_queue = NULL;
-          }
-      }
-  }
 
   digitalWrite(pin_LED_DEBUG, HIGH);
 }

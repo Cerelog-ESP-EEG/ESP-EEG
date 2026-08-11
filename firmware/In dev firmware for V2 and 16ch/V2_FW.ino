@@ -91,6 +91,7 @@ const uint8_t PACKET_IDX_END_MARKER = PACKET_IDX_CHECKSUM + PACKET_CHECKSUM_BYTE
 
 
 // --- Pin Mapping ---
+static const uint8_t pin_BATT_MON = 1;     // ADC1_CH0, battery voltage monitor
 static const uint8_t pin_TRIGGER_IN = 6;   // ADC1_CH5, reserved for future use
 static const uint8_t pin_CS_NUM = 10;
 static const uint8_t pin_MOSI_NUM = 11;
@@ -245,7 +246,7 @@ static const regVal_pair ADS1299_REGISTER_LS[size_reg_ls] = {
   {0x05, 0b01100000}, {0x06, 0b01100000}, {0x07, 0b01100000}, {0x08, 0b01100000},
   {0x09, 0b01100000}, {0x0A, 0b01100000}, {0x0B, 0b01100000}, {0x0C, 0b01100000},
   {0x0D, 0b11111111}, {0x0E, 0b00000000}, {0x0F, 0}, {0x10, 0}, {0x11, 0}, {-2, -2},
-  {0x15, 0b00100000}, {0x16, 0}, {0x17, 0}
+  {0x15, 0b00000000}, {0x16, 0}, {0x17, 0}
 };
 
 

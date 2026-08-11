@@ -91,15 +91,22 @@ const uint8_t PACKET_IDX_END_MARKER = PACKET_IDX_CHECKSUM + PACKET_CHECKSUM_BYTE
 
 
 // --- Pin Mapping ---
-static const uint8_t pin_MOSI_NUM = 23;
-static const uint8_t pin_CS_NUM = 5;
-static const uint8_t pin_MISO_NUM = 19;
-static const uint8_t pin_SCK_NUM = 18;
-static const uint8_t pin_PWDN_NUM = 13;
-static const uint8_t pin_RST_NUM = 12;
-static const uint8_t pin_START_NUM = 14;
-static const uint8_t pin_DRDY_NUM = 27;
-static const uint8_t pin_LED_DEBUG = 17;
+static const uint8_t pin_TRIGGER_IN = 6;   // ADC1_CH5, reserved for future use
+static const uint8_t pin_CS_NUM = 10;
+static const uint8_t pin_MOSI_NUM = 11;
+static const uint8_t pin_SCK_NUM = 12;
+static const uint8_t pin_MISO_NUM = 13;
+static const uint8_t pin_DRDY_NUM = 14;
+static const uint8_t pin_PWDN_NUM = 15;
+static const uint8_t pin_RST_NUM = 16;
+static const uint8_t pin_START_NUM = 17;
+static const uint8_t pin_LED_DEBUG = 18;
+
+// --- SD Card Pin Mapping ---
+static const uint8_t pin_SD_CLK = 35;   // SD_CLK / SCLK
+static const uint8_t pin_SD_CMD = 36;   // SD_CMD / MOSI
+static const uint8_t pin_SD_DAT0 = 37;  // SD_DAT0 / MISO
+static const uint8_t pin_SD_CS = 38;
 
 
 
@@ -638,7 +645,7 @@ void setup() {
 
 
 
-  vspi = new SPIClass(VSPI);
+  vspi = new SPIClass(FSPI);
   vspi->begin(pin_SCK_NUM, pin_MISO_NUM, pin_MOSI_NUM, pin_CS_NUM);
   vspi->beginTransaction(SPISettings(SPI_FREQ, MSBFIRST, SPI_MODE1));
   delay(500);

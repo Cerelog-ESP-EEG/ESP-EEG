@@ -785,6 +785,9 @@ void setup() {
   #ifdef DEBUG_ENABLED
       delay(5000);
   #endif
+  // Allow USB CDC to settle before any SPI/GPIO activity. Without this,
+  // some boards lose early Serial.write() output and appear dead.
+  delay(500);
   pinMode(pin_PWDN_NUM, OUTPUT);
   pinMode(pin_RST_NUM, OUTPUT);
   pinMode(pin_START_NUM, OUTPUT);

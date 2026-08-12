@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
+#include "esp_log.h"
 
 
 
@@ -249,19 +250,27 @@ QueueHandle_t sd_queue = NULL;
 volatile uint32_t sd_dropped_count = 0;
 
 bool sd_init() {
-    // Try SDMMC 1-bit mode first (uses dedicated SDMMC peripheral, no conflict with ADS1299 FSPI)
+    // Quick-check: read DAT0 with pull-up. If no card is inserted the line
+    // floats high.  An inserted card drives it low during idle.  Skipping
+    // SD_MMC.begin() when no card is present avoids a ~3 s SDMMC timeout
+    // that blocks USB CDC Serial.write() and kills the data stream.
+    pinMode(pin_SD_DAT0, INPUT_PULLUP);
+    delay(5);
+    if (digitalRead(pin_SD_DAT0) == HIGH) {
+        DEBUG_PRINTLN("SD: No card detected (DAT0 high), skipping init");
+        pinMode(pin_SD_DAT0, INPUT);  // release pin
+        return false;
+    }
+    pinMode(pin_SD_DAT0, INPUT);  // release before SDMMC takes over
+
+    // Try SDMMC 1-bit mode (uses dedicated SDMMC peripheral, no conflict with ADS1299 FSPI)
     SD_MMC.setPins(pin_SD_CLK, pin_SD_CMD, pin_SD_DAT0);
     if (SD_MMC.begin("/sdcard", true)) {
         DEBUG_PRINTLN("SD: SDMMC 1-bit mode OK");
         sd_fs = &SD_MMC;
         return true;
     }
-    DEBUG_PRINTLN("SD: SDMMC failed");
-
-    // SPI fallback disabled — SD.begin() via HSPI blocks Serial.write() even
-    // from a different core, killing the USB data stream.  V2 uses SDMMC only.
-    // TODO: re-enable once the cross-core blocking is resolved.
-    DEBUG_PRINTLN("SD: No card detected");
+    DEBUG_PRINTLN("SD: SDMMC init failed");
     return false;
 }
 
@@ -768,6 +777,10 @@ uint32_t get_baud_rate_from_config(uint8_t config_val) {
 
 
 void setup() {
+  // Suppress ESP-IDF log output (sdmmc, vfs_fat, etc.) so it never
+  // corrupts the binary data protocol on USB CDC Serial.
+  esp_log_level_set("*", ESP_LOG_NONE);
+
   Serial.begin(9600);
   #ifdef DEBUG_ENABLED
       delay(5000);

@@ -250,27 +250,18 @@ QueueHandle_t sd_queue = NULL;
 volatile uint32_t sd_dropped_count = 0;
 
 bool sd_init() {
-    // Quick-check: read DAT0 with pull-up. If no card is inserted the line
-    // floats high.  An inserted card drives it low during idle.  Skipping
-    // SD_MMC.begin() when no card is present avoids a ~3 s SDMMC timeout
-    // that blocks USB CDC Serial.write() and kills the data stream.
-    pinMode(pin_SD_DAT0, INPUT_PULLUP);
-    delay(5);
-    if (digitalRead(pin_SD_DAT0) == HIGH) {
-        DEBUG_PRINTLN("SD: No card detected (DAT0 high), skipping init");
-        pinMode(pin_SD_DAT0, INPUT);  // release pin
-        return false;
-    }
-    pinMode(pin_SD_DAT0, INPUT);  // release before SDMMC takes over
-
-    // Try SDMMC 1-bit mode (uses dedicated SDMMC peripheral, no conflict with ADS1299 FSPI)
+    // No GPIO-level card detect — both inserted and absent cards read HIGH on
+    // DAT0 with a pull-up, making the check unreliable.  Instead just attempt
+    // SD_MMC.begin() directly.  The ~3 s timeout when no card is present is
+    // acceptable because sd_init() runs on core 0 via sd_setup_task and never
+    // blocks the data-streaming loop on core 1.
     SD_MMC.setPins(pin_SD_CLK, pin_SD_CMD, pin_SD_DAT0);
     if (SD_MMC.begin("/sdcard", true)) {
         DEBUG_PRINTLN("SD: SDMMC 1-bit mode OK");
         sd_fs = &SD_MMC;
         return true;
     }
-    DEBUG_PRINTLN("SD: SDMMC init failed");
+    DEBUG_PRINTLN("SD: SDMMC init failed, no card?");
     return false;
 }
 

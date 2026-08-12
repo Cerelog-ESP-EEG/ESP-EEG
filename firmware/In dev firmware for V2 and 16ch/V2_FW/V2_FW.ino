@@ -249,18 +249,7 @@ QueueHandle_t sd_queue = NULL;
 volatile uint32_t sd_dropped_count = 0;
 
 bool sd_init() {
-    // Quick card-detect: DAT0 is pulled high by the card when inserted.
-    // If no card is present the line floats low → skip the slow SDMMC timeout.
-    pinMode(pin_SD_DAT0, INPUT_PULLUP);
-    delay(10);  // let the pull-up settle
-    if (digitalRead(pin_SD_DAT0) == LOW) {
-        DEBUG_PRINTLN("SD: No card detected (DAT0 low), skipping init");
-        pinMode(pin_SD_DAT0, INPUT);  // release the pin
-        return false;
-    }
-    pinMode(pin_SD_DAT0, INPUT);  // release before SDMMC takes over
-
-    // Try SDMMC 1-bit mode (uses dedicated SDMMC peripheral, no conflict with ADS1299 FSPI)
+    // Try SDMMC 1-bit mode first (uses dedicated SDMMC peripheral, no conflict with ADS1299 FSPI)
     SD_MMC.setPins(pin_SD_CLK, pin_SD_CMD, pin_SD_DAT0);
     if (SD_MMC.begin("/sdcard", true)) {
         DEBUG_PRINTLN("SD: SDMMC 1-bit mode OK");

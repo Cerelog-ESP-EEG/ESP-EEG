@@ -156,7 +156,7 @@ View hardware folder for device schematic
 *   **Battery LED:**
     *   🔴 **Red:** Charging.
     *   🟢 **Green:** Fully Charged.
-*   **Battery Connector:** JST-PH 2.0mm (Red = +, Black = -). *Supports 3.7V LiPo.*
+*   **Battery Connector:** JST-PH 1.25mm (Red = +, Black = -). *Supports 3.7V LiPo.*
 *   **Electrodes:** Standard touch-proof headers. (Pins 1-8 = Signal, SRB1 = Reference).
 ## ⚡ Technical Specifications
 | Feature | Specification |

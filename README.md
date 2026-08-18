@@ -12,7 +12,7 @@
 www.cerelog.com   and   **Product Page (Assembled Units Available)**: [Here](https://www.cerelog.com/eeg_researchers.html) 
 
 
-Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d)
+Need Help or have a question? [Discord Chat Community](https://discord.com/invite/fVYf44JTua)
 
 Open Source Firmware, Software & Schematic included on this page
 
@@ -24,7 +24,7 @@ Open Source Firmware, Software & Schematic included on this page
 
 Contact: simon@cerelog.com
 
-Need Help or have a question? [Discord Chat Community](https://discord.gg/2wXQW3Uy4d)
+Need Help or have a question? [Discord Chat Community](https://discord.com/invite/fVYf44JTua)
 
 Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
 

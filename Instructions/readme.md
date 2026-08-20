@@ -29,9 +29,14 @@ Connect your EEG cap cable(s) to the required touch-proof adapter(s), then plug 
 ## 2. Prepare the Subject
 Fit the EEG cap on the subject's head. Apply a small amount of conductive gel into each electrode cavity to ensure good skin contact.
 
-## 3. How to connect the circuit board:
+## 3a. How to connect the circuit board (what pins do what):
 
 How to connect circuit board for EEG and EMG data collection: [Read Here]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )  
+
+## 3b: Info on using microsd card for data collection
+
+ Info on using microsd card for data collection: [Read Here]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )  
+
 
 ## 4. Connect the board
 

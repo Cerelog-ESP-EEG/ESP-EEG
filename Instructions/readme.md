@@ -33,7 +33,7 @@ Fit the EEG cap on the subject's head. Apply a small amount of conductive gel in
 
 How to connect circuit board for EEG and EMG data collection: [Read Here]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )  
 
-## 3b: Info on using microsd card for data collection
+## 3b: (For V2 and 16CH devices) Info on using microsd card for data collection
 
  Info on using microsd card for data collection: [Read Here]( https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview )  
 

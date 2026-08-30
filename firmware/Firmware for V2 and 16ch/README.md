@@ -21,3 +21,22 @@ To flash firmware on the V2 and 16 channel boards, you **must** use the Arduino 
 ## If the Flash Fails
 
 - Go to `Tools -> Flash Size` and set it to `4MB (32Mb)`
+
+
+---
+
+# Features in Hardware that Users May Desire to Modify Firmware to Accommodate
+
+## Enhanced Hardware Access
+
+**Battery monitoring exposed on-board via ESP32 GPIO for custom firmware**
+
+Battery life can be monitored by the user: **IO0 (ADC1_CH0)** senses the battery through a resistor divider network — multiply the measured voltage by **2** to get the real battery voltage.
+
+**Event sync trigger exposed on-board via ESP32 GPIO for custom firmware**
+
+Event sync trigger input: **IO6 (ADC1_CH5)** is broken out from the ESP32 for an external trigger — **3.3&nbsp;V max**, with a current-limiting input resistor. Modify the existing firmware to accept the trigger for tests that need a sync.
+
+<sub>Hardware capability only — not coded into the default firmware. Intended for users modifying the firmware for custom applications.</sub>
+
+<sub>Just like the OpenBCI Cyton, the trigger input is not opto-isolated — the user is responsible for the safety of whatever they plug into it.</sub>

@@ -4,7 +4,7 @@ To flash firmware on the V2 and 16 channel boards, you **must** use the Arduino 
 
 ---
 
-## !! CRITICAL SETTINGS - READ CAREFULLY !!
+## $\textcolor{red}{\textbf{\textsf{!! CRITICAL SETTINGS - READ CAREFULLY !!}}}$
 
 **These settings are NOT default and are REQUIRED.**
 $\textcolor{red}{\textsf{Without them, the flash may succeed but}}$ $\textcolor{red}{\textsf{the firmware WILL NOT WORK and you}}$ $\textcolor{red}{\textsf{WILL NOT be able to log data.}}$

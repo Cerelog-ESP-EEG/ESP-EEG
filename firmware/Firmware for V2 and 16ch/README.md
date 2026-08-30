@@ -33,19 +33,19 @@ Set all three in the Arduino IDE **before** you hit Upload:
 
 $\textcolor{gray}{\rule{1000px}{8px}}$
 
-# Features in Hardware that Users May Desire to Modify Firmware to Accommodate
+# Special Extra Features in Hardware that Users May Desire to Modify Firmware to Accommodate
 
 ## Enhanced Hardware Access
 
 The signals below are **broken out on the board but are not used by the stock firmware**. They are here for
 users who want to extend the firmware for their own applications.
 
-### Battery monitoring exposed on-board via ESP32 GPIO for custom firmware
+### $\textcolor{dodgerblue}{\textbf{\textsf{Battery monitoring}}}$ exposed on-board via ESP32 GPIO for custom firmware
 
 Battery life can be monitored by the user: **IO0 (ADC1_CH0)** senses the battery through a resistor divider
 network — multiply the measured voltage by **2** to get the real battery voltage.
 
-### Event sync trigger exposed on-board via ESP32 GPIO for custom firmware
+### $\textcolor{dodgerblue}{\textbf{\textsf{Event sync trigger}}}$ exposed on-board via ESP32 GPIO for custom firmware
 
 Event sync trigger input: **IO6 (ADC1_CH5)** is broken out from the ESP32 for an external trigger —
 **3.3&nbsp;V max**, with a current-limiting input resistor. Modify the existing firmware to accept the trigger

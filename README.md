@@ -1,10 +1,13 @@
 # **Cerelog ESP-EEG** 
 
 
-<img src="ESP_EEG_1_2_image.jpg" alt="Cerelog Board" width="450">
+<img src="ESP_EEG_1_2_image.jpg" alt="Cerelog Board V1" width="450">
 
+# **V1 Above** 
 
+<img src="v2_photo (1).webp" alt="Cerelog Board V2" width="450">
 
+# **V2 Above** 
 
 
 ##  High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications

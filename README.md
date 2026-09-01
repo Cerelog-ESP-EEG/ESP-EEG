@@ -10,6 +10,12 @@
     <td align="center"><b>V1</b></td>
     <td align="center"><b>V2</b></td>
   </tr>
+  <tr>
+    <td align="center" colspan="2"><img src="v16ch_website_pic.webp" alt="16ch ESP-EEG" width="900"></td>
+  </tr>
+  <tr>
+    <td align="center" colspan="2"><b>16ch ESP-EEG</b></td>
+  </tr>
 </table>
 
 

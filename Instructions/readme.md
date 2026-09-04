@@ -43,6 +43,15 @@ Connect your EEG cap cable(s) to the required touch-proof adapter(s), then plug 
 ## 2. Prepare the Subject
 Fit the EEG cap on the subject's head. Apply a small amount of conductive gel into each electrode cavity to ensure good skin contact.
 
+## ⚠️ CRITICAL SAFETY REMINDER — READ BEFORE CONNECTING ANYTHING
+
+**This board has no medical-grade isolation.** As per the safety notice in Section 1 of the full product guide, only connect the device to a laptop running on its own **battery power**.
+
+*   **DO NOT** use this device if the laptop is charging.
+*   **DO NOT** connect this device to a desktop computer plugged into a wall outlet.
+
+---
+
 ## 3a. How to connect the circuit board (what pins do what):
 
 Full illustrated version on the website: [Hardware Overview](https://www.cerelog.com/eeg_researchers_guide.html#hardware-overview)
@@ -151,10 +160,6 @@ The board exposes **AVDD** and **AVSS** header pins, which connect to the ADC su
 
 Every rule above applies identically — there are simply **16 channels instead of 8**, and **two montage switch banks on the back of the board** rather than one.
 
-### ⚠️ Not Using All Channels?
-
-For best results, all channels should be in use. If you are using fewer, either **tie the unused CH+ pins to one of the active CH+ pins**, or **disable the unused channels in the firmware** and reflash. Floating (unconnected but enabled) channels make the BIAS pin less effective at eliminating noise, resulting in **poorer signal quality across all channels**.
-
 </details>
 
 ## 3b: (For V2 and 16CH devices) Info on using microsd card for data collection
@@ -228,14 +233,6 @@ Sometimes you may need to turn on and off PCB for computer to detect new board. 
 
 **Don't Like USB?:  WiFI Support (Under Dev)**
 [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
-
-## ⚠️ CRITICAL SAFETY REMINDER
-As per the notice in Section 1, only connect the device to a laptop running on its own **battery power**.
-
-*   **DO NOT** use this device if the laptop is charging.
-*   **DO NOT** connect this device to a desktop computer plugged into a wall outlet.
-
-
 
 ---
 

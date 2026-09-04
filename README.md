@@ -14,7 +14,7 @@
     <td align="center" colspan="2"><img src="v16ch_website_pic.webp" alt="16ch ESP-EEG" width="400"></td>
   </tr>
   <tr>
-    <td align="center" colspan="2"><b>16ch ESP-EEG</b></td>
+    <td align="center" colspan="2"><b>16CH ESP-EEG</b></td>
   </tr>
 </table>
 

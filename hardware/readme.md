@@ -29,7 +29,7 @@ Cerelog Inc. is a small, independent company. The sales of this hardware support
 We have chosen **not** to release the PCB layout (Gerber) files at this time to prevent low-quality clones from flooding the market and undermining our ability to support this platform.
 
 ## 📂 Contents
-*   **`Schematic.pdf`**: Full circuit diagram for educational and repair purposes.
+*   v1,v2, 16CH ESP-EEG Full circuit diagrams for educational and repair purposes.
 
 
 ## ⚡ Safety Disclaimer

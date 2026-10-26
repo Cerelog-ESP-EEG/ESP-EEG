@@ -719,10 +719,14 @@ The script above implements a robust filter chain designed for real-time BCI:
 
 https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
 
+### 🔌 USB Instructions
+
 **What the guide above shows you (wired, USB):**
 1. Plug the board into your computer with a USB cable.
 2. Run the LSL Python bridge script. It reads data from the board over USB and sends it out as an LSL stream.
 3. Open the OpenBCI GUI fork (linked in the guide) and select that LSL stream to see your data.
+
+### 📶 BLE Wireless Instructions
 
 **Don't Like USB?: BLE Wireless Support**
 
@@ -734,17 +738,15 @@ They show you how to:
 3. Open the same OpenBCI GUI fork and select the LSL stream, just like with USB.
 
 
-# ⚠️Option B (Best) Brainflow Fork - [USB Supported]
+# ⚠️Option B (Best) Brainflow Fork - [USB or BLE Supported]
 
+### 🔌 USB Instructions
 
-To get the best performance from the ESP EEG, we recommend using our custom BrainFlow instance. This guide covers installation, the theory behind our data stream, and provides a production-grade script for real-time filtering and plotting.
+*(Coming soon)*
 
-**2 Quick Videos Using Cerelog ESP-EEG with Brainflow:** Use these videos if you get stuck with the GUIDE BELOW. Make sure to read the instructions below though, as the videos don't have all of the setup command scripts.
+### 📶 BLE Wireless Instructions
 
-[ESP-EEG with Brainflow](https://www.youtube.com/watch?v=hLSeSTvoRPI)  and [General Product usage Overview Video](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
-
-
-# How to use Brainflow [READ THIS!]:
+*(Coming soon)*
 
 </details>
 

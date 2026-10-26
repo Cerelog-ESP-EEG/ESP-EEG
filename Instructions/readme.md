@@ -721,6 +721,8 @@ https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork
 
 ### 🔌 USB Instructions
 
+> **📊 Sample rate: 125 SPS over USB.** The OpenBCI GUI itself limits a 16-channel USB connection to 125 SPS. For 250 SPS, use the BLE Wireless option below.
+
 Over USB, the 16CH board connects **directly to the main (official) OpenBCI GUI** — no fork or Python script needed.
 
 Download the main OpenBCI GUI here: https://docs.openbci.com/Software/OpenBCISoftware/GUIDocs/
@@ -741,6 +743,8 @@ Download the main OpenBCI GUI here: https://docs.openbci.com/Software/OpenBCISof
 ### 📶 BLE Wireless Instructions
 
 **Don't Like USB?: BLE Wireless Support**
+
+> **📊 Sample rate: 250 SPS over BLE.** Streaming through the BLE bridge runs at 250 SPS, double the USB rate.
 
 You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bluetooth (BLE). Get the BLE firmware and the BLE bridge Python script (`.py`) from the <ins>extra instructions</ins> here: [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
 

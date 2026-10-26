@@ -235,12 +235,12 @@ Sometimes you may need to turn on and off PCB for computer to detect new board. 
 
 # 💻 Part 2: Software Setup & Advanced Analysis
 
-> **⚠️ Driver installation applies to V1 devices only.** **ESP-EEG V2 and 16-Channel boards do not require driver installation** — modern operating systems detect them automatically. Skip the two driver links below unless you own a V1 (or your Raspberry Pi still fails to see the board).
-
 <table><tr><td>
 
 <details>
 <summary><p align="center"><a name="board-photo"><img src="../ESP_EEG_1_2_image.jpg" alt="Cerelog Board V1" width="300"></a> <a name="board-photo"><img src="../v2_photo%20(1).webp" alt="Cerelog Board V2" width="300"></a></p><h1>👉 🟦🟩 V1 and V2 ESP-EEG Software Options (CLICK TO EXPAND)</h1><br><sub>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </sub></summary>
+
+> **⚠️ Driver installation applies to V1 devices only.** **ESP-EEG V2 and 16-Channel boards do not require driver installation** — modern operating systems detect them automatically. Skip the two driver links below unless you own a V1 (or your Raspberry Pi still fails to see the board).
 
 **If you own a Raspberry Pi: Driver setup first  -> [Read Here:](https://github.com/Cerelog-ESP-EEG/ESP-EEG/blob/main/Instructions/subguides/raspberrypi/readme.md) (V1 devices only)** 
 
@@ -784,7 +784,7 @@ source ~/cerelog-venv/bin/activate
 
 ### 2. Hardcode the Serial Port
 
-All BrainFlow test scripts — including `filtered_plot.py` — must have the serial port name hardcoded to run on Raspberry Pi. Automatic port detection does not work on Pi.
+All BrainFlow test scripts must have the serial port name hardcoded to run on Raspberry Pi. Automatic port detection does not work on Pi.
 
 In each script, find the line:
 
@@ -795,7 +795,7 @@ params = BrainFlowInputParams()
 And add the following line directly after it:
 
 ```python
-params.serial_port = "/dev/ttyCH341USB0"
+params.serial_port = "/dev/ttyACM0"
 ```
 
 > ⚠️ **Note for V2 and 16CH devices:** These boards do not use the CH341 chip, so `/dev/ttyCH341USB0` will not exist. You need to manually find your board's port name in the terminal (for example, run `ls /dev/tty*` before and after plugging in the board and look for the new entry), then use that port name in the line above.
@@ -1178,9 +1178,6 @@ board.start_stream()
 ```
 
 <sub>⚠️ Note: Don't use the default `BoardShim.get_sampling_rate()` value for this board. BrainFlow will report **1000** SPS, but the actual stream is **250** SPS. Hardcode 250 in your script instead.</sub>
-
-<!-- TODO: add photo of BrainFlow BLE connection here -->
-*📷 [Photo placeholder: BrainFlow BLE connection]*
 
 </details>
 

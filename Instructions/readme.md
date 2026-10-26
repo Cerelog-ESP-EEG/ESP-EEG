@@ -247,6 +247,9 @@ and
 **Other Linux Users: Driver setup first  -> [CH341SER Driver Here:](https://www.wch-ic.com/downloads/CH341SER_EXE.html)** 
 
 
+<details>
+<summary><b>🟦🟩 V1 and V2 ESP-EEG Software Options — click to expand</b></summary>
+
 # *⚠️Option A (NEW and Easy) Use with the modified version of the OpenBCI GUI  or Lab Stream Layer (LSL) here: 
 
 https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
@@ -645,6 +648,13 @@ def update_plot(frame, lines, axes):
 if __name__ == "__main__":
     main()
 ```
+
+</details>
+
+<details>
+<summary><b>🟪 16CH ESP-EEG Software Options — click to expand</b></summary>
+
+</details>
 
 
 

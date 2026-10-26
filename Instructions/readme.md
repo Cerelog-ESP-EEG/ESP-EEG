@@ -247,6 +247,8 @@ and
 **Other Linux Users: Driver setup first  -> [CH341SER Driver Here:](https://www.wch-ic.com/downloads/CH341SER_EXE.html)** 
 
 
+<table><tr><td>
+
 <details>
 <summary><h1>👉 🟦🟩 V1 and V2 ESP-EEG Software Options (CLICK TO EXPAND)</h1></summary>
 
@@ -651,10 +653,16 @@ if __name__ == "__main__":
 
 </details>
 
+</td></tr></table>
+
+<table><tr><td>
+
 <details>
 <summary><h1>👉 🟪 16CH ESP-EEG Software Options (CLICK TO EXPAND)</h1></summary>
 
 </details>
+
+</td></tr></table>
 
 
 

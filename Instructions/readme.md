@@ -715,7 +715,7 @@ The script above implements a robust filter chain designed for real-time BCI:
 <summary><p align="center"><img src="../v16ch_website_pic.webp" alt="16ch ESP-EEG" width="300"></p><h1>👉 🟪 16CH ESP-EEG Software Options (CLICK TO EXPAND)</h1><br><sub>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </sub></summary>
 
 # *⚠️Option A (NEW and Easy) - [USB or BLE Supported]
-## Stream data to Modified OpenBCI GUI + Lab Stream Layer (LSL) python streamer script:
+## OpenBCI GUI
 
 https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
 
@@ -732,7 +732,7 @@ Download the main OpenBCI GUI here: https://docs.openbci.com/Software/OpenBCISof
 4. Select **Serial (from Dongle)**.
 5. Select **Manual Connect**.
 6. Click the serial port that comes up.
-7. Make sure **Channel Count** is set to **8 Channels**.
+7. Make sure **Channel Count** is set to **16 Channels**.
 8. Press **START SESSION**.
 
 <!-- TODO: add photo of OpenBCI GUI connection settings here -->
@@ -742,12 +742,23 @@ Download the main OpenBCI GUI here: https://docs.openbci.com/Software/OpenBCISof
 
 **Don't Like USB?: BLE Wireless Support**
 
-You can do the exact same thing without a cable, using Bluetooth (BLE). Follow the <ins>extra instructions</ins> here: [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
+You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bluetooth (BLE). Get the BLE firmware and the BLE bridge Python script (`.py`) from the <ins>extra instructions</ins> here: [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
 
-They show you how to:
-1. Flash the BLE firmware onto the board.
-2. Run the BLE LSL Python bridge script (the wireless version of the USB script).
-3. Open the same OpenBCI GUI fork and select the LSL stream, just like with USB.
+> **Why a bridge script?** The main OpenBCI GUI can't read BLE directly. The bridge script connects to the board over BLE and makes it look like an OpenBCI WiFi Shield to the GUI.
+
+**To connect:**
+1. Flash the BLE firmware onto the board (from the link above).
+2. Run the included BLE bridge Python script (`.py`) from the link above. Leave it running.
+3. Open the OpenBCI GUI.
+4. Under **Data Source**, select **CYTON**.
+5. Select **Wifi (from Wifi Shield)**.
+6. Select **16 Channels**.
+7. Select **Static IP** and enter **127.0.0.1**.
+8. Set the **Sample Rate** to **250**.
+9. Press **START SESSION**.
+
+<!-- TODO: add photo of OpenBCI GUI BLE/WiFi connection settings here -->
+*📷 [Photo placeholder: OpenBCI GUI WiFi Shield connection settings]*
 
 
 # ⚠️Option B (Best) Brainflow Fork - [USB or BLE Supported]

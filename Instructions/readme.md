@@ -436,6 +436,8 @@ And add the following line directly after it:
 params.serial_port = "/dev/ttyCH341USB0"
 ```
 
+> ⚠️ **Note for V2 and 16CH devices:** These boards do not use the CH341 chip, so `/dev/ttyCH341USB0` will not exist. You need to manually find your board's port name in the terminal (for example, run `ls /dev/tty*` before and after plugging in the board and look for the new entry), then use that port name in the line above.
+
 You must make this edit in **every** BrainFlow test script you want to run on the Pi.
 
 ### 3. Running Test Scripts Over SSH
@@ -763,6 +765,56 @@ You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bl
 
 
 # ⚠️Option B (Best) Brainflow - [USB or BLE Supported]
+
+<table>
+<tr>
+<td>
+
+<details>
+<summary>$\Large\textcolor{red}{\textsf{Raspberry Pi Users: Read This First}}$</summary>
+
+
+### 1. Activate Your Virtual Environment
+
+Before running any test scripts, make sure your virtual environment is active. If you opened a new terminal since Step A.3, re-activate it:
+
+```bash
+source ~/cerelog-venv/bin/activate
+```
+
+### 2. Hardcode the Serial Port
+
+All BrainFlow test scripts — including `filtered_plot.py` — must have the serial port name hardcoded to run on Raspberry Pi. Automatic port detection does not work on Pi.
+
+In each script, find the line:
+
+```python
+params = BrainFlowInputParams()
+```
+
+And add the following line directly after it:
+
+```python
+params.serial_port = "/dev/ttyCH341USB0"
+```
+
+> ⚠️ **Note for V2 and 16CH devices:** These boards do not use the CH341 chip, so `/dev/ttyCH341USB0` will not exist. You need to manually find your board's port name in the terminal (for example, run `ls /dev/tty*` before and after plugging in the board and look for the new entry), then use that port name in the line above.
+
+You must make this edit in **every** BrainFlow test script you want to run on the Pi.
+
+### 3. Running Test Scripts Over SSH
+
+Test scripts that display plots must be run from the Raspberry Pi's own terminal. If you are connected over SSH, the plot window cannot open on your remote machine by default. To run a script over SSH and have the plot display on the Pi's screen, prefix the command with `DISPLAY=:0`:
+
+```bash
+DISPLAY=:0 python filtered_plot.py
+```
+
+</details>
+
+</td>
+</tr>
+</table>
 
 ### 🔌 USB Instructions
 

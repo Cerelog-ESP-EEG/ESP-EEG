@@ -721,10 +721,22 @@ https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork
 
 ### 🔌 USB Instructions
 
-**What the guide above shows you (wired, USB):**
+Over USB, the 16CH board connects **directly to the main (official) OpenBCI GUI** — no fork or Python script needed.
+
+Download the main OpenBCI GUI here: https://docs.openbci.com/Software/OpenBCISoftware/GUIDocs/
+
+**To connect:**
 1. Plug the board into your computer with a USB cable.
-2. Run the LSL Python bridge script. It reads data from the board over USB and sends it out as an LSL stream.
-3. Open the OpenBCI GUI fork (linked in the guide) and select that LSL stream to see your data.
+2. Open the OpenBCI GUI.
+3. Under **Data Source**, select **CYTON**.
+4. Select **Serial (from Dongle)**.
+5. Select **Manual Connect**.
+6. Click the serial port that comes up.
+7. Make sure **Channel Count** is set to **8 Channels**.
+8. Press **START SESSION**.
+
+<!-- TODO: add photo of OpenBCI GUI connection settings here -->
+*📷 [Photo placeholder: OpenBCI GUI connection settings]*
 
 ### 📶 BLE Wireless Instructions
 

@@ -761,8 +761,7 @@ You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bl
 9. Press **START SESSION**.
 10. **⚠️ You MUST then press START STREAM to see data.**
 
-<!-- TODO: add photo of OpenBCI GUI BLE/WiFi connection settings here -->
-*📷 [Photo placeholder: OpenBCI GUI WiFi Shield connection settings]*
+<img src="OB16_ble.jpg" alt="OpenBCI GUI BLE (WiFi Shield) connection settings for the 16CH board" width="700">
 
 
 # ⚠️Option B (Best) Brainflow - [USB or BLE Supported]

@@ -43,6 +43,8 @@ Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
 
 Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html) and **See Instructions file above for device usage**
 
+Additional Setup Instructions: [Quickstart Guide](Instructions/readme.md)
+
 Video Product Overview: [Here](youtube.com/watch?v=6XKdIbguI00&embeds_referring_euri=https%3A%2F%2Fwww.cerelog.com%2F)
 
 3D Print your own case [Here](https://github.com/Cerelog-ESP-EEG/3D-print-Case/tree/main)

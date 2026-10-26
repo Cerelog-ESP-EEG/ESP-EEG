@@ -248,7 +248,7 @@ and
 
 
 <details>
-<summary><b>🟦🟩 V1 and V2 ESP-EEG Software Options — click to expand</b></summary>
+<summary><h1>👉 🟦🟩 V1 and V2 ESP-EEG Software Options (CLICK TO EXPAND)</h1></summary>
 
 # *⚠️Option A (NEW and Easy) Use with the modified version of the OpenBCI GUI  or Lab Stream Layer (LSL) here: 
 
@@ -652,7 +652,7 @@ if __name__ == "__main__":
 </details>
 
 <details>
-<summary><b>🟪 16CH ESP-EEG Software Options — click to expand</b></summary>
+<summary><h1>👉 🟪 16CH ESP-EEG Software Options (CLICK TO EXPAND)</h1></summary>
 
 </details>
 

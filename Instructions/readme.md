@@ -773,7 +773,37 @@ You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bl
 
 ### 📶 BLE Wireless Instructions
 
-*(Coming soon)*
+**Don't Like USB?: BLE Wireless Support**
+
+> **📊 Sample rate: 250 SPS over BLE.** Streaming through the BLE bridge runs at 250 SPS.
+
+You can connect the 16CH board to BrainFlow without a cable, using Bluetooth (BLE). Get the BLE firmware and the BLE bridge Python script (`.py`) from the <ins>extra instructions</ins> here: [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
+
+> **Why a bridge script?** BrainFlow can't read BLE directly from this board. The bridge script connects to the board over BLE and makes it look like an OpenBCI WiFi Shield to BrainFlow.
+
+**To connect:**
+1. Flash the BLE firmware onto the board (from the link above).
+2. Run the included BLE bridge Python script (`.py`) from the link above. Leave it running.
+3. In your BrainFlow script, select the **Cyton + Daisy WiFi** board (16 channels): `BoardIds.CYTON_DAISY_WIFI_BOARD`.
+4. Set the IP address to **127.0.0.1**.
+5. Set the **Sample Rate** to **250**.
+6. Start the session and stream.
+
+```python
+from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds
+
+params = BrainFlowInputParams()
+params.ip_address = "127.0.0.1"   # the BLE bridge script
+params.ip_port = 6677              # any free local port
+
+board = BoardShim(BoardIds.CYTON_DAISY_WIFI_BOARD, params)
+board.prepare_session()
+board.config_board("~6")          # set sample rate to 250 SPS
+board.start_stream()
+```
+
+<!-- TODO: add photo of BrainFlow BLE connection here -->
+*📷 [Photo placeholder: BrainFlow BLE connection]*
 
 </details>
 

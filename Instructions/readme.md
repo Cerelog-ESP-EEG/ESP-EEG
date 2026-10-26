@@ -765,11 +765,32 @@ You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bl
 *📷 [Photo placeholder: OpenBCI GUI WiFi Shield connection settings]*
 
 
-# ⚠️Option B (Best) Brainflow Fork - [USB or BLE Supported]
+# ⚠️Option B (Best) Brainflow - [USB or BLE Supported]
 
 ### 🔌 USB Instructions
 
-*(Coming soon)*
+> **📊 Sample rate: 125 SPS over USB.** For 250 SPS, use the BLE Wireless option below.
+
+Over USB, the 16CH board works with the **main (official) BrainFlow** — no fork needed. Download BrainFlow here: https://github.com/brainflow-dev/brainflow
+
+Use the board exactly like you would an **OpenBCI Cyton + Daisy over serial**.
+
+**To connect:**
+1. Plug the board into your computer with a USB cable.
+2. In your BrainFlow script, select the **Cyton + Daisy** board: `BoardIds.CYTON_DAISY_BOARD`.
+3. Set the serial port to the board's port (e.g. `COM3` on Windows, `/dev/cu.usbmodem...` on macOS, `/dev/ttyACM0` on Linux).
+4. Start the session and stream.
+
+```python
+from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds
+
+params = BrainFlowInputParams()
+params.serial_port = "COM3"       # change to your board's port
+
+board = BoardShim(BoardIds.CYTON_DAISY_BOARD, params)
+board.prepare_session()
+board.start_stream()
+```
 
 ### 📶 BLE Wireless Instructions
 
@@ -801,6 +822,8 @@ board.prepare_session()
 board.config_board("~6")          # set sample rate to 250 SPS
 board.start_stream()
 ```
+
+<sub>⚠️ Note: Don't use the default `BoardShim.get_sampling_rate()` value for this board. BrainFlow will report **1000** SPS, but the actual stream is **250** SPS. Hardcode 250 in your script instead.</sub>
 
 <!-- TODO: add photo of BrainFlow BLE connection here -->
 *📷 [Photo placeholder: BrainFlow BLE connection]*

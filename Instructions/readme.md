@@ -231,9 +231,6 @@ Connect the board to your computer via USB-C. Wait for green LED to turn on.
 ⚠️ Don't see the LED turn on? 
 Sometimes you may need to turn on and off PCB for computer to detect new board. If you do not see this status LED turn on after 10 seconds you need to powercycle with switch. Also, if the LIPO battery is dead you will need to charge it with USB-C. After plugging in a new battery you must also turn on and off the power switch.
 
-**Don't Like USB?:  WiFI Support (Under Dev)**
-[More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
-
 ---
 
 # 💻 Part 2: Software Setup & Advanced Analysis
@@ -255,6 +252,20 @@ and
 ## *⚠️Option A (NEW and Easy)<br>Use with the modified version of the OpenBCI GUI or Lab Stream Layer (LSL) here: 
 
 https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
+
+**What the guide above shows you (wired, USB):**
+1. Plug the board into your computer with a USB cable.
+2. Run the LSL Python bridge script. It reads data from the board over USB and sends it out as an LSL stream.
+3. Open the OpenBCI GUI fork (linked in the guide) and select that LSL stream to see your data.
+
+**Don't Like USB?: BLE Wireless Support (Under Dev)**
+
+You can do the exact same thing without a cable, using Bluetooth (BLE). Follow the extra wireless instructions here: [More info](https://github.com/Cerelog-ESP-EEG/WiFi_Support)
+
+They show you how to:
+1. Flash the BLE firmware onto the board.
+2. Run the BLE LSL Python bridge script (the wireless version of the USB script).
+3. Open the same OpenBCI GUI fork and select the LSL stream, just like with USB.
 
 
 # Option B (Best) To learn how to use with Brainflow keep reading: 

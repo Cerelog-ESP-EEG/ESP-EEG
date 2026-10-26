@@ -735,9 +735,9 @@ Download the main OpenBCI GUI here: https://docs.openbci.com/Software/OpenBCISof
 6. Click the serial port that comes up.
 7. Make sure **Channel Count** is set to **16 Channels**.
 8. Press **START SESSION**.
+9. **⚠️ You MUST then press START STREAM to see data.**
 
-<!-- TODO: add photo of OpenBCI GUI connection settings here -->
-*📷 [Photo placeholder: OpenBCI GUI connection settings]*
+<img src="OB16_USB.jpg" alt="OpenBCI GUI USB connection settings for the 16CH board" width="700">
 
 ### 📶 BLE Wireless Instructions
 
@@ -759,6 +759,7 @@ You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bl
 7. Select **Static IP** and enter **127.0.0.1**.
 8. Set the **Sample Rate** to **250**.
 9. Press **START SESSION**.
+10. **⚠️ You MUST then press START STREAM to see data.**
 
 <!-- TODO: add photo of OpenBCI GUI BLE/WiFi connection settings here -->
 *📷 [Photo placeholder: OpenBCI GUI WiFi Shield connection settings]*

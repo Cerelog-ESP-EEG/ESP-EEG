@@ -790,8 +790,10 @@ board.prepare_session()
 board.start_stream()
 ```
 
+<table><tr><td>
+
 <details>
-<summary><b>📈 Sample Real-Time Plotter Script (Python, USB) — click to expand</b></summary>
+<summary><h3>👉 📈 Sample Real-Time Plotter Script (Python, USB) (CLICK TO EXPAND)</h3></summary>
 
 A verified working test script that streams all 16 channels over USB and shows a live, filtered, scrolling plot. Run it with `python plotter.py`, or `python plotter.py --serial-port COM3` to set the port yourself.
 
@@ -1090,6 +1092,8 @@ if __name__ == "__main__":
 ```
 
 </details>
+
+</td></tr></table>
 
 ### 📶 BLE Wireless Instructions
 

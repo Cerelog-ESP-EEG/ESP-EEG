@@ -672,7 +672,7 @@ Run it by saying python filtered_plot.py or on mac OS python3 filtered_plot.py i
 ## **[Note: If you can't connect the computer to the device, read this helpful [troubleshooting guide:](https://github.com/Cerelog-ESP-EEG/Troubleshooting_connection/tree/main )]**
 
 ##  Run the Script
-Below is the complete Python script for robust, real-time plotting. Save this code as `filtered_plot.py` inside your custom BrainFlow folder.
+
 
 <details>
 <summary>🛠️ $\textcolor{red}{\textsf{Troubleshooting: }\texttt{ModuleNotFoundError: No module named 'pkg\_resources'}}$</summary>
@@ -693,6 +693,8 @@ python -m pip install "setuptools<82"
 ```
 
 </details>
+
+Below is the complete Python script for robust, real-time plotting. Save this code as `filtered_plot.py` inside your custom BrainFlow folder.
 
 **Scroll down past the code to learn how it works.**
 
@@ -1002,28 +1004,331 @@ Re-run `source ~/cerelog-venv/bin/activate` in every new terminal or SSH session
 
 ---
 
-### 2 · Save the script and find the port
+### 2 · Save the test script
 
 ```bash
 mkdir -p ~/cerelog-16ch && cd ~/cerelog-16ch
-nano plotter.py
+nano filtered_plot.py
 ```
 
-Paste in the **📈 Sample Real-Time Plotter Script** below, save with **Ctrl+O**, **Enter**, exit with **Ctrl+X**.
+Paste in the script below, save with **Ctrl+O**, **Enter**, exit with **Ctrl+X**. No port editing needed — it finds the board automatically.
 
-Port auto-detection doesn't work on the Pi. Run `ls /dev/tty*` with the board unplugged, then plugged in — the new entry is your port (usually `/dev/ttyACM0`).
+<details>
+<summary><b>📈 16CH test script (filtered_plot.py) — click to expand</b></summary>
+
+```python
+import argparse
+import glob
+import sys
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds, BrainFlowError
+from brainflow.data_filter import DataFilter, FilterTypes
+from brainflow.data_filter import NoiseTypes, DetrendOperations, AggOperations, WaveletTypes, NoiseEstimationLevelTypes, WaveletExtensionTypes, ThresholdTypes, WaveletDenoisingTypes
+# --- Configuration ---
+BOARD_ID = BoardIds.CYTON_DAISY_BOARD.value
+SECONDS_TO_DISPLAY = 10
+UPDATE_INTERVAL_MS = 40
+
+# Cyton+Daisy talks over the OpenBCI USB dongle, so unlike the Cerelog board it needs a serial
+# port. Leave as None to auto-detect the dongle, or pass --serial-port to pin it down.
+SERIAL_PORT = None
+
+# Filter corners. The Daisy runs at 125 Hz (Nyquist 62.5 Hz), so the 100 Hz lowpass used for the
+# Cerelog board is not representable here - 45 Hz keeps the EEG band and already knocks down both
+# 50 and 60 Hz mains. Anything whose stop band crowds Nyquist is skipped at runtime.
+LOWPASS_HZ = 45.0
+NOTCH_BANDS = ((48.0, 52.0), (58.0, 62.0))
+NYQUIST_SAFETY = 0.9        # highest fraction of Nyquist a filter edge may sit at
+
+# Extra seconds of data kept to the LEFT of the visible window, used only to let the IIR
+# filters settle. The 4th-order 0.5 Hz highpass has a time constant of ~0.32s, so 2s is about
+# 6 time constants - by the time the signal enters the visible window the startup transient is
+# gone. Without this the filters restart from zero on every frame and the left edge writhes.
+FILTER_RUNIN_SECONDS = 2.0
+
+# Autoscale: expand instantly so the trace never clips, shrink smoothly so it does not twitch.
+Y_AXIS_PADDING_FACTOR = 1.25
+Y_SHRINK_RATE = 0.15        # per frame, ~1s to settle at 25fps
+Y_SNAP_RATIO = 0.5          # if the range is more than 2x too wide, jump instead of easing
+Y_MIN_HALF_RANGE_UV = 5.0   # never zoom in past +/-5uV, a flat channel would just show noise
+Y_ROBUST_PERCENTILE = 99.9  # ignore the top/bottom 0.1%: rejects single-sample glitches but
+                            # still keeps real features like eye blinks inside the window
+
+# --- Global variables ---
+board = None
+eeg_channels = []
+sampling_rate = 0
+window_size = 0
+runin_size = 0
+data_buffer = np.array([])
+y_half_ranges = {}
+y_seeded = False
+lowpass_hz = 0.0
+notch_bands = []
+
+def find_serial_port():
+    """
+    Best-effort guess at the OpenBCI dongle's serial port. Returns None if nothing obvious shows
+    up, in which case BrainFlow will fail with a clear message and the user can pass the port.
+    """
+    if sys.platform.startswith('darwin'):
+        patterns = ['/dev/cu.usbserial-*', '/dev/cu.usbmodem*']
+    elif sys.platform.startswith('linux'):
+        patterns = ['/dev/ttyUSB*', '/dev/ttyACM*']
+    else:
+        return None
+
+    for pattern in patterns:
+        matches = sorted(glob.glob(pattern))
+        if matches:
+            return matches[0]
+    return None
+
+def plan_filters(rate):
+    """
+    Drop any filter whose stop band sits too close to Nyquist. A Butterworth designed right at
+    the edge blows up numerically and fills the plot with NaNs instead of failing loudly.
+    """
+    global lowpass_hz, notch_bands
+
+    ceiling = NYQUIST_SAFETY * rate / 2.0
+    lowpass_hz = min(LOWPASS_HZ, ceiling)
+    notch_bands = [(lo, hi) for lo, hi in NOTCH_BANDS if hi <= ceiling]
+
+    print(f"Lowpass: {lowpass_hz:.1f} Hz")
+    if notch_bands:
+        print("Notches: " + ", ".join(f"{lo:.0f}-{hi:.0f} Hz" for lo, hi in notch_bands))
+    skipped = [b for b in NOTCH_BANDS if b not in notch_bands]
+    for lo, hi in skipped:
+        print(f"Skipping {lo:.0f}-{hi:.0f} Hz notch: too close to Nyquist ({rate / 2.0:.1f} Hz)")
+
+def main():
+    """
+    Connects to the Cyton+Daisy board and creates a robust, real-time, scrolling plot
+    with stable filtering and adaptive scaling.
+    """
+    global board, eeg_channels, sampling_rate, window_size, runin_size, data_buffer, y_half_ranges
+
+    parser = argparse.ArgumentParser(description='Real-time filtered plot for the OpenBCI Cyton+Daisy.')
+    parser.add_argument('--serial-port', default=SERIAL_PORT,
+                        help='Serial port of the OpenBCI dongle, e.g. /dev/cu.usbserial-DM01234 or COM3.')
+    args = parser.parse_args()
+
+    serial_port = args.serial_port or find_serial_port()
+    if not serial_port:
+        print("Could not auto-detect a serial port. Re-run with --serial-port <port>.")
+        return
+
+    params = BrainFlowInputParams()
+    params.serial_port = serial_port
+    params.timeout = 15
+    board = BoardShim(BOARD_ID, params)
+
+    try:
+        eeg_channels = BoardShim.get_eeg_channels(BOARD_ID)
+        sampling_rate = BoardShim.get_sampling_rate(BOARD_ID)
+        window_size = SECONDS_TO_DISPLAY * sampling_rate
+        runin_size = int(FILTER_RUNIN_SECONDS * sampling_rate)
+
+        if sampling_rate <= 0:
+            raise BrainFlowError("Could not get a valid sampling rate from the board.", 0)
+
+        for i in range(len(eeg_channels)):
+            y_half_ranges[i] = 100.0
+
+        print(f"Connecting to {board.get_board_descr(BOARD_ID)['name']} on {serial_port}...")
+        print(f"Detected Sampling Rate: {sampling_rate} Hz")
+        print(f"EEG Channels: {len(eeg_channels)}")
+        plan_filters(sampling_rate)
+        board.prepare_session()
+        print("\nStarting stream... Close the plot window to stop.")
+        board.start_stream(5 * 60 * sampling_rate)
+        time.sleep(2)
+
+        num_board_channels = BoardShim.get_num_rows(BOARD_ID)
+        data_buffer = np.empty((num_board_channels, 0))
+
+        # --- Plot Setup ---
+        plt.rcParams.update({
+            'figure.facecolor': '#ffffff',
+            'axes.facecolor': '#fbfbfd',
+            'axes.edgecolor': '#c8ccd4',
+            'axes.labelcolor': '#3c4048',
+            'grid.color': '#e2e5ea',
+            'xtick.color': '#6b7280',
+            'ytick.color': '#6b7280',
+            'font.size': 8,
+        })
+
+        # 16 channels on the Daisy, so lay the grid out from the channel count instead of
+        # hardcoding it - this still works if a Cyton-only board is dropped in.
+        num_channels = len(eeg_channels)
+        num_cols = 4 if num_channels > 8 else 2
+        num_rows = int(np.ceil(num_channels / num_cols))
+
+        fig, axes = plt.subplots(num_rows, num_cols, figsize=(18, 10), sharex=True)
+        fig.suptitle('Real-Time Cyton+Daisy EEG Waveforms', fontsize=15, color='#20242b')
+        axes_flat = np.atleast_1d(axes).flatten()
+
+        palette = plt.get_cmap('tab20')
+        lines = [axes_flat[i].plot([], [], lw=0.9, color=palette(i % 20), solid_joinstyle='round')[0]
+                 for i in range(num_channels)]
+
+        for i, ax in enumerate(axes_flat):
+            if i >= num_channels:
+                ax.axis('off')
+                continue
+            ax.set_title(f'Channel {i + 1}', fontsize=9, color='#3c4048', pad=3)
+            ax.set_ylabel('µV')
+            ax.grid(True, linewidth=0.6, alpha=0.9)
+            ax.set_axisbelow(True)
+            ax.set_xlim(-SECONDS_TO_DISPLAY, 0)
+            ax.axhline(0, color='#c8ccd4', lw=0.6, zorder=1)
+            for side in ('top', 'right'):
+                ax.spines[side].set_visible(False)
+
+        fig.text(0.5, 0.035, 'Time (Seconds from "Now")', ha='center', va='center', color='#3c4048')
+        plt.tight_layout(rect=[0, 0.05, 1, 0.96])
+
+        def on_close(event):
+            print("Plot window closed, stopping stream...")
+            if board and board.is_prepared():
+                board.stop_stream()
+                board.release_session()
+            print("Session released. Exiting.")
+
+        fig.canvas.mpl_connect('close_event', on_close)
+
+        ani = FuncAnimation(fig, update_plot, fargs=(lines, axes_flat[:num_channels]),
+                            interval=UPDATE_INTERVAL_MS, blit=False, cache_frame_data=False)
+        plt.show()
+
+    except Exception as e:
+        print(f"An error occurred in main(): {e}")
+    finally:
+        if board and board.is_prepared():
+            board.release_session()
+
+def update_plot(frame, lines, axes):
+    """
+    This function is called periodically to update the plot data.
+    """
+    global data_buffer, y_half_ranges, y_seeded
+
+    try:
+        new_data = board.get_board_data()
+        if new_data.shape[1] > 0:
+            data_buffer = np.hstack((data_buffer, new_data))
+        # Keep the visible window plus the filter run-in margin.
+        buffer_limit = window_size + runin_size
+        if data_buffer.shape[1] > buffer_limit:
+            data_buffer = data_buffer[:, -buffer_limit:]
+
+        total_points = data_buffer.shape[1]
+        if total_points < 32:
+            return
+
+        # Filter the run-in margin together with the visible window, then throw the margin away.
+        # Every displayed sample has then seen the same amount of filter history regardless of
+        # where the window happens to start, so its value stops changing from frame to frame.
+        # While the buffer is still filling we trim a proportionally smaller run-in so something
+        # shows up right away instead of waiting the full margin.
+        runin = min(runin_size, total_points // 4)
+        num_points = total_points - runin
+        if num_points < 2:
+            return
+
+        # BrainFlow already hands the Cyton/Daisy EEG rows over in microvolts, so unlike the
+        # Cerelog board (which reports volts) there is no unit conversion to do here.
+        eeg_plot_data = np.copy(data_buffer[eeg_channels])
+
+        # --- Filtering Logic (Corrected for Real-Time Stability) ---
+        for i in range(len(eeg_channels)):
+            # Use a safe data length check for the filters
+            if eeg_plot_data[i].size > 20:
+                #1 Detrend to get dc offset away
+                DataFilter.detrend(eeg_plot_data[i], DetrendOperations.CONSTANT.value)
+                # 2. Apply a STABLE 4nd-order low-pass. This is crucial for real-time processing.
+                DataFilter.perform_lowpass(eeg_plot_data[i], sampling_rate, lowpass_hz, 4, FilterTypes.BUTTERWORTH, 0)
+
+                # 3. Apply the band-stop (notch) filters for mains noise.
+                for lo, hi in notch_bands:
+                    DataFilter.perform_bandstop(eeg_plot_data[i], sampling_rate, lo, hi, 3, FilterTypes.BUTTERWORTH, 0)
+
+                #4 High Pass above 0.5 Hz
+                DataFilter.perform_highpass(eeg_plot_data[i], sampling_rate, 0.5, 4, FilterTypes.BUTTERWORTH, 0)
+
+        # Drop the run-in margin now that the filters have settled across it.
+        eeg_plot_data = eeg_plot_data[:, runin:]
+
+        # --- Manual Time Axis Generation (for True Scrolling) ---
+        time_vector_full_window = np.linspace(-SECONDS_TO_DISPLAY, 0, window_size)
+        time_vector_for_plot = time_vector_full_window[-num_points:]
+
+        for i, (line, ax) in enumerate(zip(lines, axes)):
+            channel_data = eeg_plot_data[i]
+
+            # Check for invalid filter output (NaN) to prevent crashes
+            if np.isnan(channel_data).any():
+                print(f"Warning: NaN detected in channel {eeg_channels[i]} after filtering. Skipping one update.")
+                continue
+
+            # The highpass already removed DC; the median is a stable re-centring that a rare
+            # artifact cannot drag around the way a mean can.
+            centered_data = channel_data - np.median(channel_data)
+
+            line.set_data(time_vector_for_plot, centered_data)
+
+            # --- Adaptive Y-Axis Logic ---
+            # Scale off a robust percentile of the whole visible window rather than the raw
+            # min/max, so one spike does not zoom the whole trace out.
+            hi = np.percentile(centered_data, Y_ROBUST_PERCENTILE)
+            lo = np.percentile(centered_data, 100.0 - Y_ROBUST_PERCENTILE)
+            target_half = max(abs(hi), abs(lo)) * Y_AXIS_PADDING_FACTOR
+            target_half = max(target_half, Y_MIN_HALF_RANGE_UV)
+
+            current_half = y_half_ranges[i]
+            if (not y_seeded) or (target_half > current_half) or (target_half < current_half * Y_SNAP_RATIO):
+                # First frame, about to clip, or wildly over-zoomed: go there now.
+                new_half = target_half
+            else:
+                # Settle in gently.
+                new_half = current_half * (1 - Y_SHRINK_RATE) + target_half * Y_SHRINK_RATE
+
+            y_half_ranges[i] = new_half
+            ax.set_ylim(-new_half, new_half)
+
+        y_seeded = True
+
+    except Exception as e:
+        print(f"!!! ERROR IN UPDATE_PLOT: {e}")
+
+if __name__ == "__main__":
+    main()
+```
+
+</details>
 
 ---
 
 ### 3 · Run it
 
+On the Pi's own terminal:
+
 ```bash
-python plotter.py --serial-port /dev/ttyACM0
+python filtered_plot.py
 ```
 
-Over SSH, use `DISPLAY=:0 python plotter.py --serial-port /dev/ttyACM0` so the plot shows on the Pi's monitor. Stop with **Ctrl+C**.
+Over SSH you **must** run it exactly like this, or it won't connect:
 
-> In your own scripts, use `BoardIds.CYTON_DAISY_BOARD` and set `params.serial_port = "/dev/ttyACM0"`.
+```bash
+DISPLAY=:0 python filtered_plot.py
+```
+
+Stop with **Ctrl+C**.
 
 ---
 
@@ -1031,9 +1336,9 @@ Over SSH, use `DISPLAY=:0 python plotter.py --serial-port /dev/ttyACM0` so the p
 
 | Problem | Fix |
 | --- | --- |
-| `UNABLE_TO_OPEN_PORT_ERROR` | Wrong port — re-check with `ls /dev/tty*`. |
-| Won't connect or drops out with the right port | Power problem — use a wall supply. `vcgencmd get_throttled` should print `throttled=0x0`. |
-| `can't open file 'plotter.py'` | `cd ~/cerelog-16ch` first. |
+| Won't connect over SSH | Run with `DISPLAY=:0` in front (Step 3). |
+| Won't connect or drops out | Power problem — use a wall supply. `vcgencmd get_throttled` should print `throttled=0x0`. |
+| `can't open file 'filtered_plot.py'` | `cd ~/cerelog-16ch` first. |
 
 </details>
 

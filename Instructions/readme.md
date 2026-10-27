@@ -271,6 +271,262 @@ They show you how to:
 
 # ⚠️Option B (Best) Brainflow Fork - [USB Supported]
 
+---
+
+<details>
+<summary>$\Large\textcolor{red}{\textsf{Raspberry Pi Users: Read This First}}$</summary>
+
+**Get a Cerelog board running on a Raspberry Pi 4B** — flash the Pi, install the USB driver (V1 boards only), and run the BrainFlow test scripts locally or over SSH.
+
+*Tested on Raspberry Pi OS (64-bit, Debian trixie), kernel `6.18.34+rpt-rpi-v8`.*
+
+### Which board do you have?
+
+Setup differs slightly depending on your board. Find yours here first:
+
+| Board | USB chip | Driver install (Step 3) | Serial port on the Pi |
+| --- | --- | --- | --- |
+| **ESP-EEG V1** | WCH CH341 | **Required** | `/dev/ttyCH341USB0` |
+| **ESP-EEG V2** | Native USB (no CH341) | Skip | Find it yourself — usually `/dev/ttyACM0` |
+| **16CH** | Native USB (no CH341) | Skip | Find it yourself (see Step 7) |
+
+> [!IMPORTANT]
+> The CH341 driver in Step 3 is **only for V1 boards**. V2 and 16CH boards do not use the CH341 chip and work without any driver install.
+
+---
+
+### What you need
+
+| Item | Details |
+| --- | --- |
+| **Raspberry Pi 4B** | with SD card + a **dedicated USB-C wall power supply** (the official 5.1V / 3A supply is recommended) |
+| **Monitor + USB keyboard** | monitor needs a micro-HDMI → HDMI cable/adapter |
+| **Network** | an ethernet cable **or** your WiFi name + password |
+| **Cerelog board** | + its USB cable |
+| **A computer** | with an SD card slot (for flashing, and optionally for SSH) |
+
+> [!IMPORTANT]
+> **The Pi must have a sufficient power source.** The Cerelog board draws its power through the Pi's USB port. If the Pi is underpowered (a laptop USB port, a phone charger, a weak power bank or a long, thin cable), the board will brown out and **you will not be able to connect to it** until the power issue is fixed. Use a dedicated wall power supply plugged directly into the outlet.
+
+---
+
+### Step 1 · Flash the SD card
+
+1. On your computer, install and open **[Raspberry Pi Imager](https://www.raspberrypi.com/software/)**.
+2. Choose **Raspberry Pi OS (64-bit)**, then select your SD card.
+3. Click the **gear icon** (Edit Settings) and set:
+   - **Username + password** — write both down
+   - **Enable SSH** → password authentication
+   - **WiFi** name + password (skip if using ethernet)
+4. Write it, then put the card in the Pi.
+
+> [!IMPORTANT]
+> The username you pick here is your login for everything below. It does **not** default to `pi` — it's whatever you type.
+
+---
+
+### Step 2 · First boot
+
+1. Plug the monitor into the Pi's **micro-HDMI port nearest the USB-C jack**, connect the keyboard, and plug in ethernet if you're using it.
+2. Plug in USB-C power **last**. It boots to a desktop in under a minute.
+3. If a setup wizard appears, finish it (language, WiFi, confirm user/password).
+4. Open a terminal — the `>_` icon in the top bar.
+
+Everything from here runs in that terminal (or over SSH — see **Remote access** below).
+
+---
+
+### Step 3 · Install the CH341 driver (V1 boards only)
+
+> [!NOTE]
+> **V2 and 16CH users: skip to Step 4.** This step installs WCH's CH341 vendor driver so a V1 board reliably shows up as `/dev/ttyCH341USB0`. It's a one-time setup and loads automatically on every boot.
+
+#### 3a · Build the driver
+
+Install the build tools + kernel headers (harmless if already present):
+
+```bash
+sudo apt update
+sudo apt install -y git build-essential linux-headers-rpi-v8
+```
+
+Download and build:
+
+```bash
+cd ~
+git clone https://github.com/WCHSoftGroup/ch341ser_linux.git
+cd ch341ser_linux/driver
+make
+```
+
+Success ends with **"The target driver file has been generated"** and a `ch341.ko` file.
+
+#### 3b · Install the driver
+
+```bash
+sudo mkdir -p /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates
+sudo cp ~/ch341ser_linux/driver/ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates/ch341-vendor.ko
+sudo depmod -a
+```
+
+No output means it worked.
+
+#### 3c · Load it on every boot
+
+```bash
+echo "blacklist ch341" | sudo tee /etc/modprobe.d/blacklist-ch341.conf
+echo "ch341-vendor" | sudo tee /etc/modules-load.d/ch341-vendor.conf
+sudo reboot
+```
+
+This blocks the stock driver and auto-loads the vendor one at startup, so the board is ready straight from power-on.
+
+> [!TIP]
+> To undo later: `sudo rm /etc/modprobe.d/blacklist-ch341.conf /etc/modules-load.d/ch341-vendor.conf` then `sudo reboot`.
+
+#### 3d · Verify
+
+After it reboots, plug in the V1 board and run:
+
+```bash
+ls /dev/ttyCH341USB*
+```
+
+If you see **`/dev/ttyCH341USB0`**, the driver is working.
+
+---
+
+### Step 4 · Install BrainFlow and the virtual environment
+
+Follow **Steps 1–5 below** (Option B) to clone `Shared_brainflow-cerelog` into your home folder and create the `~/cerelog-venv` virtual environment. When you're done, `ls ~` should show both `cerelog-venv` and `Shared_brainflow-cerelog`.
+
+---
+
+### Remote access (optional)
+
+You can work on the Pi from your laptop without the monitor attached. You'll still need the Pi connected to a screen if you want to **see plots** (see Step 8).
+
+1. On the Pi, get its address: `hostname -I` (capital **I**) → e.g. `192.168.1.118`.
+2. From your laptop's terminal:
+   ```bash
+   ssh <username>@raspberrypi.local
+   ```
+   or use the IP: `ssh <username>@192.168.1.118`.
+3. First time, type `yes` at the fingerprint prompt, then enter the **Pi's** password.
+
+---
+
+### Step 5 · Activate the virtual environment
+
+Do this every time you open a new terminal or SSH session:
+
+```bash
+source ~/cerelog-venv/bin/activate
+```
+
+You'll see `(cerelog-venv)` at the start of your prompt when it's active.
+
+---
+
+### Step 6 · Update the scripts (optional)
+
+To get the latest scripts and fixes:
+
+```bash
+cd ~/Shared_brainflow-cerelog
+git pull
+```
+
+If `git pull` fails with *"Your local changes to the following files would be overwritten by merge"*, it's because you've already edited a script (Step 7). Set your edits aside, pull, then reapply them:
+
+```bash
+git stash
+git pull
+git stash pop
+```
+
+---
+
+### Step 7 · Set the serial port in the script
+
+Automatic port detection does not work on the Pi, so every BrainFlow test script (including `filtered_plot.py`) needs the serial port hardcoded.
+
+Go to the test scripts folder — you must be in this folder to edit and run them:
+
+```bash
+cd ~/Shared_brainflow-cerelog/python_package/cerelog_tests
+```
+
+Open the script in the nano editor:
+
+```bash
+nano filtered_plot.py
+```
+
+Find the line that sets the serial port — it starts with:
+
+```python
+params.serial_port =
+```
+
+Change the value after the `=` to your board's port. For a V1 board:
+
+```python
+params.serial_port = "/dev/ttyCH341USB0"
+```
+
+Save with **Ctrl+O**, then **Enter**, and exit with **Ctrl+X**.
+
+> [!NOTE]
+> **V2 and 16CH users:** `/dev/ttyCH341USB0` will not exist for your board. To find your port, unplug the board and run `ls /dev/tty*`, then plug it in and run it again. The new entry is your board (for example, `/dev/ttyACM0`). Use that name instead:
+> ```python
+> params.serial_port = "/dev/ttyACM0"
+> ```
+
+Repeat this edit in every BrainFlow test script you want to run on the Pi.
+
+---
+
+### Step 8 · Run the script
+
+From the `cerelog_tests` folder, on the Pi's own terminal:
+
+```bash
+python filtered_plot.py
+```
+
+Over SSH, plot windows can't open on your laptop by default. Prefix the command with `DISPLAY=:0` so the plot appears on the Pi's monitor:
+
+```bash
+DISPLAY=:0 python filtered_plot.py
+```
+
+To stop a running script, press **Ctrl+C** (on a Mac, this is Control, not Command).
+
+---
+
+### Troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| `make` fails about headers | Run `ls -ld /lib/modules/$(uname -r)/build` — it should point to a real path. If not, reinstall `linux-headers-rpi-v8` and retry. |
+| `Unable to locate package raspberrypi-kernel-headers` | Old package name. Use `linux-headers-rpi-v8`. |
+| SSH **Permission denied** | Wrong username — it's not `pi` by default. Run `whoami` on the Pi to see it. The password is the **Pi's**, not your laptop's. |
+| SSH address shows `127.0.1.1` | A loopback placeholder, not the Pi. Use `hostname -I` (capital **I**) for the real address. |
+| Password shows nothing as you type | Normal for terminals — just type it and press **Enter**. |
+| `can't open file 'filtered_plot.py'` | You're in the wrong folder. `cd ~/Shared_brainflow-cerelog/python_package/cerelog_tests` and retry. |
+| `UNABLE_TO_OPEN_PORT_ERROR` | The port in the script doesn't match your board. Check it's plugged in and re-check the name with `ls /dev/tty*` (Step 7). V1 users: confirm the driver loaded (Step 3d). |
+| Board won't connect, connects intermittently, or the handshake fails, even with the right port | Likely a power problem: the board is browning out. Power the Pi from a dedicated wall supply (official 5.1V / 3A recommended), not a laptop port or phone charger. A lightning-bolt icon on the Pi's screen, or anything other than `throttled=0x0` from `vcgencmd get_throttled`, means the Pi is under-voltage. |
+| `pkg_resources is deprecated` warning, or an `Exception ignored in BoardShim.__del__` traceback on exit | Harmless — ignore them. |
+
+---
+
+<sub>CH341 driver source (V1 only): [WCHSoftGroup/ch341ser_linux](https://github.com/WCHSoftGroup/ch341ser_linux)</sub>
+
+</details>
+
+---
+
 
 To get the best performance from the ESP EEG, we recommend using our custom BrainFlow instance. This guide covers installation, the theory behind our data stream, and provides a production-grade script for real-time filtering and plotting.
 
@@ -404,264 +660,6 @@ pip install numpy matplotlib pyserial plotly dash scikit-learn "setuptools<82"
 
 
 ## Step 6   Run Test Script
-
-
----
-
-<details>
-<summary>$\Large\textcolor{red}{\textsf{Raspberry Pi Users: Read This First}}$</summary>
-
-**Get a Cerelog board running on a Raspberry Pi 4B** — flash the Pi, install the USB driver (V1 boards only), and run the BrainFlow test scripts locally or over SSH.
-
-*Tested on Raspberry Pi OS (64-bit, Debian trixie), kernel `6.18.34+rpt-rpi-v8`.*
-
-### Which board do you have?
-
-Setup differs slightly depending on your board. Find yours here first:
-
-| Board | USB chip | Driver install (Step 3) | Serial port on the Pi |
-| --- | --- | --- | --- |
-| **ESP-EEG V1** | WCH CH341 | **Required** | `/dev/ttyCH341USB0` |
-| **ESP-EEG V2** | Native USB (no CH341) | Skip | Find it yourself — usually `/dev/ttyACM0` |
-| **16CH** | Native USB (no CH341) | Skip | Find it yourself (see Step 7) |
-
-> [!IMPORTANT]
-> The CH341 driver in Step 3 is **only for V1 boards**. V2 and 16CH boards do not use the CH341 chip and work without any driver install.
-
----
-
-### What you need
-
-| Item | Details |
-| --- | --- |
-| **Raspberry Pi 4B** | with SD card + a **dedicated USB-C wall power supply** (the official 5.1V / 3A supply is recommended) |
-| **Monitor + USB keyboard** | monitor needs a micro-HDMI → HDMI cable/adapter |
-| **Network** | an ethernet cable **or** your WiFi name + password |
-| **Cerelog board** | + its USB cable |
-| **A computer** | with an SD card slot (for flashing, and optionally for SSH) |
-
-> [!IMPORTANT]
-> **The Pi must have a sufficient power source.** The Cerelog board draws its power through the Pi's USB port. If the Pi is underpowered (a laptop USB port, a phone charger, a weak power bank or a long, thin cable), the board will brown out and **you will not be able to connect to it** until the power issue is fixed. Use a dedicated wall power supply plugged directly into the outlet.
-
----
-
-### Step 1 · Flash the SD card
-
-1. On your computer, install and open **[Raspberry Pi Imager](https://www.raspberrypi.com/software/)**.
-2. Choose **Raspberry Pi OS (64-bit)**, then select your SD card.
-3. Click the **gear icon** (Edit Settings) and set:
-   - **Username + password** — write both down
-   - **Enable SSH** → password authentication
-   - **WiFi** name + password (skip if using ethernet)
-4. Write it, then put the card in the Pi.
-
-> [!IMPORTANT]
-> The username you pick here is your login for everything below. It does **not** default to `pi` — it's whatever you type.
-
----
-
-### Step 2 · First boot
-
-1. Plug the monitor into the Pi's **micro-HDMI port nearest the USB-C jack**, connect the keyboard, and plug in ethernet if you're using it.
-2. Plug in USB-C power **last**. It boots to a desktop in under a minute.
-3. If a setup wizard appears, finish it (language, WiFi, confirm user/password).
-4. Open a terminal — the `>_` icon in the top bar.
-
-Everything from here runs in that terminal (or over SSH — see **Remote access** below).
-
----
-
-### Step 3 · Install the CH341 driver (V1 boards only)
-
-> [!NOTE]
-> **V2 and 16CH users: skip to Step 4.** This step installs WCH's CH341 vendor driver so a V1 board reliably shows up as `/dev/ttyCH341USB0`. It's a one-time setup and loads automatically on every boot.
-
-#### 3a · Build the driver
-
-Install the build tools + kernel headers (harmless if already present):
-
-```bash
-sudo apt update
-sudo apt install -y git build-essential linux-headers-rpi-v8
-```
-
-Download and build:
-
-```bash
-cd ~
-git clone https://github.com/WCHSoftGroup/ch341ser_linux.git
-cd ch341ser_linux/driver
-make
-```
-
-Success ends with **"The target driver file has been generated"** and a `ch341.ko` file.
-
-#### 3b · Install the driver
-
-```bash
-sudo mkdir -p /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates
-sudo cp ~/ch341ser_linux/driver/ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates/ch341-vendor.ko
-sudo depmod -a
-```
-
-No output means it worked.
-
-#### 3c · Load it on every boot
-
-```bash
-echo "blacklist ch341" | sudo tee /etc/modprobe.d/blacklist-ch341.conf
-echo "ch341-vendor" | sudo tee /etc/modules-load.d/ch341-vendor.conf
-sudo reboot
-```
-
-This blocks the stock driver and auto-loads the vendor one at startup, so the board is ready straight from power-on.
-
-> [!TIP]
-> To undo later: `sudo rm /etc/modprobe.d/blacklist-ch341.conf /etc/modules-load.d/ch341-vendor.conf` then `sudo reboot`.
-
-#### 3d · Verify
-
-After it reboots, plug in the V1 board and run:
-
-```bash
-ls /dev/ttyCH341USB*
-```
-
-If you see **`/dev/ttyCH341USB0`**, the driver is working.
-
----
-
-### Step 4 · Install BrainFlow and the virtual environment
-
-Follow **Steps 1–5 above** (Option B) to clone `Shared_brainflow-cerelog` into your home folder and create the `~/cerelog-venv` virtual environment. When you're done, `ls ~` should show both `cerelog-venv` and `Shared_brainflow-cerelog`.
-
----
-
-### Remote access (optional)
-
-You can work on the Pi from your laptop without the monitor attached. You'll still need the Pi connected to a screen if you want to **see plots** (see Step 8).
-
-1. On the Pi, get its address: `hostname -I` (capital **I**) → e.g. `192.168.1.118`.
-2. From your laptop's terminal:
-   ```bash
-   ssh <username>@raspberrypi.local
-   ```
-   or use the IP: `ssh <username>@192.168.1.118`.
-3. First time, type `yes` at the fingerprint prompt, then enter the **Pi's** password.
-
----
-
-### Step 5 · Activate the virtual environment
-
-Do this every time you open a new terminal or SSH session:
-
-```bash
-source ~/cerelog-venv/bin/activate
-```
-
-You'll see `(cerelog-venv)` at the start of your prompt when it's active.
-
----
-
-### Step 6 · Update the scripts (optional)
-
-To get the latest scripts and fixes:
-
-```bash
-cd ~/Shared_brainflow-cerelog
-git pull
-```
-
-If `git pull` fails with *"Your local changes to the following files would be overwritten by merge"*, it's because you've already edited a script (Step 7). Set your edits aside, pull, then reapply them:
-
-```bash
-git stash
-git pull
-git stash pop
-```
-
----
-
-### Step 7 · Set the serial port in the script
-
-Automatic port detection does not work on the Pi, so every BrainFlow test script (including `filtered_plot.py`) needs the serial port hardcoded.
-
-Go to the test scripts folder — you must be in this folder to edit and run them:
-
-```bash
-cd ~/Shared_brainflow-cerelog/python_package/cerelog_tests
-```
-
-Open the script in the nano editor:
-
-```bash
-nano filtered_plot.py
-```
-
-Find the line that sets the serial port — it starts with:
-
-```python
-params.serial_port =
-```
-
-Change the value after the `=` to your board's port. For a V1 board:
-
-```python
-params.serial_port = "/dev/ttyCH341USB0"
-```
-
-Save with **Ctrl+O**, then **Enter**, and exit with **Ctrl+X**.
-
-> [!NOTE]
-> **V2 and 16CH users:** `/dev/ttyCH341USB0` will not exist for your board. To find your port, unplug the board and run `ls /dev/tty*`, then plug it in and run it again. The new entry is your board (for example, `/dev/ttyACM0`). Use that name instead:
-> ```python
-> params.serial_port = "/dev/ttyACM0"
-> ```
-
-Repeat this edit in every BrainFlow test script you want to run on the Pi.
-
----
-
-### Step 8 · Run the script
-
-From the `cerelog_tests` folder, on the Pi's own terminal:
-
-```bash
-python filtered_plot.py
-```
-
-Over SSH, plot windows can't open on your laptop by default. Prefix the command with `DISPLAY=:0` so the plot appears on the Pi's monitor:
-
-```bash
-DISPLAY=:0 python filtered_plot.py
-```
-
-To stop a running script, press **Ctrl+C** (on a Mac, this is Control, not Command).
-
----
-
-### Troubleshooting
-
-| Problem | Fix |
-| --- | --- |
-| `make` fails about headers | Run `ls -ld /lib/modules/$(uname -r)/build` — it should point to a real path. If not, reinstall `linux-headers-rpi-v8` and retry. |
-| `Unable to locate package raspberrypi-kernel-headers` | Old package name. Use `linux-headers-rpi-v8`. |
-| SSH **Permission denied** | Wrong username — it's not `pi` by default. Run `whoami` on the Pi to see it. The password is the **Pi's**, not your laptop's. |
-| SSH address shows `127.0.1.1` | A loopback placeholder, not the Pi. Use `hostname -I` (capital **I**) for the real address. |
-| Password shows nothing as you type | Normal for terminals — just type it and press **Enter**. |
-| `can't open file 'filtered_plot.py'` | You're in the wrong folder. `cd ~/Shared_brainflow-cerelog/python_package/cerelog_tests` and retry. |
-| `UNABLE_TO_OPEN_PORT_ERROR` | The port in the script doesn't match your board. Check it's plugged in and re-check the name with `ls /dev/tty*` (Step 7). V1 users: confirm the driver loaded (Step 3d). |
-| Board won't connect, connects intermittently, or the handshake fails, even with the right port | Likely a power problem: the board is browning out. Power the Pi from a dedicated wall supply (official 5.1V / 3A recommended), not a laptop port or phone charger. A lightning-bolt icon on the Pi's screen, or anything other than `throttled=0x0` from `vcgencmd get_throttled`, means the Pi is under-voltage. |
-| `pkg_resources is deprecated` warning, or an `Exception ignored in BoardShim.__del__` traceback on exit | Harmless — ignore them. |
-
----
-
-<sub>CH341 driver source (V1 only): [WCHSoftGroup/ch341ser_linux](https://github.com/WCHSoftGroup/ch341ser_linux)</sub>
-
-</details>
-
----
-
 
 ## Running the first Brainflow Testscript 
 

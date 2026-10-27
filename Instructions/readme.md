@@ -981,129 +981,16 @@ You can connect the 16CH board to the main OpenBCI GUI without a cable, using Bl
 <details>
 <summary>$\Large\textcolor{red}{\textsf{Raspberry Pi Users: Read This First}}$</summary>
 
-**Get a Cerelog board running on a Raspberry Pi 4B** — flash the Pi, install the USB driver (V1 boards only), and run the BrainFlow test scripts locally or over SSH.
-
-*Tested on Raspberry Pi OS (64-bit, Debian trixie), kernel `6.18.34+rpt-rpi-v8`.*
-
-### Which board do you have?
-
-Setup differs slightly depending on your board. Find yours here first:
-
-| Board | USB chip | Driver install (Step 3) | Serial port on the Pi |
-| --- | --- | --- | --- |
-| **ESP-EEG V1** | WCH CH341 | **Required** | `/dev/ttyCH341USB0` |
-| **ESP-EEG V2** | Native USB (no CH341) | Skip | Find it yourself — usually `/dev/ttyACM0` |
-| **16CH** | Native USB (no CH341) | Skip | Find it yourself (see Step 7) |
+**First set up the Pi** (flash the SD card, first boot, optional SSH) using Steps 1–2 and *Remote access* of the **Raspberry Pi Users** guide in the 🟦🟩 V1/V2 section above. Skip its driver step — the 16CH board needs no driver.
 
 > [!IMPORTANT]
-> The CH341 driver in Step 3 is **only for V1 boards**. V2 and 16CH boards do not use the CH341 chip and work without any driver install.
+> Power the Pi from a **dedicated wall supply** (official 5.1V / 3A recommended). The board is powered through the Pi's USB port, and an underpowered Pi means the board won't connect.
 
 ---
 
-### What you need
+### 1 · Install BrainFlow
 
-| Item | Details |
-| --- | --- |
-| **Raspberry Pi 4B** | with SD card + a **dedicated USB-C wall power supply** (the official 5.1V / 3A supply is recommended) |
-| **Monitor + USB keyboard** | monitor needs a micro-HDMI → HDMI cable/adapter |
-| **Network** | an ethernet cable **or** your WiFi name + password |
-| **Cerelog board** | + its USB cable |
-| **A computer** | with an SD card slot (for flashing, and optionally for SSH) |
-
-> [!IMPORTANT]
-> **The Pi must have a sufficient power source.** The Cerelog board draws its power through the Pi's USB port. If the Pi is underpowered (a laptop USB port, a phone charger, a weak power bank or a long, thin cable), the board will brown out and **you will not be able to connect to it** until the power issue is fixed. Use a dedicated wall power supply plugged directly into the outlet.
-
----
-
-### Step 1 · Flash the SD card
-
-1. On your computer, install and open **[Raspberry Pi Imager](https://www.raspberrypi.com/software/)**.
-2. Choose **Raspberry Pi OS (64-bit)**, then select your SD card.
-3. Click the **gear icon** (Edit Settings) and set:
-   - **Username + password** — write both down
-   - **Enable SSH** → password authentication
-   - **WiFi** name + password (skip if using ethernet)
-4. Write it, then put the card in the Pi.
-
-> [!IMPORTANT]
-> The username you pick here is your login for everything below. It does **not** default to `pi` — it's whatever you type.
-
----
-
-### Step 2 · First boot
-
-1. Plug the monitor into the Pi's **micro-HDMI port nearest the USB-C jack**, connect the keyboard, and plug in ethernet if you're using it.
-2. Plug in USB-C power **last**. It boots to a desktop in under a minute.
-3. If a setup wizard appears, finish it (language, WiFi, confirm user/password).
-4. Open a terminal — the `>_` icon in the top bar.
-
-Everything from here runs in that terminal (or over SSH — see **Remote access** below).
-
----
-
-### Step 3 · Install the CH341 driver (V1 boards only)
-
-> [!NOTE]
-> **V2 and 16CH users: skip to Step 4.** This step installs WCH's CH341 vendor driver so a V1 board reliably shows up as `/dev/ttyCH341USB0`. It's a one-time setup and loads automatically on every boot.
-
-#### 3a · Build the driver
-
-Install the build tools + kernel headers (harmless if already present):
-
-```bash
-sudo apt update
-sudo apt install -y git build-essential linux-headers-rpi-v8
-```
-
-Download and build:
-
-```bash
-cd ~
-git clone https://github.com/WCHSoftGroup/ch341ser_linux.git
-cd ch341ser_linux/driver
-make
-```
-
-Success ends with **"The target driver file has been generated"** and a `ch341.ko` file.
-
-#### 3b · Install the driver
-
-```bash
-sudo mkdir -p /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates
-sudo cp ~/ch341ser_linux/driver/ch341.ko /lib/modules/$(uname -r)/kernel/drivers/usb/serial/updates/ch341-vendor.ko
-sudo depmod -a
-```
-
-No output means it worked.
-
-#### 3c · Load it on every boot
-
-```bash
-echo "blacklist ch341" | sudo tee /etc/modprobe.d/blacklist-ch341.conf
-echo "ch341-vendor" | sudo tee /etc/modules-load.d/ch341-vendor.conf
-sudo reboot
-```
-
-This blocks the stock driver and auto-loads the vendor one at startup, so the board is ready straight from power-on.
-
-> [!TIP]
-> To undo later: `sudo rm /etc/modprobe.d/blacklist-ch341.conf /etc/modules-load.d/ch341-vendor.conf` then `sudo reboot`.
-
-#### 3d · Verify
-
-After it reboots, plug in the V1 board and run:
-
-```bash
-ls /dev/ttyCH341USB*
-```
-
-If you see **`/dev/ttyCH341USB0`**, the driver is working.
-
----
-
-### Step 4 · Install BrainFlow and the virtual environment
-
-Over USB the 16CH board uses the **official BrainFlow** from PyPI — no fork to clone or build. Raspberry Pi OS requires a Python virtual environment, so create one and install BrainFlow into it:
+The 16CH board uses the **official BrainFlow** (no fork). Create a virtual environment and install it:
 
 ```bash
 python3 -m venv ~/cerelog-venv
@@ -1111,83 +998,32 @@ source ~/cerelog-venv/bin/activate
 pip install brainflow numpy matplotlib
 ```
 
-When you're done, `ls ~` should show `cerelog-venv`.
+Re-run `source ~/cerelog-venv/bin/activate` in every new terminal or SSH session.
 
 ---
 
-### Remote access (optional)
-
-You can work on the Pi from your laptop without the monitor attached. You'll still need the Pi connected to a screen if you want to **see plots** (see Step 8).
-
-1. On the Pi, get its address: `hostname -I` (capital **I**) → e.g. `192.168.1.118`.
-2. From your laptop's terminal:
-   ```bash
-   ssh <username>@raspberrypi.local
-   ```
-   or use the IP: `ssh <username>@192.168.1.118`.
-3. First time, type `yes` at the fingerprint prompt, then enter the **Pi's** password.
-
----
-
-### Step 5 · Activate the virtual environment
-
-Do this every time you open a new terminal or SSH session:
+### 2 · Save the script and find the port
 
 ```bash
-source ~/cerelog-venv/bin/activate
-```
-
-You'll see `(cerelog-venv)` at the start of your prompt when it's active.
-
----
-
-### Step 6 · Update BrainFlow (optional)
-
-To get the latest BrainFlow release, with the virtual environment active:
-
-```bash
-pip install --upgrade brainflow
-```
-
----
-
-### Step 7 · Save the script and find your serial port
-
-Make a folder for your scripts and open a new file in the nano editor:
-
-```bash
-mkdir -p ~/cerelog-16ch
-cd ~/cerelog-16ch
+mkdir -p ~/cerelog-16ch && cd ~/cerelog-16ch
 nano plotter.py
 ```
 
-Paste in the **📈 Sample Real-Time Plotter Script** from the USB Instructions below, then save with **Ctrl+O**, then **Enter**, and exit with **Ctrl+X**.
+Paste in the **📈 Sample Real-Time Plotter Script** below, save with **Ctrl+O**, **Enter**, exit with **Ctrl+X**.
 
-Automatic port detection does not work on the Pi, so you need to give the script your board's port. To find it, unplug the board and run `ls /dev/tty*`, then plug it in and run it again. The new entry is your board (usually `/dev/ttyACM0`).
-
-> [!NOTE]
-> The sample plotter takes the port on the command line (Step 8), so you don't need to edit it. In your own BrainFlow scripts, use `BoardIds.CYTON_DAISY_BOARD` and hardcode the port:
-> ```python
-> params.serial_port = "/dev/ttyACM0"
-> ```
+Port auto-detection doesn't work on the Pi. Run `ls /dev/tty*` with the board unplugged, then plugged in — the new entry is your port (usually `/dev/ttyACM0`).
 
 ---
 
-### Step 8 · Run the script
-
-From the `~/cerelog-16ch` folder, on the Pi's own terminal (swap in your port from Step 7):
+### 3 · Run it
 
 ```bash
 python plotter.py --serial-port /dev/ttyACM0
 ```
 
-Over SSH, plot windows can't open on your laptop by default. Prefix the command with `DISPLAY=:0` so the plot appears on the Pi's monitor:
+Over SSH, use `DISPLAY=:0 python plotter.py --serial-port /dev/ttyACM0` so the plot shows on the Pi's monitor. Stop with **Ctrl+C**.
 
-```bash
-DISPLAY=:0 python plotter.py --serial-port /dev/ttyACM0
-```
-
-To stop a running script, press **Ctrl+C** (on a Mac, this is Control, not Command).
+> In your own scripts, use `BoardIds.CYTON_DAISY_BOARD` and set `params.serial_port = "/dev/ttyACM0"`.
 
 ---
 
@@ -1195,19 +1031,9 @@ To stop a running script, press **Ctrl+C** (on a Mac, this is Control, not Comma
 
 | Problem | Fix |
 | --- | --- |
-| `make` fails about headers | Run `ls -ld /lib/modules/$(uname -r)/build` — it should point to a real path. If not, reinstall `linux-headers-rpi-v8` and retry. |
-| `Unable to locate package raspberrypi-kernel-headers` | Old package name. Use `linux-headers-rpi-v8`. |
-| SSH **Permission denied** | Wrong username — it's not `pi` by default. Run `whoami` on the Pi to see it. The password is the **Pi's**, not your laptop's. |
-| SSH address shows `127.0.1.1` | A loopback placeholder, not the Pi. Use `hostname -I` (capital **I**) for the real address. |
-| Password shows nothing as you type | Normal for terminals — just type it and press **Enter**. |
-| `can't open file 'plotter.py'` | You're in the wrong folder. `cd ~/cerelog-16ch` and retry. |
-| `UNABLE_TO_OPEN_PORT_ERROR` | The port in the script doesn't match your board. Check it's plugged in and re-check the name with `ls /dev/tty*` (Step 7). |
-| Board won't connect, connects intermittently, or the handshake fails, even with the right port | Likely a power problem: the board is browning out. Power the Pi from a dedicated wall supply (official 5.1V / 3A recommended), not a laptop port or phone charger. A lightning-bolt icon on the Pi's screen, or anything other than `throttled=0x0` from `vcgencmd get_throttled`, means the Pi is under-voltage. |
-| `pkg_resources is deprecated` warning, or an `Exception ignored in BoardShim.__del__` traceback on exit | Harmless — ignore them. |
-
----
-
-<sub>CH341 driver source (V1 only): [WCHSoftGroup/ch341ser_linux](https://github.com/WCHSoftGroup/ch341ser_linux)</sub>
+| `UNABLE_TO_OPEN_PORT_ERROR` | Wrong port — re-check with `ls /dev/tty*`. |
+| Won't connect or drops out with the right port | Power problem — use a wall supply. `vcgencmd get_throttled` should print `throttled=0x0`. |
+| `can't open file 'plotter.py'` | `cd ~/cerelog-16ch` first. |
 
 </details>
 

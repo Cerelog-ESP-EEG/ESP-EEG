@@ -117,9 +117,13 @@ CMRR measures that fraction: how much smaller the leaked signal is than the sign
 
 ### Test setup
 
-The channel input under test (CH1) and SRB1 are tied together and driven by the same sine wave, measured against the board's ground. The channel then sees an identical signal on both of its inputs, so an ideal device would read zero. Whatever the ESP-EEG does read at the test frequency is the leakage.
+Channel 1 is a differential pair: the CH1 input is CH1+, and SRB1 is CH1−. The two are tied together and driven by the same sine wave, measured against the board's ground. CH1+ and CH1− then see an identical signal, so an ideal device would read zero. Whatever the ESP-EEG does read at the test frequency is the leakage.
 
 <img src="cmrr_test_schematic.svg" alt="CMRR test circuit: function generator drives Channel 1 input and SRB1 together, with its ground on ESP-EEG GND (mid-supply voltage, 0 V)" width="480">
+
+<a href="cmrr_testset.jpg"><img src="cmrr_testset.jpg" alt="CMRR bench setup: Digilent Analog Discovery 2 on the left driving CH1 and SRB1 together on the ESP-EEG V2 on the right" width="600"></a>
+
+**Bench setup:** Digilent Analog Discovery 2 (left) driving CH1 and SRB1 together on the ESP-EEG V2 (right). Open bench, no shielded enclosure.
 
 ### Procedure
 
@@ -158,7 +162,7 @@ $$
 |---------|------------------------------|---------------------------|------|
 | 1 | 1.41 Vrms (2 V amplitude, 50 Hz) | 0.25 µV | **135 dB** |
 
-The 0.25 µV leakage is the FFT peak height, used directly as V<sub>leak</sub>. Any conversion of a peak reading to RMS would make V<sub>leak</sub> smaller and the CMRR higher, so 135 dB is a conservative figure. Remaining channels: testing in progress.
+The 0.25 µV leakage is the FFT peak height, used directly as V<sub>leak</sub>. Any conversion of a peak reading to RMS would make V<sub>leak</sub> smaller and the CMRR higher, so 135 dB is a conservative figure. Similar performance was measured at 60 Hz, so the result holds at both mains frequencies. Remaining channels: testing in progress.
 
 **Why it's this high:** the ESP-EEG V2 uses both a common-mode and a differential input filter, the arrangement TI recommends for the ADS1299. A small capacitor to ground on each leg handles common-mode filtering, and one larger capacitor across CH+ and CH− does the differential filtering. Keeping the per-leg capacitors small means component tolerances turn far less common-mode signal into a differential error. Most ADS1299 boards filter each leg to ground only, and published measurements of other open-source ADS1299 boards range from about 80 to 110 dB ([ironbci](https://arxiv.org/abs/2111.03656), [Creamino](https://www.researchgate.net/publication/326818755_Creamino_A_Cost-Effective_Open-Source_EEG-Based_BCI_System), [BEATS](https://arxiv.org/abs/2203.02102)).
 

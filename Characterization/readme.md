@@ -1,5 +1,7 @@
 # ESP-EEG Characterization
 
+(All data on this page is for the ESP-EEG V2. The 16-channel board is expected to perform similarly, as it uses a nearly identical front-end filter design and layout methods.)
+
 **Real bench data, no shielding.**
 
 - **1.17 µV read from a 1.19 µV input**, 98% accurate

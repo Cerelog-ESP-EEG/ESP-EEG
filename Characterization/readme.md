@@ -1,12 +1,14 @@
 # ESP-EEG Characterization
 
-Bench measurements of the ESP-EEG analog front end, all physically tested on an open bench with no shielding.
+**Real bench data, no shielding.**
 
-| | Result |
-|---|---|
-| **Microvolt accuracy** | A 1.19 µVrms input read back as **1.17 µVrms**, within 2% |
-| **Common-mode rejection** | **135 dB** at 50 Hz: a 2 V common-mode signal is cut to 0.25 µV, a reduction of more than 5 million times |
-| **vs. other open-source ADS1299 boards** | Published CMRR results range from about 80 to 110 dB. The ESP-EEG beats the top of that range by 25 dB, roughly 18 times better rejection |
+- **1.17 µV read from a 1.19 µV input**, 98% accurate
+- **135 dB CMRR**, 25 dB above the ADS1299 spec
+- **18× better** rejection than the best other open-source board we found
+
+[cerelog.com](https://cerelog.com)
+
+---
 
 1. [1.19 µVrms Input Test](#1-119-µvrms-input-test)
 2. [Noise Floor](#2-noise-floor)

@@ -44,11 +44,11 @@
   <text x="318" y="155">R2 = 680 Ω</text>
   <text x="550" y="154">C1 = 100 nF</text>
   <text x="92" y="136">Function generator</text>
-  <text x="92" y="156">500 µV amplitude</text>
+  <text x="92" y="156">250 µV amplitude</text>
   <text x="92" y="176">20 Hz</text>
   <text x="614" y="55" font-weight="600">ESP-EEG</text>
   <text x="614" y="73">Channel 1 input</text>
-  <text x="614" y="95" font-weight="700" fill="#0b6e4f">2.39 µVrms</text>
+  <text x="614" y="95" font-weight="700" fill="#0b6e4f">1.19 µVrms</text>
   <text x="614" y="235" font-weight="600">ESP-EEG</text>
   <text x="614" y="253">SRB1</text>
   <text x="200" y="272">GND</text>

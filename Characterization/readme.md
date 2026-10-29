@@ -3,7 +3,7 @@
 **Real bench data, no shielding.**
 
 - **1.17 µV read from a 1.19 µV input**, 98% accurate
-- **135 dB CMRR**, 25 dB above the ADS1299 spec
+- **135 dB CMRR**, 25 dB above the ADS1299's 110 dB minimum spec
 - **18× better** rejection than the best other open-source board we found
 
 [cerelog.com](https://cerelog.com)

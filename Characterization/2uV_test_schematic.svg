@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 320" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#222">
+  <rect width="780" height="320" fill="#fff"/>
+  <g stroke="#222" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Function generator -->
+    <circle cx="60" cy="150" r="22"/>
+    <path d="M46 150 q7 -14 14 0 t14 0"/>
+    <polyline points="60,128 60,60 130,60"/>
+    <polyline points="60,172 60,240"/>
+    <!-- R1 -->
+    <polyline points="130,60 135,52 145,68 155,52 165,68 175,52 185,68 195,52 205,68 210,60"/>
+    <line x1="210" y1="60" x2="360" y2="60"/>
+    <!-- R3 -->
+    <polyline points="360,60 365,52 375,68 385,52 395,68 405,52 415,68 425,52 435,68 440,60"/>
+    <line x1="440" y1="60" x2="594" y2="60"/>
+    <!-- R2 -->
+    <polyline points="300,60 300,110 292,115 308,125 292,135 308,145 292,155 308,165 292,175 308,185 300,190 300,240"/>
+    <!-- C1 -->
+    <polyline points="520,60 520,142"/>
+    <line x1="500" y1="142" x2="540" y2="142"/>
+    <line x1="500" y1="156" x2="540" y2="156"/>
+    <polyline points="520,156 520,240"/>
+    <!-- Bottom rail -->
+    <line x1="60" y1="240" x2="594" y2="240"/>
+    <!-- Ground symbol -->
+    <line x1="180" y1="240" x2="180" y2="256"/>
+    <line x1="166" y1="256" x2="194" y2="256"/>
+    <line x1="171" y1="262" x2="189" y2="262"/>
+    <line x1="176" y1="268" x2="184" y2="268"/>
+    <!-- Output terminals -->
+    <circle cx="600" cy="60" r="6" fill="#fff"/>
+    <circle cx="600" cy="240" r="6" fill="#fff"/>
+    <!-- Section brackets -->
+    <polyline points="100,292 100,298 320,298 320,292" stroke="#888" stroke-width="1.5"/>
+    <polyline points="340,292 340,298 560,298 560,292" stroke="#888" stroke-width="1.5"/>
+  </g>
+  <g fill="#222">
+    <circle cx="300" cy="60" r="4"/>
+    <circle cx="300" cy="240" r="4"/>
+    <circle cx="520" cy="60" r="4"/>
+    <circle cx="520" cy="240" r="4"/>
+  </g>
+  <text x="170" y="38" text-anchor="middle">R1 = 100 kΩ</text>
+  <text x="400" y="38" text-anchor="middle">R3 = 1 kΩ</text>
+  <text x="318" y="155">R2 = 680 Ω</text>
+  <text x="550" y="154">C1 = 100 nF</text>
+  <text x="92" y="136">Function generator</text>
+  <text x="92" y="156">500 µV amplitude</text>
+  <text x="92" y="176">20 Hz</text>
+  <text x="614" y="55" font-weight="600">ESP-EEG</text>
+  <text x="614" y="73">Channel 1 input</text>
+  <text x="614" y="95" font-weight="700" fill="#0b6e4f">2.39 µVrms</text>
+  <text x="614" y="235" font-weight="600">ESP-EEG</text>
+  <text x="614" y="253">SRB1</text>
+  <text x="200" y="272">GND</text>
+  <text x="210" y="316" text-anchor="middle" fill="#555">Voltage divider (÷148)</text>
+  <text x="450" y="316" text-anchor="middle" fill="#555">RC low-pass (fc ≈ 950 Hz)</text>
+</svg>

@@ -5,6 +5,7 @@
 **Real bench data, no shielding.**
 
 - **1.17 µV read from a 1.19 µV input**, 98% accurate
+- **≤ 0.14 µVrms noise floor** on all 8 channels (inputs shorted, with BIAS)
 - **135 dB CMRR**, 25 dB above the ADS1299's 110 dB minimum spec
 - **18× better** rejection than the best other open-source board we found
 
@@ -107,6 +108,14 @@ For an accurate result, **terminate every channel, not just the one under test.*
 | **Channels tested** | 1–8 |
 | **Bandwidth** | 1–50 Hz |
 | **Noise (RMS)** | **≤ 0.14 µVrms** on all channels |
+
+<a href="noise_short.jpg"><img src="noise_short.jpg" alt="ESP-EEG V2 recording with all inputs, SRB1 and BIAS shorted: all eight channels read between 0.12 and 0.14 µVrms on a ±1 µV scale." width="100%"></a>
+
+**ESP-EEG V2, all inputs shorted with BIAS connected.** All eight channels read **0.12–0.14 µVrms** (±1 µV vertical scale, 1 s window).
+
+| Channel | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---------|---|---|---|---|---|---|---|---|
+| **Noise (µVrms)** | 0.13 | 0.12 | 0.12 | 0.12 | 0.14 | 0.13 | 0.13 | 0.13 |
 
 <details>
 <summary><b>Future testing: noise with simulated electrodes</b></summary>

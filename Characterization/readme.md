@@ -86,26 +86,52 @@ The filter sees the divider's 675 Ω source resistance in series with R3. At 20 
 
 ### Test setup
 
-Every channel input is connected to SRB1 through a small resistor (a few ohms, e.g. 2.2 Ω). No signal is applied. Bias is not connected.
+Every channel input, SRB1 and the BIAS pin are shorted together. BIAS holds the shorted inputs at the amplifier's reference voltage, as the bias electrode does on the head. No signal is applied.
 
-Two details matter for an accurate result:
-
-- **Use a resistive load, not a bare jumper wire.** On the V2 and 16-channel boards, a differential filter capacitor sits across each input pair. A bare jumper's own wire inductance forms a resonant loop with that capacitor, which adds energy from the test fixture to the measurement. A few ohms damps this out, and its own thermal noise is negligible (≈ 0.2 nV/√Hz). Real electrodes present kilohms of impedance, so this only arises with a near-zero-ohm test short, never in use. EEG noise standards such as IEC 60601-2-26 likewise measure noise with a simulated electrode impedance in place, not a dead short.
-- **Terminate every channel, not just the one under test.** A floating input can drift to several volts, and a signal that large can couple into neighboring channels and raise their apparent noise floor. This applies to any high-impedance multichannel EEG amplifier, so connect all inputs to SRB1 the same way before measuring.
+For an accurate result, **terminate every channel, not just the one under test.** A floating input can drift to several volts, and a signal that large can couple into neighboring channels and raise their apparent noise floor. This applies to any high-impedance multichannel EEG amplifier, so connect all inputs before measuring.
 
 ### Procedure
 
-1. **Connect every channel input to SRB1** through a resistor of a few ohms.
+1. **Short every channel input, SRB1 and BIAS together.**
 2. **Run the ESP-EEG on battery** with no USB connection to a computer.
 3. **Record 30–60 s** with the ESP-EEG.
 4. **Band-pass filter the recording** to the EEG band (e.g. 1–50 Hz).
-5. **Take the RMS** of the filtered recording on each channel. This is the noise floor, in µVrms.
+5. **Take the RMS and peak-to-valley** of the filtered recording on each channel. This is the noise floor.
 
 ### Results
 
-| Channel | Bandwidth | Noise floor (RMS) |
-|---------|-----------|-------------------|
-| 1 | _TBD_ | _TBD_ |
+| | Amplifier noise floor |
+|---|---|
+| **Input** | All inputs, SRB1 and BIAS shorted |
+| **BIAS** | Connected |
+| **Channels tested** | 1–8 |
+| **Bandwidth** | 1–50 Hz |
+| **Noise (RMS)** | **≤ 0.14 µVrms** on all channels |
+
+<details>
+<summary><b>Future testing: noise with simulated electrodes</b></summary>
+
+<br>
+
+**Setup:** CH1 and SRB1 each connected to a common point through a standard simulated electrode load of **51 kΩ in parallel with 47 nF** (0.047 µF). BIAS is not connected. No signal is applied.
+
+In real use, each input sees an electrode on the skin, which behaves like a resistance in parallel with a capacitance, and the ESP-EEG's input filter is designed around that kind of source. The two loads' own thermal noise (about 0.27 µVrms over 1–50 Hz) is included in the result, so this figure reflects real-use conditions.
+
+**Reference standard.** The international standard for EEG equipment is IEC 60601-2-26 (since 2019, IEC 80601-2-26). Its input noise test (clause 201.12.1.101.3 in the 2012 edition) measures noise with a simulated electrode impedance in place, not a dead short. It requires noise referred to the input to stay within **6 µV peak-to-valley**.
+
+**Procedure:** connect CH1 and SRB1 to a common point, each through a 51 kΩ ∥ 47 nF load, with BIAS unconnected. Then follow steps 2–5 above.
+
+| | With simulated electrodes |
+|---|---|
+| **Input** | 51 kΩ ∥ 47 nF on CH1 and SRB1 |
+| **BIAS** | Not connected |
+| **Channels tested** | 1 |
+| **Bandwidth** | 1–50 Hz |
+| **Noise (RMS)** | _TBD_ |
+| **Noise (peak-to-valley)** | _TBD_ |
+| **IEC 80601-2-26 limit** | 6 µV peak-to-valley |
+
+</details>
 
 ---
 

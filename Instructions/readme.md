@@ -249,7 +249,9 @@ Sometimes you may need to turn on and off PCB for computer to detect new board. 
 
 > ⚠️ **Note: These drivers only apply to V1 boards.** V2 boards do not need them.
 
-# *⚠️Option A (NEW and Easy) - [USB or BLE Supported]
+<details>
+<summary><h2>👉 ⚠️ Option A (NEW and Easy) - [USB or BLE Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
+
 ## Stream data to Modified OpenBCI GUI + Lab Stream Layer (LSL) python streamer script:
 
 https://github.com/Cerelog-ESP-EEG/How-to-use-OpenBCI-GUI-fork 
@@ -269,7 +271,13 @@ They show you how to:
 3. Open the same OpenBCI GUI fork and select the LSL stream, just like with USB.
 
 
-# ⚠️Option B (Best) Brainflow Fork - [USB Supported]
+</details>
+
+---
+
+<details>
+<summary><h2>👉 ⚠️ Option B (Best) Brainflow Fork - [USB Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
+
 
 ---
 
@@ -916,7 +924,13 @@ The script above implements a robust filter chain designed for real-time BCI:
 5.  **Rolling Median:** A final smoothing pass to remove sudden spikes without blurring the signal.
 
 
-# ⚠️Option C LSL Stream to CSV Logger - [USB Supported]
+</details>
+
+---
+
+<details>
+<summary><h2>👉 ⚠️ Option C LSL Stream to CSV Logger - [USB Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
+
 ## Record the LSL stream to CSV files on your computer:
 
 https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/tree/main/Extra%20(CSV%20file%20recording%20of%20the%20lsl%20stream)
@@ -946,6 +960,8 @@ Press `Ctrl+C` in Terminal 2 to stop recording. The CSV is saved in the `Extra (
 Optional flags: `--duration 60` (stop after 60 s), `--rotate-mins 10` (new file every 10 min), `--out DIR` (different folder).
 
 > **Note:** The OpenBCI GUI fork from Option A can stay connected to the stream while you record.
+
+</details>
 
 </details>
 

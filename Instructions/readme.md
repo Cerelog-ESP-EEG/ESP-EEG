@@ -929,14 +929,17 @@ The script above implements a robust filter chain designed for real-time BCI:
 ---
 
 <details>
-<summary><h2>👉 ⚠️ Option C LSL Stream to CSV Logger - [USB Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
+<summary><h2>👉 ⚠️ Option C LSL Stream to CSV Logger - [USB or BLE Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
 
 ## Save your EEG data to a CSV file on your computer
 
 Run these 2 Python scripts at the same time, each in its own terminal:
 
-1. **[cerelog_lsl.py](https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/blob/main/cerelog_lsl.py)** – reads the board over USB and streams the data
-2. **[lsl_to_csv_logmaker.py](https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/blob/main/Extra%20(CSV%20file%20recording%20of%20the%20lsl%20stream)/lsl_to_csv_logmaker.py)** – records that stream to a CSV file
+**1. Stream the board** – pick one:
+- **USB:** [cerelog_lsl.py](https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/blob/main/cerelog_lsl.py)
+- **BLE:** [Python_ble_LSL.py](https://github.com/Cerelog-ESP-EEG/Wireless_Support/tree/main/Bluetooth%20Low%20Energy%20(BLE)%20%5BBEST!!%5D) – ⚠️ requires flashing the BLE firmware first (instructions at the link)
+
+**2. Record to CSV:** [lsl_to_csv_logmaker.py](https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/blob/main/Extra%20(CSV%20file%20recording%20of%20the%20lsl%20stream)/lsl_to_csv_logmaker.py)
 
 <details>
 <summary><b>📖 How to run it (click to expand)</b></summary>
@@ -951,7 +954,7 @@ Download or clone the [Lab-Stream-Layer-LSL-Compatability](https://github.com/Ce
 python3 cerelog_lsl.py
 ```
 
-Wait until you see `>>> STREAMING WITH ACTIVE DC BLOCKER >>>`.
+Wait until you see `>>> STREAMING WITH ACTIVE DC BLOCKER >>>`. *(BLE users: run `Python_ble_LSL.py` here instead, following the BLE link above.)*
 
 **Terminal 2 – start recording:**
 

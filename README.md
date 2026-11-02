@@ -21,7 +21,7 @@
 
 ##  High-precision 8-channel biosensing board designed for EEG, EMG, ECG, and Brain Computer Interface (BCI) research applications
 
-www.cerelog.com   and   **Product Page (Assembled Units Available)**: [Here](https://www.cerelog.com/eeg_researchers.html) 
+www.cerelog.com   and   **Product Page (Assembled Units Available)**: [Here](https://www.cerelog.com) 
 
 
 Need Help or have a question? [Discord Chat Community](https://discord.com/invite/fVYf44JTua)
@@ -40,7 +40,7 @@ Contact: simon@cerelog.com
 
 Need Help or have a question? [Discord Chat Community](https://discord.com/invite/fVYf44JTua)
 
-Product Page: [Here](https://www.cerelog.com/eeg_researchers.html)
+Product Page: [Here](https://www.cerelog.com)
 
 
 Product Usage Guide : [Here](https://www.cerelog.com/eeg_researchers_guide.html) and **See Instructions file above for device usage**

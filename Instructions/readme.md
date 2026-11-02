@@ -931,35 +931,45 @@ The script above implements a robust filter chain designed for real-time BCI:
 <details>
 <summary><h2>👉 ⚠️ Option C LSL Stream to CSV Logger - [USB Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
 
-## Record the LSL stream to CSV files on your computer:
+## Save your EEG data to a CSV file on your computer
 
-https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/tree/main/Extra%20(CSV%20file%20recording%20of%20the%20lsl%20stream)
+Run these 2 Python scripts at the same time, each in its own terminal:
 
-This builds on **Option A**. The LSL Python streamer (`cerelog_lsl.py`) sends the board's data out as an LSL stream, and the logger script (`lsl_to_csv_logmaker.py`) listens to that stream and saves it to a CSV file.
+1. **[cerelog_lsl.py](https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/blob/main/cerelog_lsl.py)** – reads the board over USB and streams the data
+2. **[lsl_to_csv_logmaker.py](https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/blob/main/Extra%20(CSV%20file%20recording%20of%20the%20lsl%20stream)/lsl_to_csv_logmaker.py)** – records that stream to a CSV file
 
-**You must run both scripts at the same time, each in its own terminal window**, from inside the `Lab-Stream-Layer-LSL-Compatability` folder:
+<details>
+<summary><b>📖 How to run it (click to expand)</b></summary>
 
-**Terminal 1** – start the board stream (leave this running):
+<br>
+
+Download or clone the [Lab-Stream-Layer-LSL-Compatability](https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability) repo, then open 2 terminals inside that folder.
+
+**Terminal 1 – start streaming** (leave it running):
 
 ```
 python3 cerelog_lsl.py
 ```
 
-**Terminal 2** – once Terminal 1 shows `>>> STREAMING WITH ACTIVE DC BLOCKER >>>`, start the CSV logger:
+Wait until you see `>>> STREAMING WITH ACTIVE DC BLOCKER >>>`.
+
+**Terminal 2 – start recording:**
 
 ```
 python3 "Extra (CSV file recording of the lsl stream)/lsl_to_csv_logmaker.py"
 ```
 
-Press `Ctrl+C` in Terminal 2 to stop recording. The CSV is saved in the `Extra (CSV file recording of the lsl stream)` folder as `Cerelog_EEG_YYYYMMDD_HHMMSS.csv`.
+**To stop:** press `Ctrl+C` in Terminal 2. Your file is saved in the `Extra (CSV file recording of the lsl stream)` folder.
 
-**CSV format** – the same layout as the SD-card logs, minus the Status column:
-- **Timestamp** – milliseconds since the log started
-- **CH1 … CH8** – signed ADC counts (DC offset removed, since the streamer DC-blocks the signal before sending it)
+**What's in the file:** one row per sample.
+- `Timestamp` – milliseconds since recording started
+- `CH1` … `CH8` – the signal on each channel (ADC counts)
 
-Optional flags: `--duration 60` (stop after 60 s), `--rotate-mins 10` (new file every 10 min), `--out DIR` (different folder).
+**Good to know:**
+- You can keep the OpenBCI GUI from Option A open while you record.
+- To record for a set time, add `--duration 60` to the Terminal 2 command (60 = seconds).
 
-> **Note:** The OpenBCI GUI fork from Option A can stay connected to the stream while you record.
+</details>
 
 </details>
 

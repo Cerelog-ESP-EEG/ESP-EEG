@@ -915,6 +915,38 @@ The script above implements a robust filter chain designed for real-time BCI:
 4.  **High-Pass (0.5Hz):** Removes extremely slow drifts caused by sweat or head movement.
 5.  **Rolling Median:** A final smoothing pass to remove sudden spikes without blurring the signal.
 
+
+# ⚠️Option C LSL Stream to CSV Logger - [USB Supported]
+## Record the LSL stream to CSV files on your computer:
+
+https://github.com/Cerelog-ESP-EEG/Lab-Stream-Layer-LSL-Compatability/tree/main/Extra%20(CSV%20file%20recording%20of%20the%20lsl%20stream)
+
+This builds on **Option A**. The LSL Python streamer (`cerelog_lsl.py`) sends the board's data out as an LSL stream, and the logger script (`lsl_to_csv_logmaker.py`) listens to that stream and saves it to a CSV file.
+
+**You must run both scripts at the same time, each in its own terminal window**, from inside the `Lab-Stream-Layer-LSL-Compatability` folder:
+
+**Terminal 1** – start the board stream (leave this running):
+
+```
+python3 cerelog_lsl.py
+```
+
+**Terminal 2** – once Terminal 1 shows `>>> STREAMING WITH ACTIVE DC BLOCKER >>>`, start the CSV logger:
+
+```
+python3 "Extra (CSV file recording of the lsl stream)/lsl_to_csv_logmaker.py"
+```
+
+Press `Ctrl+C` in Terminal 2 to stop recording. The CSV is saved in the `Extra (CSV file recording of the lsl stream)` folder as `Cerelog_EEG_YYYYMMDD_HHMMSS.csv`.
+
+**CSV format** – the same layout as the SD-card logs, minus the Status column:
+- **Timestamp** – milliseconds since the log started
+- **CH1 … CH8** – signed ADC counts (DC offset removed, since the streamer DC-blocks the signal before sending it)
+
+Optional flags: `--duration 60` (stop after 60 s), `--rotate-mins 10` (new file every 10 min), `--out DIR` (different folder).
+
+> **Note:** The OpenBCI GUI fork from Option A can stay connected to the stream while you record.
+
 </details>
 
 ---

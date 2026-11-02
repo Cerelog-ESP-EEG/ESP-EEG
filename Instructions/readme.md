@@ -245,12 +245,10 @@ Sometimes you may need to turn on and off PCB for computer to detect new board. 
 
 **If you own a Raspberry Pi: Driver setup first  -> [Read Here:](https://github.com/Cerelog-ESP-EEG/ESP-EEG/blob/main/Instructions/subguides/raspberrypi/readme.md) (V1 devices only)** 
 
-**Other Linux Users: Driver setup first  -> [CH341SER Driver Here:](https://www.wch-ic.com/downloads/CH341SER_EXE.html)** 
-
-> ⚠️ **Note: These drivers only apply to V1 boards.** V2 boards do not need them.
+**Other Linux Users: Driver setup first  -> [CH341SER Driver Here:](https://www.wch-ic.com/downloads/CH341SER_EXE.html) (V1 devices only)** 
 
 <details>
-<summary><h2>👉 ⚠️ Option A (NEW and Easy) - [USB or BLE Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
+<summary><h2>👉 ⚠️ Option A (Easy - OpenBCI GUI Fork) - [USB or BLE Supported] &nbsp;—&nbsp; 🔽 CLICK TO EXPAND 🔽</h2></summary>
 
 ## Stream data to Modified OpenBCI GUI + Lab Stream Layer (LSL) python streamer script:
 

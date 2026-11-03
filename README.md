@@ -28,7 +28,7 @@ Need Help or have a question? [Discord Chat Community](https://discord.com/invit
 
 Open Source Firmware, Software & Schematic included on this page
 
-**Measured Performance:** 1.19 µVrms input read as 1.17 µVrms (V2) and 1.15 µVrms (16CH); 135 dB CMRR (V2). [See the bench characterization →](Characterization/readme.md)
+**Measured Performance:** 1.19 µVrms input read as 1.17 µVrms (V2) and 1.15 µVrms (16CH); 135 dB (V2) and 140 dB (16CH) CMRR. [See the bench characterization →](Characterization/readme.md)
 
 
 

@@ -27,8 +27,8 @@
   </tr>
 </table>
 
-- CMRR **at least 25 dB above** the ADS1299's 110 dB minimum spec
-- **18× better** rejection than the best other open-source board we found
+- CMRR **25 dB (V2) and 30 dB (16CH) above** the ADS1299's 110 dB minimum spec
+- **18× (V2) and 32× (16CH) better** rejection than the best other open-source board we found
 
 [cerelog.com](https://cerelog.com)
 

@@ -31,9 +31,18 @@ Function generators can't output microvolt-level signals cleanly; at that level 
 
 <img src="2uV_test_schematic.svg" alt="1.19 µVrms test circuit: function generator, 100 kΩ / 680 Ω voltage divider, 1 kΩ / 100 nF RC low-pass filter, into ESP-EEG Channel 1 input and SRB1" width="600">
 
-<a href="setup.jpg"><img src="setup.jpg" alt="Bench setup: Digilent Analog Discovery 2 on the left, voltage divider and RC filter on a breadboard in the center, ESP-EEG V2 on the right" width="600"></a>
+<table>
+  <tr>
+    <th align="center">ESP-EEG V2 setup</th>
+    <th align="center">16CH ESP-EEG setup</th>
+  </tr>
+  <tr>
+    <td align="center"><a href="setup.jpg"><img src="setup.jpg" alt="V2 bench setup: Digilent Analog Discovery 2 on the left, voltage divider and RC filter on a breadboard in the center, ESP-EEG V2 on the right" width="100%"></a></td>
+    <td align="center"><a href="16ch_test_insetup.jpg"><img src="16ch_test_insetup.jpg" alt="16CH bench setup: Digilent Analog Discovery 2 on the left, voltage divider and RC filter on a breadboard in the center, 16-channel ESP-EEG on the right" width="100%"></a></td>
+  </tr>
+</table>
 
-**Bench setup:** Digilent Analog Discovery 2 (left), voltage divider and RC filter on a breadboard (center), ESP-EEG V2 (right). Open bench, no shielded enclosure.
+**Bench setup (both boards):** Digilent Analog Discovery 2 (left), voltage divider and RC filter on a breadboard (center), ESP-EEG under test (right). Open bench, no shielded enclosure.
 
 ### Signal at the input
 
@@ -90,7 +99,7 @@ In each screenshot, **left:** function generator output, a 20 Hz sine at 250 µV
 |---|----------|-------------|---------------|
 | Signal at ESP-EEG input | 1.19 µVrms | **1.17 µVrms** | **1.15 µVrms** |
 | Frequency | 20 Hz | 20 Hz | 20 Hz |
-| Difference | | 1.7% (within resistor tolerance) | 3.4% |
+| Difference | | 1.7% (within resistor tolerance) | 3.4% (within resistor tolerance) |
 
 ---
 

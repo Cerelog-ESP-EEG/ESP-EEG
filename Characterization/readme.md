@@ -21,7 +21,7 @@
     <td align="center"><b>≤ 0.13 µVrms</b></td>
   </tr>
   <tr>
-    <td><b>CMRR</b><br><sub>Channel 1, 50 Hz</sub></td>
+    <td><b>CMRR</b><br><sub>Channel 1, 50 Hz (similar at 60 Hz)</sub></td>
     <td align="center"><b>135 dB</b></td>
     <td align="center"><b>140 dB</b></td>
   </tr>
@@ -292,7 +292,7 @@ In each screenshot, **left:** function generator output, a 50 Hz sine at 2 V amp
 | ESP-EEG V2 | 1 | 1.41 Vrms (2 V amplitude, 50 Hz) | 0.25 µV | **135 dB** |
 | 16CH ESP-EEG | 1 | 1.41 Vrms (2 V amplitude, 50 Hz) | 0.14 µV | **140 dB** |
 
-The 0.25 µV leakage is the FFT peak height, used directly as V<sub>leak</sub>. Any conversion of a peak reading to RMS would make V<sub>leak</sub> smaller and the CMRR higher, so 135 dB is a conservative figure. Similar performance was measured at 60 Hz, so the result holds at both mains frequencies. Remaining channels: testing in progress.
+The 0.25 µV leakage is the FFT peak height, used directly as V<sub>leak</sub>. Any conversion of a peak reading to RMS would make V<sub>leak</sub> smaller and the CMRR higher, so 135 dB is a conservative figure. Similar performance was measured at 60 Hz on both the V2 and the 16CH, so the results hold at both mains frequencies. Remaining channels: testing in progress.
 
 **Why it's this high:** the ESP-EEG V2 and 16CH both use a common-mode and a differential input filter, the arrangement TI recommends for the ADS1299. A small capacitor to ground on each leg handles common-mode filtering, and one larger capacitor across CH+ and CH− does the differential filtering. Keeping the per-leg capacitors small means component tolerances turn far less common-mode signal into a differential error. Most ADS1299 boards filter each leg to ground only, and published measurements of other open-source ADS1299 boards range from about 80 to 110 dB ([ironbci](https://arxiv.org/abs/2111.03656), [Creamino](https://www.researchgate.net/publication/326818755_Creamino_A_Cost-Effective_Open-Source_EEG-Based_BCI_System), [BEATS](https://arxiv.org/abs/2203.02102)).
 

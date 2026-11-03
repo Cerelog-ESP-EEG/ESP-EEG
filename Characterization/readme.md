@@ -1,10 +1,10 @@
 # ESP-EEG Characterization
 
-(All data on this page is for the ESP-EEG V2. The 16-channel board is expected to perform similarly, as it uses a nearly identical front-end filter design and layout methods.)
+(The 1.19 µVrms input test was run on both the ESP-EEG V2 and the 16-channel ESP-EEG. Noise floor and CMRR data are for the V2; the 16-channel board is expected to perform similarly, as it uses a nearly identical front-end filter design and layout methods.)
 
 **Real bench data, no shielding.**
 
-- **1.17 µV read from a 1.19 µV input**, 98% accurate
+- **1.19 µV input read as 1.17 µV (V2) and 1.15 µV (16CH)**, 98% and 97% accurate
 - **≤ 0.14 µVrms noise floor** on all 8 channels (inputs shorted, with BIAS)
 - **135 dB CMRR**, 25 dB above the ADS1299's 110 dB minimum spec
 - **18× better** rejection than the best other open-source board we found
@@ -21,7 +21,7 @@
 
 ## 1. 1.19 µVrms Input Test
 
-The ESP-EEG was **physically tested on the bench with a 1.19 µVrms, 20 Hz input signal, proving it can resolve microvolt-level signals.** It measured **1.17 µVrms**, within 2% of the expected value, with a clean 20 Hz peak in the spectrum. Typical scalp EEG signals are roughly 10–100 µV, so this is well below the level of the signals the device is built to record.
+The ESP-EEG V2 and 16-channel ESP-EEG were **physically tested on the bench with a 1.19 µVrms, 20 Hz input signal, proving they can resolve microvolt-level signals.** The V2 measured **1.17 µVrms** and the 16CH measured **1.15 µVrms**, within 2% and 3.4% of the expected value, each with a clean 20 Hz peak in the spectrum. Typical scalp EEG signals are roughly 10–100 µV, so this is well below the level of the signals the device is built to record.
 
 ### Test setup
 
@@ -69,15 +69,28 @@ The filter sees the divider's 675 Ω source resistance in series with R3. At 20 
 
 ### Result
 
-<a href="v2_250uVin.jpg"><img src="v2_250uVin.jpg" alt="Left: function generator set to a 20 Hz, 250 µV amplitude sine. Right: ESP-EEG V2 recording on channel 1 reading 1.17 µVrms, with a single clear peak at 20 Hz in the FFT." width="100%"></a>
+<table>
+  <tr>
+    <th align="center">ESP-EEG V2</th>
+    <th align="center">16CH ESP-EEG</th>
+  </tr>
+  <tr>
+    <td align="center"><a href="v2_250uVin.jpg"><img src="v2_250uVin.jpg" alt="Left: function generator set to a 20 Hz, 250 µV amplitude sine. Right: ESP-EEG V2 recording on channel 1 reading 1.17 µVrms, with a single clear peak at 20 Hz in the FFT." width="100%"></a></td>
+    <td align="center"><a href="16ch_250u_Vin.png"><img src="16ch_250u_Vin.png" alt="Left: function generator set to a 20 Hz, 250 µV amplitude sine. Right: 16-channel ESP-EEG recording on channel 1 reading 1.15 µVrms, with a single clear peak at 20 Hz in the FFT." width="100%"></a></td>
+  </tr>
+  <tr>
+    <td>Channel 1 reads <b>1.17 µVrms</b>. Channels 2–8 were turned off for a clean display. A 50/60 Hz notch filter was on in the GUI; the measured value is the same with it off.</td>
+    <td>Channel 1 reads <b>1.15 µVrms</b>. Channels 2–16 were turned off for a clean display.</td>
+  </tr>
+</table>
 
-**Left:** function generator output, a 20 Hz sine at 250 µV amplitude, before the ÷148 divider. **Right:** ESP-EEG V2 recording. Channel 1 reads **1.17 µVrms**, and the FFT shows a single clear peak at 20 Hz. Channels 2–8 were turned off for a clean display. A 50/60 Hz notch filter was on in the GUI; the measured value is the same with it off.
+In each screenshot, **left:** function generator output, a 20 Hz sine at 250 µV amplitude, before the ÷148 divider. **Right:** ESP-EEG recording, with a single clear peak at 20 Hz in the FFT. Click an image to enlarge.
 
-| | Expected | Measured |
-|---|----------|----------|
-| Signal at ESP-EEG input | 1.19 µVrms | **1.17 µVrms** |
-| Frequency | 20 Hz | 20 Hz |
-| Difference | | 1.7% (within resistor tolerance) |
+| | Expected | V2 measured | 16CH measured |
+|---|----------|-------------|---------------|
+| Signal at ESP-EEG input | 1.19 µVrms | **1.17 µVrms** | **1.15 µVrms** |
+| Frequency | 20 Hz | 20 Hz | 20 Hz |
+| Difference | | 1.7% (within resistor tolerance) | 3.4% |
 
 ---
 

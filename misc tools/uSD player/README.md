@@ -1,5 +1,27 @@
 # ESP-EEG microSD Player (BETA)
 
+![ESP-EEG microSD Player showing a 16-channel recording, with an eyes-closed alpha burst selected on CH9 and its FFT peak near 10 Hz](screenshot.png)
+<sub>Screenshot uses synthetic, EEG-like example data, not a real recording.</sub>
+
+## Quick start
+
+Open a terminal in the ESP-EEG folder and run the player script. Your browser opens the player.
+
+**macOS / Linux**
+```bash
+cd "misc tools/uSD player"
+python3 usd_player.py
+```
+
+**Windows** (Command Prompt or PowerShell)
+```bat
+cd "misc tools\uSD player"
+python usd_player.py
+```
+
+Then drag a `REC_xxx.csv` from your microSD card onto the page. The card must be in a microSD card reader (see [step 1](#1-get-the-data-off-the-card)).
+You need Python 3 and no extra packages.
+
 > **Beta software.** This is a simple, quick-look viewer for recordings made to the microSD card on the
 > ESP-EEG V2 (8-channel) and 16-Channel boards. It is provided as-is for browsing your data. It is not
 > validated analysis software, so use your own pipeline (MNE, EEGLAB, BrainFlow, etc.) for anything you publish.
@@ -20,22 +42,18 @@ On macOS you may also see `._REC_001.csv` files. These are Finder metadata, so i
 
 ## 2. Run the player
 
-You need Python 3 (already installed on macOS and most Linux systems). No extra packages are needed.
+You need Python 3. It is already installed on macOS and most Linux systems. On Windows, install it from [python.org](https://www.python.org/downloads/) and tick **"Add Python to PATH"** during setup.
+No extra packages are needed.
 
-```bash
-cd "misc tools/uSD player"
-python3 usd_player.py
-```
+| | macOS / Linux | Windows |
+|---|---|---|
+| Start the player | `python3 usd_player.py` | `python usd_player.py` |
+| Start with a file loaded | `python3 usd_player.py /Volumes/MICROSD/REC_001.csv` | `python usd_player.py E:\REC_001.csv` |
+
+On Windows, if `python` isn't found, try `py usd_player.py`.
 
 Your browser opens the player. Drag a `REC_xxx.csv` onto the page, or click **Choose file…**.
 To try it without a card, click **Try demo data**.
-
-You can also open a file directly:
-
-```bash
-python3 usd_player.py /Volumes/MICROSD/REC_001.csv     # macOS
-python  usd_player.py E:\REC_001.csv                   # Windows
-```
 
 Press **Ctrl+C** in the terminal to stop the player. You can also open `viewer.html` by double-clicking it, without Python, and use **Choose file…**.
 

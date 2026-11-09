@@ -233,6 +233,9 @@ function parseRecording(text, name) {
   const railCount = new Uint32Array(nCh), satCount = new Uint32Array(nCh);
   const pendingDrops = [];
   let n = 0, dropped = 0, pending = 0;
+  // V2 firmware resets its time reference when a host connects over USB, so
+  // timestamps can jump backwards mid-file. Keep time running forward instead.
+  let tsOffset = 0, lastDt = 4, timeResets = 0;
 
   for (let li = h + 1; li < lines.length; li++) {
     const line = lines[li];
@@ -245,17 +248,22 @@ function parseRecording(text, name) {
     const p = line.split(",");
     if (p.length < header.length) continue; // half-written last row after power-off
     const tv = +p[tsIdx];
-    if (!Number.isFinite(tv)) continue;
-    let ok = true;
+    if (!Number.isFinite(tv) || chIdx.some(i => !Number.isFinite(+p[i]))) continue;
     for (let c = 0; c < nCh; c++) {
       const v = +p[chIdx[c]];
-      if (!Number.isFinite(v)) { ok = false; break; }
       raw[c][n] = v * UV_PER_COUNT;
       if (Math.abs(v) >= FULL_SCALE - 1) railCount[c]++;
       if (Math.abs(v) >= 0.95 * FULL_SCALE) satCount[c]++;
     }
-    if (!ok) continue;
-    ts[n] = tv;
+    let tsv = tv + tsOffset;
+    if (n > 0 && tsv < ts[n - 1]) {
+      tsOffset += ts[n - 1] + lastDt - tsv;
+      tsv = tv + tsOffset;
+      timeResets++;
+    } else if (n > 0 && tsv > ts[n - 1] && tsv - ts[n - 1] < 1000) {
+      lastDt = tsv - ts[n - 1];
+    }
+    ts[n] = tsv;
     if (pending) { pendingDrops.push([n, pending]); pending = 0; }
     n++;
   }
@@ -275,7 +283,7 @@ function parseRecording(text, name) {
   }
 
   return {
-    name, t, fs, dur, dropped,
+    name, t, fs, dur, dropped, timeResets,
     raw: raw.map(a => a.subarray(0, n)),
     names: chIdx.map(i => header[i].toUpperCase()),
     railed: Array.from(railCount, c => c / n > 0.5),
@@ -311,7 +319,7 @@ function makeDemo() {
     name: "demo data (synthetic)", t, fs, dur: t[n - 1], dropped: 0, raw,
     names: Array.from({ length: nCh }, (_, i) => "CH" + (i + 1)),
     railed: new Array(nCh).fill(false), saturated: new Array(nCh).fill(false),
-    medianDtMs: 1000 / fs, dropTimes: [],
+    medianDtMs: 1000 / fs, dropTimes: [], timeResets: 0,
   };
 }
 
@@ -745,6 +753,7 @@ function load(rec) {
   if (rec.fs < 100) chips.push(`<span class="chip warn" title="Expected 250 samples/s. Samples are ${rec.medianDtMs.toFixed(0)} ms apart, so the recording was not captured at the normal rate.">Low sample rate: ${rec.fs < 10 ? rec.fs.toFixed(2) : rec.fs.toFixed(0)} samples/s</span>`);
   const sat = rec.names.filter((_, i) => rec.saturated[i]);
   if (sat.length) chips.push(`<span class="chip warn" title="${sat.join(", ")}: above 95% of full scale. Usually an unconnected or poorly contacting electrode.">${sat.length} near full scale</span>`);
+  if (rec.timeResets) chips.push(`<span class="chip warn" title="The board's timestamp restarted (this happens on V2 when a computer connects over USB during recording). The time axis has been stitched so it keeps running forward.">Timestamp reset ×${rec.timeResets}</span>`);
   if (rec.dropped) chips.push(`<span class="chip warn">${rec.dropped} dropped samples</span>`);
   const railed = rec.names.filter((_, i) => rec.railed[i]);
   if (railed.length) chips.push(`<span class="chip warn" title="${railed.join(", ")}">${railed.length} railed: ${railed.length > 3 ? railed[0] + "–" + railed[railed.length - 1] : railed.join(", ")}</span>`);

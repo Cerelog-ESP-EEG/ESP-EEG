@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESP-EEG microSD Player</title>
+<style>
+  :root {
+    --bg: #eef0f3; --panel: #ffffff; --ink: #18202a; --muted: #6a7482; --line: #dfe3e8;
+    --grid: #eef0f3; --trace: #26425f; --accent: #d2452f; --railed: #b9c0c9;
+    --sel: rgba(210, 69, 47, 0.10); --btn: #f1f3f6; --btn-hover: #e5e8ec; --on: #18202a; --on-ink: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1116; --panel: #161b22; --ink: #e5e9ee; --muted: #8a94a2; --line: #262e38;
+      --grid: #1d232b; --trace: #9fc4e8; --accent: #ff7b5e; --railed: #47505b;
+      --sel: rgba(255, 123, 94, 0.14); --btn: #1f262f; --btn-hover: #29313b; --on: #e5e9ee; --on-ink: #11161c;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    display: grid; grid-template-rows: auto 1fr auto; height: 100vh; overflow: hidden;
+  }
+  button, select, input { font: inherit; color: inherit; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+
+  header {
+    display: flex; align-items: center; gap: 14px; padding: 10px 16px;
+    background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap;
+  }
+  .brand { font-weight: 650; letter-spacing: -0.01em; }
+  .beta { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 2px 6px; border-radius: 4px;
+          background: var(--accent); color: #fff; margin-left: 6px; vertical-align: 1px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+  .chip { padding: 3px 9px; border-radius: 999px; background: var(--btn); color: var(--muted); white-space: nowrap; }
+  .chip b { color: var(--ink); font-weight: 600; }
+  .chip.warn { color: var(--accent); }
+
+  .btn { background: var(--btn); border: 1px solid var(--line); border-radius: 7px; padding: 5px 11px; cursor: pointer; }
+  .btn:hover { background: var(--btn-hover); }
+  .btn.primary { background: var(--on); color: var(--on-ink); border-color: var(--on); }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+  .seg button { background: var(--btn); border: 0; padding: 5px 11px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--on); color: var(--on-ink); }
+  .seg button:disabled { opacity: 0.35; cursor: default; }
+  select { background: var(--btn); border: 1px solid var(--line); border-radius: 7px; padding: 4px 6px; }
+
+  main { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(330px, 1fr); gap: 12px; padding: 12px; min-height: 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; min-height: 0; }
+  .toolbar { display: flex; align-items: center; gap: 14px; padding: 9px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .group { display: flex; align-items: center; gap: 6px; }
+  .label { color: var(--muted); font-size: 12px; }
+  .toggle { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border: 1px solid var(--line);
+            border-radius: 999px; cursor: pointer; user-select: none; background: var(--btn); }
+  .toggle input { margin: 0; accent-color: var(--accent); }
+  .canvas-wrap { position: relative; flex: 1; min-height: 0; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #main-canvas { cursor: crosshair; }
+
+  .focus-head { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .focus-head .range { color: var(--muted); flex: 1; min-width: 140px; }
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
+  .stat { background: var(--panel); padding: 6px 10px; }
+  .stat .k { color: var(--muted); font-size: 11px; }
+  .stat .v { font-size: 14px; font-weight: 600; }
+  .sub { padding: 6px 12px 0; color: var(--muted); font-size: 12px; }
+  .bands { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 6px 12px 12px; }
+  .band .bar { height: 5px; background: var(--grid); border-radius: 3px; overflow: hidden; margin: 3px 0; }
+  .band .bar i { display: block; height: 100%; background: var(--accent); }
+  .band .k { font-size: 11px; color: var(--muted); }
+  .band .v { font-size: 12px; font-weight: 600; }
+
+  footer { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--panel); border-top: 1px solid var(--line); flex-wrap: wrap; }
+  #slider { flex: 1; min-width: 160px; accent-color: var(--accent); }
+  .readout { min-width: 190px; text-align: right; color: var(--muted); }
+  .hint { color: var(--muted); font-size: 11px; }
+
+  #drop {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(3px); z-index: 10;
+  }
+  #drop.hidden { display: none; }
+  .dropbox {
+    width: min(520px, calc(100vw - 32px)); padding: 36px 28px; text-align: center; background: var(--panel);
+    border: 2px dashed var(--line); border-radius: 14px;
+  }
+  .dropbox.over { border-color: var(--accent); }
+  .dropbox h1 { font-size: 20px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .dropbox p { color: var(--muted); margin: 0 0 18px; }
+  .dropbox .row { display: flex; gap: 8px; justify-content: center; }
+  .dropbox .note { margin-top: 18px; font-size: 11px; color: var(--muted); }
+  #status { margin-top: 12px; color: var(--accent); min-height: 1.4em; }
+
+  @media (max-width: 900px) {
+    body { overflow: auto; height: auto; }
+    main { grid-template-columns: 1fr; }
+    .card { min-height: 420px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">ESP-EEG microSD Player<span class="beta">BETA</span></div>
+  <div class="chips" id="chips"></div>
+  <button class="btn" id="open-btn">Open file…</button>
+</header>
+
+<main>
+  <section class="card">
+    <div class="toolbar">
+      <div class="group">
+        <span class="label">Channels</span>
+        <div class="seg" id="nch"><button data-n="8">8</button><button data-n="16">16</button></div>
+      </div>
+      <div class="group">
+        <span class="label">Scale</span>
+        <button class="btn" id="scale-down" title="Zoom out (−)">−</button>
+        <span class="mono" id="scale-val" style="min-width:86px;text-align:center">— µV/div</span>
+        <button class="btn" id="scale-up" title="Zoom in (+)">+</button>
+        <button class="btn" id="scale-auto" title="Auto scale (A)">Auto</button>
+      </div>
+      <div class="group" id="filters">
+        <span class="label">Filters</span>
+        <label class="toggle"><input type="checkbox" data-f="hp" checked>High-pass 0.5 Hz</label>
+        <label class="toggle"><input type="checkbox" data-f="bp">Band-pass 1–40 Hz</label>
+        <label class="toggle"><input type="checkbox" data-f="n50">Notch 50</label>
+        <label class="toggle"><input type="checkbox" data-f="n60">Notch 60</label>
+      </div>
+    </div>
+    <div class="canvas-wrap"><canvas id="main-canvas"></canvas></div>
+  </section>
+
+  <section class="card">
+    <div class="focus-head">
+      <select id="focus-ch" aria-label="Focus channel"></select>
+      <span class="range" id="focus-range">Drag across the traces to select a time range</span>
+      <button class="btn" id="clear-sel" disabled>Clear selection</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">Min</div><div class="v mono" id="s-min">–</div></div>
+      <div class="stat"><div class="k">Max</div><div class="v mono" id="s-max">–</div></div>
+      <div class="stat"><div class="k">Peak-to-peak</div><div class="v mono" id="s-pp">–</div></div>
+      <div class="stat"><div class="k">RMS (AC)</div><div class="v mono" id="s-rms">–</div></div>
+      <div class="stat"><div class="k">Samples</div><div class="v mono" id="s-n">–</div></div>
+    </div>
+    <div class="canvas-wrap" style="flex:1.1"><canvas id="focus-canvas"></canvas></div>
+    <div class="sub">FFT amplitude spectrum (Hann window, µV peak)</div>
+    <div class="canvas-wrap" style="flex:1"><canvas id="psd-canvas"></canvas></div>
+    <div class="bands" id="bands"></div>
+  </section>
+</main>
+
+<footer>
+  <button class="btn primary" id="play" title="Play / pause (Space)" style="min-width:72px">▶ Play</button>
+  <select id="speed" title="Playback speed">
+    <option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option>
+    <option value="5">5×</option><option value="10">10×</option>
+  </select>
+  <button class="btn" id="back" title="Back one window (Page Up)">◀◀</button>
+  <button class="btn" id="fwd" title="Forward one window (Page Down)">▶▶</button>
+  <input type="range" id="slider" min="0" max="1" step="any" value="0" aria-label="Time">
+  <span class="readout mono" id="readout">0.00 – 0.00 s / 0.00 s</span>
+  <div class="group">
+    <span class="label">Window</span>
+    <select id="win">
+      <option>1</option><option>2</option><option>5</option><option selected>10</option>
+      <option>20</option><option>30</option><option>60</option>
+    </select><span class="label">s</span>
+  </div>
+  <span class="hint">← → step · Space play · +/− scale · A auto · click a trace to focus it</span>
+</footer>
+
+<div id="drop">
+  <div class="dropbox" id="dropbox">
+    <h1>Open an ESP-EEG recording</h1>
+    <p>Drop a <span class="mono">REC_xxx.csv</span> from the microSD card here, or choose one.</p>
+    <div class="row">
+      <button class="btn primary" id="choose">Choose file…</button>
+      <button class="btn" id="demo">Try demo data</button>
+    </div>
+    <div id="status"></div>
+    <div class="note">Your file is read in this browser tab only. Nothing is uploaded anywhere.</div>
+  </div>
+</div>
+<input type="file" id="file" accept=".csv,.CSV,text/csv" hidden>
+
+<script>
+"use strict";
+
+// ---------------------------------------------------------------------------
+// Constants: ADS1299 scaling (VREF = 4.5 V, default gain 24)
+// ---------------------------------------------------------------------------
+const VREF = 4.5, GAIN = 24;
+const UV_PER_COUNT = (2 * VREF / GAIN) / 2 ** 24 * 1e6;
+const FULL_SCALE = 8388607; // 2^23 - 1, railed / unconnected input
+const BANDS = [["Delta", 1, 4], ["Theta", 4, 8], ["Alpha", 8, 13], ["Beta", 13, 30], ["Gamma", 30, 45]];
+
+const S = {
+  rec: null,        // { name, t, raw[], names[], fs, dur, dropped, dropTimes[], railed[] }
+  uv: null,         // filtered channel arrays
+  nShow: 8, focus: 0, t0: 0, win: 10, uvDiv: 100,
+  sel: null,        // [ta, tb] selected time range, or null
+  filters: { hp: true, bp: false, n50: false, n60: false },
+  playing: false, speed: 1,
+};
+
+const $ = id => document.getElementById(id);
+
+// ---------------------------------------------------------------------------
+// Loading
+// ---------------------------------------------------------------------------
+function parseRecording(text, name) {
+  const lines = text.split(/\r?\n/);
+  let h = 0;
+  while (h < lines.length && (lines[h].startsWith("#") || !lines[h].trim())) h++;
+  const header = (lines[h] || "").split(",").map(s => s.trim().toLowerCase());
+  const tsIdx = header.indexOf("timestamp_ms");
+  const chIdx = header.map((c, i) => (/^ch\d+$/.test(c) ? i : -1)).filter(i => i >= 0)
+    .sort((a, b) => parseInt(header[a].slice(2)) - parseInt(header[b].slice(2)));
+  if (tsIdx < 0 || !chIdx.length) {
+    throw new Error("This doesn't look like an ESP-EEG microSD file (expected timestamp_ms, status, ch1…chN columns).");
+  }
+
+  const nCh = chIdx.length, cap = lines.length;
+  const ts = new Float64Array(cap);
+  const raw = Array.from({ length: nCh }, () => new Float32Array(cap));
+  const railCount = new Uint32Array(nCh);
+  const pendingDrops = [];
+  let n = 0, dropped = 0, pending = 0;
+
+  for (let li = h + 1; li < lines.length; li++) {
+    const line = lines[li];
+    if (!line) continue;
+    if (line.charCodeAt(0) === 35) { // '#': firmware comment, e.g. "# DROPPED 12 samples"
+      const m = /DROPPED\s+(\d+)/.exec(line);
+      if (m) { dropped += +m[1]; pending += +m[1]; }
+      continue;
+    }
+    const p = line.split(",");
+    if (p.length < header.length) continue; // half-written last row after power-off
+    const tv = +p[tsIdx];
+    if (!Number.isFinite(tv)) continue;
+    let ok = true;
+    for (let c = 0; c < nCh; c++) {
+      const v = +p[chIdx[c]];
+      if (!Number.isFinite(v)) { ok = false; break; }
+      raw[c][n] = v * UV_PER_COUNT;
+      if (Math.abs(v) >= FULL_SCALE - 1) railCount[c]++;
+    }
+    if (!ok) continue;
+    ts[n] = tv;
+    if (pending) { pendingDrops.push([n, pending]); pending = 0; }
+    n++;
+  }
+  if (n < 2) throw new Error("No samples found in this file.");
+
+  const t = new Float64Array(n);
+  for (let i = 0; i < n; i++) t[i] = (ts[i] - ts[0]) / 1000;
+  const dur = t[n - 1];
+  let fs = (n - 1) / dur;
+  // Timestamps are whole ms, so snap to a standard ADS1299 rate when close.
+  for (const std of [250, 500, 1000, 2000, 4000, 8000, 16000]) {
+    if (Math.abs(fs - std) / std < 0.05) { fs = std; break; }
+  }
+
+  return {
+    name, t, fs, dur, dropped,
+    raw: raw.map(a => a.subarray(0, n)),
+    names: chIdx.map(i => header[i].toUpperCase()),
+    railed: Array.from(railCount, c => c / n > 0.5),
+    dropTimes: pendingDrops.map(([i, k]) => [t[i], k]),
+  };
+}
+
+function makeDemo() {
+  const fs = 250, dur = 120, n = fs * dur, nCh = 16;
+  const t = new Float64Array(n);
+  for (let i = 0; i < n; i++) t[i] = i / fs;
+  let seed = 7;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647 - 0.5; };
+  const raw = [];
+  for (let c = 0; c < nCh; c++) {
+    const a = new Float32Array(n);
+    let drift = 0, pink = 0;
+    for (let i = 0; i < n; i++) {
+      const s = t[i];
+      drift += rnd() * 0.8;
+      pink = 0.97 * pink + rnd() * 6;
+      const eyesClosed = (s % 30) > 15 ? 1 : 0.25;
+      const alpha = 18 * eyesClosed * Math.sin(2 * Math.PI * (9.5 + c * 0.1) * s + c);
+      const blink = c < 2 ? 140 * Math.exp(-(((s % 7) - 3) ** 2) / 0.01) : 0;
+      a[i] = 1500 + c * 220 + drift + pink + alpha + blink + 6 * Math.sin(2 * Math.PI * 50 * s) + rnd() * 4;
+    }
+    raw.push(a);
+  }
+  return {
+    name: "demo data (synthetic)", t, fs, dur: t[n - 1], dropped: 0, raw,
+    names: Array.from({ length: nCh }, (_, i) => "CH" + (i + 1)),
+    railed: new Array(nCh).fill(false), dropTimes: [],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Filtering: RBJ biquads run forward and backward (zero phase)
+// ---------------------------------------------------------------------------
+function biquad(type, f0, fs, Q) {
+  const w = 2 * Math.PI * f0 / fs, c = Math.cos(w), al = Math.sin(w) / (2 * Q);
+  let b0, b1, b2;
+  if (type === "hp") { b0 = (1 + c) / 2; b1 = -(1 + c); b2 = (1 + c) / 2; }
+  else if (type === "lp") { b0 = (1 - c) / 2; b1 = 1 - c; b2 = (1 - c) / 2; }
+  else { b0 = 1; b1 = -2 * c; b2 = 1; } // notch
+  const a0 = 1 + al;
+  return [b0 / a0, b1 / a0, b2 / a0, -2 * c / a0, (1 - al) / a0];
+}
+
+function runBiquad(x, [b0, b1, b2, a1, a2]) {
+  // Start in steady state for x[0] so there's no step at the edge.
+  const u = x[0], y0 = u * (b0 + b1 + b2) / (1 + a1 + a2);
+  let z1 = y0 - b0 * u, z2 = b2 * u - a2 * y0;
+  for (let i = 0; i < x.length; i++) {
+    const xi = x[i], y = b0 * xi + z1;
+    z1 = b1 * xi - a1 * y + z2;
+    z2 = b2 * xi - a2 * y;
+    x[i] = y;
+  }
+}
+
+function filtfilt(src, stages, fs) {
+  const n = src.length, L = Math.min(n - 1, Math.round(3 * fs));
+  const ext = new Float64Array(n + 2 * L);
+  for (let i = 0; i < n; i++) ext[L + i] = src[i];
+  for (let k = 1; k <= L; k++) {       // odd reflection padding
+    ext[L - k] = 2 * src[0] - src[k];
+    ext[L + n - 1 + k] = 2 * src[n - 1] - src[n - 1 - k];
+  }
+  for (const s of stages) runBiquad(ext, s);
+  ext.reverse();
+  for (const s of stages) runBiquad(ext, s);
+  ext.reverse();
+  return Float32Array.from(ext.subarray(L, L + n));
+}
+
+function applyFilters() {
+  const r = S.rec, fs = r.fs, nyq = fs / 2, stages = [];
+  if (S.filters.bp && nyq > 40) stages.push(biquad("hp", 1, fs, Math.SQRT1_2), biquad("lp", 40, fs, Math.SQRT1_2));
+  else if (S.filters.hp) stages.push(biquad("hp", 0.5, fs, Math.SQRT1_2));
+  if (S.filters.n50 && nyq > 50) stages.push(biquad("notch", 50, fs, 30));
+  if (S.filters.n60 && nyq > 60) stages.push(biquad("notch", 60, fs, 30));
+  S.uv = r.raw.map((a, c) => {
+    if (r.railed[c]) return new Float32Array(a.length); // no signal; draw flat
+    return stages.length ? filtfilt(a, stages, fs) : a;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function lowerBound(arr, v) {
+  let lo = 0, hi = arr.length;
+  while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m] < v) lo = m + 1; else hi = m; }
+  return lo;
+}
+function niceStep(raw) {
+  const m = 10 ** Math.floor(Math.log10(raw));
+  for (const k of [1, 2, 5, 10]) if (k * m >= raw) return k * m;
+  return 10 * m;
+}
+function fmtUv(v) {
+  const a = Math.abs(v);
+  return (a >= 1000 ? v.toFixed(0) : a >= 10 ? v.toFixed(1) : v.toFixed(2)) + " µV";
+}
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function prep(cv) {
+  const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect();
+  const w = Math.max(1, r.width), h = Math.max(1, r.height);
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) {
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  }
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.font = "11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  return { ctx, w, h };
+}
+function maxT0() { return S.rec ? Math.max(0, S.rec.dur - S.win) : 0; }
+function focusRange() { return S.sel || [S.t0, S.t0 + S.win]; }
+
+// Draws one trace into [x0, x0+pw]; min/max per pixel column when dense.
+function drawTrace(ctx, t, y, i0, i1, ta, tb, x0, pw, toY) {
+  const pxPerS = pw / (tb - ta), gap = 3 / S.rec.fs;
+  ctx.beginPath();
+  if (i1 - i0 > pw * 2) {
+    const cols = Math.ceil(pw) + 1, mn = new Float32Array(cols).fill(Infinity), mx = new Float32Array(cols).fill(-Infinity);
+    for (let i = i0; i < i1; i++) {
+      const col = Math.min(cols - 1, Math.max(0, ((t[i] - ta) * pxPerS) | 0)), v = y[i];
+      if (v < mn[col]) mn[col] = v;
+      if (v > mx[col]) mx[col] = v;
+    }
+    let pen = false;
+    for (let c = 0; c < cols; c++) {
+      if (mn[c] === Infinity) { pen = false; continue; }
+      const x = x0 + c, ya = toY(mx[c]), yb = toY(mn[c]);
+      if (!pen) { ctx.moveTo(x, ya); pen = true; } else ctx.lineTo(x, ya);
+      ctx.lineTo(x, yb);
+    }
+  } else {
+    const a = Math.max(0, i0 - 1), b = Math.min(t.length, i1 + 1);
+    for (let i = a; i < b; i++) {
+      const x = x0 + (t[i] - ta) * pxPerS, yy = toY(y[i]);
+      if (i === a || t[i] - t[i - 1] > gap) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+    }
+  }
+  ctx.stroke();
+}
+
+function drawTimeAxis(ctx, ta, tb, x0, pw, top, bottom, labels) {
+  const step = niceStep((tb - ta) / Math.max(2, pw / 90));
+  ctx.strokeStyle = css("--grid"); ctx.fillStyle = css("--muted"); ctx.lineWidth = 1;
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (let s = Math.ceil(ta / step) * step; s <= tb + 1e-9; s += step) {
+    const x = Math.round(x0 + (s - ta) / (tb - ta) * pw) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x, bottom); ctx.stroke();
+    if (labels) ctx.fillText(+s.toFixed(3) + " s", x, bottom + 5);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Main stacked view
+// ---------------------------------------------------------------------------
+const mainGeom = { padL: 64, padR: 20, padT: 10, padB: 26, w: 0, h: 0 };
+
+function drawMain() {
+  const cv = $("main-canvas"), { ctx, w, h } = prep(cv);
+  if (!S.rec) return;
+  const g = mainGeom; g.w = w; g.h = h;
+  const r = S.rec, t = r.t, pw = w - g.padL - g.padR, ph = h - g.padT - g.padB;
+  const n = S.nShow, rowH = ph / n, ta = S.t0, tb = S.t0 + S.win;
+  const i0 = lowerBound(t, ta), i1 = lowerBound(t, tb);
+
+  drawTimeAxis(ctx, ta, tb, g.padL, pw, g.padT, g.padT + ph, true);
+
+  if (S.sel) {
+    const xa = g.padL + (S.sel[0] - ta) / S.win * pw, xb = g.padL + (S.sel[1] - ta) / S.win * pw;
+    ctx.fillStyle = css("--sel");
+    ctx.fillRect(Math.max(g.padL, xa), g.padT, Math.min(g.padL + pw, xb) - Math.max(g.padL, xa), ph);
+  }
+
+  ctx.strokeStyle = css("--accent"); ctx.setLineDash([3, 3]);
+  for (const [dt, k] of r.dropTimes) {
+    if (dt < ta || dt > tb) continue;
+    const x = Math.round(g.padL + (dt - ta) / S.win * pw) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x, g.padT); ctx.lineTo(x, g.padT + ph); ctx.stroke();
+    ctx.fillStyle = css("--accent"); ctx.textAlign = "left"; ctx.textBaseline = "top";
+    ctx.fillText(`${k} dropped`, x + 3, g.padT + 2);
+  }
+  ctx.setLineDash([]);
+
+  const trace = css("--trace"), accent = css("--accent"), railed = css("--railed"), muted = css("--muted"), ink = css("--ink");
+  ctx.save();
+  ctx.beginPath(); ctx.rect(g.padL, g.padT, pw, ph); ctx.clip();
+  for (let c = 0; c < n; c++) {
+    const yc = g.padT + rowH * (c + 0.5), y = S.uv[c];
+    let mean = 0;
+    for (let i = i0; i < i1; i++) mean += y[i];
+    mean /= Math.max(1, i1 - i0);
+    const k = rowH / S.uvDiv, lim = 1.5 * rowH;
+    ctx.lineWidth = c === S.focus ? 1.2 : 0.9;
+    ctx.strokeStyle = r.railed[c] ? railed : c === S.focus ? accent : trace;
+    drawTrace(ctx, t, y, i0, i1, ta, tb, g.padL, pw,
+      v => yc - Math.max(-lim, Math.min(lim, (v - mean) * k)));
+    if (r.railed[c]) {
+      ctx.fillStyle = muted; ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+      ctx.fillText("railed / not connected", g.padL + 6, yc - 3);
+    }
+  }
+  ctx.restore();
+
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  for (let c = 0; c < n; c++) {
+    ctx.fillStyle = c === S.focus ? accent : r.railed[c] ? muted : ink;
+    ctx.font = (c === S.focus ? "600 " : "") + "11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    ctx.fillText(r.names[c], g.padL - 10, g.padT + rowH * (c + 0.5));
+  }
+  if (S.drag) {
+    const xa = Math.min(S.drag.x0, S.drag.x1), xb = Math.max(S.drag.x0, S.drag.x1);
+    ctx.fillStyle = css("--sel"); ctx.fillRect(xa, g.padT, xb - xa, ph);
+    ctx.strokeStyle = accent; ctx.strokeRect(xa + 0.5, g.padT + 0.5, xb - xa, ph - 1);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Focus panel: single channel, stats, spectrum, band power
+// ---------------------------------------------------------------------------
+function fft(re, im) {
+  const n = re.length;
+  for (let i = 1, j = 0; i < n; i++) {
+    let bit = n >> 1;
+    for (; j & bit; bit >>= 1) j ^= bit;
+    j ^= bit;
+    if (i < j) { [re[i], re[j]] = [re[j], re[i]]; [im[i], im[j]] = [im[j], im[i]]; }
+  }
+  for (let len = 2; len <= n; len <<= 1) {
+    const ang = -2 * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang);
+    for (let i = 0; i < n; i += len) {
+      let cr = 1, ci = 0;
+      for (let k = 0; k < len / 2; k++) {
+        const a = i + k, b = a + len / 2;
+        const xr = re[b] * cr - im[b] * ci, xi = re[b] * ci + im[b] * cr;
+        re[b] = re[a] - xr; im[b] = im[a] - xi; re[a] += xr; im[a] += xi;
+        const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t;
+      }
+    }
+  }
+}
+
+// Classic single FFT of the whole range: Hann window, zero-padded to a power
+// of two, amplitude-corrected so a sine of A µV shows a peak of A µV.
+function fftSpectrum(y, fs) {
+  const n = Math.min(y.length, 1 << 18);
+  if (n < 32) return null;
+  let N = 1;
+  while (N < n) N *= 2;
+  const re = new Float64Array(N), im = new Float64Array(N);
+  let m = 0, wsum = 0, wss = 0;
+  for (let i = 0; i < n; i++) m += y[i];
+  m /= n;
+  for (let i = 0; i < n; i++) {
+    const w = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (n - 1));
+    re[i] = (y[i] - m) * w; wsum += w; wss += w * w;
+  }
+  fft(re, im);
+  const amp = new Float64Array(N / 2 + 1), p = new Float64Array(N / 2 + 1);
+  for (let k = 0; k <= N / 2; k++) {
+    const mag2 = re[k] ** 2 + im[k] ** 2, one = k === 0 || k === N / 2;
+    amp[k] = (one ? 1 : 2) * Math.sqrt(mag2) / wsum;           // µV peak
+    p[k] = (one ? 1 : 2) * mag2 / (fs * wss);                   // µV²/Hz, for band power
+  }
+  return { amp, p, df: fs / N };
+}
+
+function drawFocus() {
+  const fc = prep($("focus-canvas")), pc = prep($("psd-canvas"));
+  if (!S.rec) return;
+  const r = S.rec, t = r.t, [ta, tb] = focusRange();
+  const i0 = lowerBound(t, ta), i1 = Math.max(i0 + 1, lowerBound(t, tb));
+  const y = S.uv[S.focus].subarray(i0, i1);
+
+  $("focus-range").textContent = S.sel
+    ? `Selection ${ta.toFixed(2)} – ${tb.toFixed(2)} s (${(tb - ta).toFixed(2)} s)`
+    : `Visible window ${ta.toFixed(2)} – ${tb.toFixed(2)} s · drag across the traces to select`;
+
+  let mn = Infinity, mx = -Infinity, sum = 0;
+  for (const v of y) { if (v < mn) mn = v; if (v > mx) mx = v; sum += v; }
+  const mean = sum / y.length;
+  let ss = 0;
+  for (const v of y) ss += (v - mean) ** 2;
+  $("s-min").textContent = fmtUv(mn); $("s-max").textContent = fmtUv(mx);
+  $("s-pp").textContent = fmtUv(mx - mn); $("s-rms").textContent = fmtUv(Math.sqrt(ss / y.length));
+  $("s-n").textContent = y.length.toLocaleString();
+
+  // Trace with true µV axis
+  {
+    const { ctx, w, h } = fc, padL = 58, padR = 24, padT = 12, padB = 24, pw = w - padL - padR, ph = h - padT - padB;
+    let lo = mn, hi = mx;
+    if (hi - lo < 1e-6) { lo -= 1; hi += 1; }
+    const step = niceStep((hi - lo) / 4);
+    lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+    const toY = v => padT + (hi - v) / (hi - lo) * ph;
+    drawTimeAxis(ctx, ta, tb, padL, pw, padT, padT + ph, true);
+    ctx.strokeStyle = css("--grid"); ctx.fillStyle = css("--muted"); ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (let v = lo; v <= hi + step / 2; v += step) {
+      const yy = Math.round(toY(v)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(padL + pw, yy); ctx.stroke();
+      ctx.fillText(+v.toFixed(6) + "", padL - 6, yy);
+    }
+    ctx.save(); ctx.translate(12, padT + ph / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = "center";
+    ctx.fillText("µV", 0, 0); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.rect(padL, padT, pw, ph); ctx.clip();
+    ctx.strokeStyle = css("--accent"); ctx.lineWidth = 1;
+    drawTrace(ctx, t, S.uv[S.focus], i0, i1, ta, tb, padL, pw, toY);
+    ctx.restore();
+  }
+
+  // Spectrum
+  const { ctx, w, h } = pc, padL = 58, padR = 24, padT = 8, padB = 24, pw = w - padL - padR, ph = h - padT - padB;
+  const res = r.railed[S.focus] ? null : fftSpectrum(y, r.fs);
+  const bandsEl = $("bands");
+  if (!res) {
+    ctx.fillStyle = css("--muted"); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(r.railed[S.focus] ? "Channel is railed: no signal" : "Select a longer range to see the spectrum", w / 2, h / 2);
+    bandsEl.innerHTML = "";
+    return;
+  }
+  const { amp, p, df } = res, fmax = Math.min(r.fs / 2, 100), kmax = Math.min(amp.length - 1, Math.floor(fmax / df));
+  let amax = 0, kpk = 1;
+  for (let k = 1; k <= kmax; k++) if (amp[k] > amax) { amax = amp[k]; kpk = k; }
+  const ystep = niceStep((amax || 1) / 4), ytop = Math.ceil((amax || 1) * 1.08 / ystep) * ystep;
+  const toX = f => padL + f / fmax * pw, toY = v => padT + (1 - v / ytop) * ph;
+
+  ctx.fillStyle = css("--grid");
+  BANDS.forEach(([, f1, f2], i) => {
+    if (i % 2 || f1 >= fmax) return;
+    ctx.globalAlpha = 0.6; ctx.fillRect(toX(f1), padT, toX(Math.min(f2, fmax)) - toX(f1), ph); ctx.globalAlpha = 1;
+  });
+  ctx.strokeStyle = css("--grid"); ctx.fillStyle = css("--muted"); ctx.lineWidth = 1;
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  for (let v = 0; v <= ytop + ystep / 2; v += ystep) {
+    const yy = Math.round(toY(v)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(padL + pw, yy); ctx.stroke();
+    ctx.fillText(String(+v.toPrecision(6)), padL - 6, yy);
+  }
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (let f = 0; f <= fmax; f += niceStep(fmax / 6)) {
+    const x = Math.round(toX(f)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + ph); ctx.stroke();
+    ctx.fillText(f + " Hz", x, padT + ph + 5);
+  }
+  ctx.save(); ctx.translate(12, padT + ph / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("µV", 0, 0); ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(padL, padT, pw, ph); ctx.clip();
+  ctx.strokeStyle = css("--accent"); ctx.lineWidth = 1.2; ctx.beginPath();
+  // Many bins per pixel on long ranges: draw per-column max so peaks survive.
+  let lastCol = -1, colMax = 0;
+  for (let k = 1; k <= kmax; k++) {
+    const col = Math.round(toX(k * df));
+    if (col === lastCol) { colMax = Math.max(colMax, amp[k]); continue; }
+    if (lastCol >= 0) ctx.lineTo(lastCol, toY(colMax)); else ctx.moveTo(col, toY(amp[k]));
+    lastCol = col; colMax = amp[k];
+  }
+  ctx.lineTo(lastCol, toY(colMax));
+  ctx.stroke();
+  ctx.restore();
+  if (amax > 0) {
+    const x = toX(kpk * df), yy = toY(amax), label = `${(kpk * df).toFixed(2)} Hz · ${fmtUv(amax)}`;
+    ctx.fillStyle = css("--ink"); ctx.textBaseline = "bottom";
+    ctx.textAlign = x > padL + pw * 0.7 ? "right" : "left";
+    ctx.fillText(label, x + (ctx.textAlign === "left" ? 6 : -6), Math.max(padT + 12, yy));
+  }
+
+  // Band power: absolute (µV rms) and share of 1–45 Hz
+  const pw_ = BANDS.map(([, f1, f2]) => {
+    let s = 0;
+    for (let k = Math.ceil(f1 / df); k * df < f2 && k < p.length; k++) s += p[k] * df;
+    return s;
+  });
+  const tot = pw_.reduce((a, b) => a + b, 0) || 1;
+  bandsEl.innerHTML = BANDS.map(([bn, f1, f2], i) => `
+    <div class="band" title="${f1}–${f2} Hz">
+      <div class="k">${bn} <span style="opacity:.7">${f1}–${f2}</span></div>
+      <div class="bar"><i style="width:${(100 * pw_[i] / tot).toFixed(1)}%"></i></div>
+      <div class="v mono">${(100 * pw_[i] / tot).toFixed(0)}%</div>
+      <div class="k mono">${Math.sqrt(pw_[i]).toFixed(1)} µV rms</div>
+    </div>`).join("");
+}
+
+// ---------------------------------------------------------------------------
+// UI state
+// ---------------------------------------------------------------------------
+let raf = 0;
+function render() {
+  if (raf) return;
+  raf = requestAnimationFrame(() => { raf = 0; drawMain(); drawFocus(); updateReadout(); });
+}
+
+function updateReadout() {
+  if (!S.rec) return;
+  const sl = $("slider");
+  sl.max = maxT0() || 1e-6;
+  sl.value = S.t0;
+  $("readout").textContent = `${S.t0.toFixed(2)} – ${(S.t0 + S.win).toFixed(2)} s / ${S.rec.dur.toFixed(2)} s`;
+  $("scale-val").textContent = `${+S.uvDiv.toPrecision(3)} µV/div`;
+}
+
+function setT0(v) { S.t0 = Math.max(0, Math.min(maxT0(), v)); render(); }
+
+function autoScale() {
+  const r = S.rec, t = r.t, i0 = lowerBound(t, S.t0), i1 = lowerBound(t, S.t0 + S.win), spreads = [];
+  for (let c = 0; c < S.nShow; c++) {
+    if (r.railed[c] || i1 - i0 < 4) continue;
+    // Robust spread (MAD) so filter settling or one artifact doesn't dominate.
+    const seg = Array.from(S.uv[c].subarray(i0, i1)).sort((a, b) => a - b);
+    const med = seg[seg.length >> 1];
+    const dev = seg.map(v => Math.abs(v - med)).sort((a, b) => a - b);
+    spreads.push(1.4826 * dev[dev.length >> 1]);
+  }
+  spreads.sort((a, b) => a - b);
+  const s = spreads[spreads.length >> 1];
+  if (s > 0) S.uvDiv = niceStep(3 * s);
+  render();
+}
+
+function buildChannelUI() {
+  const r = S.rec, has16 = r.names.length >= 16;
+  for (const b of $("nch").querySelectorAll("button")) {
+    const n = +b.dataset.n;
+    b.disabled = n === 16 && !has16;
+    b.classList.toggle("on", n === S.nShow);
+  }
+  const sel = $("focus-ch");
+  sel.innerHTML = r.names.slice(0, S.nShow).map((nm, i) =>
+    `<option value="${i}">${nm}${r.railed[i] ? " (railed)" : ""}</option>`).join("");
+  sel.value = S.focus;
+}
+
+function setNShow(n) {
+  S.nShow = Math.min(n, S.rec.names.length);
+  if (S.focus >= S.nShow) S.focus = 0;
+  buildChannelUI();
+  render();
+}
+
+function load(rec) {
+  S.rec = rec; S.t0 = 0; S.sel = null; S.focus = 0; stop();
+  S.win = Math.min(+$("win").value, Math.max(1, Math.floor(rec.dur)));
+  $("win").value = [1, 2, 5, 10, 20, 30, 60].includes(S.win) ? S.win : $("win").value;
+  S.nShow = rec.names.length >= 16 ? 16 : rec.names.length;
+  // Start the focus on the first channel that actually has signal.
+  const live = rec.railed.indexOf(false);
+  S.focus = live >= 0 && live < S.nShow ? live : 0;
+  applyFilters();
+  buildChannelUI();
+  $("clear-sel").disabled = true;
+
+  const chips = [
+    `<span class="chip"><b>${rec.name}</b></span>`,
+    `<span class="chip"><b>${rec.names.length}</b> channels</span>`,
+    `<span class="chip"><b>${rec.fs}</b> SPS</span>`,
+    `<span class="chip"><b>${rec.dur.toFixed(1)}</b> s</span>`,
+  ];
+  if (rec.dropped) chips.push(`<span class="chip warn">${rec.dropped} dropped samples</span>`);
+  const railed = rec.names.filter((_, i) => rec.railed[i]);
+  if (railed.length) chips.push(`<span class="chip warn" title="${railed.join(", ")}">${railed.length} railed: ${railed.length > 3 ? railed[0] + "–" + railed[railed.length - 1] : railed.join(", ")}</span>`);
+  $("chips").innerHTML = chips.join("");
+  $("drop").classList.add("hidden");
+  autoScale();
+}
+
+async function loadFile(file) {
+  const st = $("status");
+  st.textContent = `Reading ${file.name}…`;
+  $("drop").classList.remove("hidden");
+  await new Promise(r => setTimeout(r, 20));
+  try {
+    const rec = parseRecording(await file.text(), file.name);
+    st.textContent = "";
+    load(rec);
+  } catch (e) {
+    st.textContent = e.message;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Playback
+// ---------------------------------------------------------------------------
+let playRaf = 0, lastTs = 0;
+function tick(ts) {
+  if (!S.playing) return;
+  if (lastTs) {
+    S.t0 += (ts - lastTs) / 1000 * S.speed;
+    if (S.t0 >= maxT0()) { S.t0 = maxT0(); stop(); }
+    render();
+  }
+  lastTs = ts;
+  playRaf = requestAnimationFrame(tick);
+}
+function play() {
+  if (!S.rec) return;
+  if (S.t0 >= maxT0()) S.t0 = 0;
+  S.playing = true; lastTs = 0; $("play").textContent = "❚❚ Pause";
+  playRaf = requestAnimationFrame(tick);
+}
+function stop() { S.playing = false; cancelAnimationFrame(playRaf); $("play").textContent = "▶ Play"; }
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+$("open-btn").onclick = $("choose").onclick = () => $("file").click();
+$("file").onchange = e => { if (e.target.files[0]) loadFile(e.target.files[0]); e.target.value = ""; };
+$("demo").onclick = () => load(makeDemo());
+
+const box = $("dropbox");
+window.addEventListener("dragover", e => { e.preventDefault(); $("drop").classList.remove("hidden"); box.classList.add("over"); });
+window.addEventListener("dragleave", e => { if (!e.relatedTarget) { box.classList.remove("over"); if (S.rec) $("drop").classList.add("hidden"); } });
+window.addEventListener("drop", e => {
+  e.preventDefault(); box.classList.remove("over");
+  const f = e.dataTransfer.files[0];
+  if (f) loadFile(f); else if (S.rec) $("drop").classList.add("hidden");
+});
+$("drop").addEventListener("click", e => { if (e.target.id === "drop" && S.rec) $("drop").classList.add("hidden"); });
+
+$("nch").onclick = e => { const b = e.target.closest("button"); if (b && !b.disabled && S.rec) setNShow(+b.dataset.n); };
+$("scale-up").onclick = () => { S.uvDiv /= 2; render(); };
+$("scale-down").onclick = () => { S.uvDiv *= 2; render(); };
+$("scale-auto").onclick = () => S.rec && autoScale();
+$("filters").onchange = e => {
+  const f = e.target.dataset.f;
+  if (!f) return;
+  S.filters[f] = e.target.checked;
+  if (f === "bp" && e.target.checked) { S.filters.hp = false; document.querySelector('[data-f="hp"]').checked = false; }
+  if (f === "hp" && e.target.checked) { S.filters.bp = false; document.querySelector('[data-f="bp"]').checked = false; }
+  if (S.rec) { applyFilters(); render(); }
+};
+$("focus-ch").onchange = e => { S.focus = +e.target.value; render(); };
+$("clear-sel").onclick = () => { S.sel = null; $("clear-sel").disabled = true; render(); };
+
+$("play").onclick = () => (S.playing ? stop() : play());
+$("speed").onchange = e => { S.speed = +e.target.value; };
+$("back").onclick = () => setT0(S.t0 - S.win);
+$("fwd").onclick = () => setT0(S.t0 + S.win);
+$("slider").oninput = e => setT0(+e.target.value);
+$("win").onchange = e => { S.win = +e.target.value; if (S.rec) setT0(S.t0); };
+
+// Main canvas: click = choose channel, drag = select time range.
+const mc = $("main-canvas");
+function canvasPos(e) { const r = mc.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+mc.addEventListener("pointerdown", e => {
+  if (!S.rec) return;
+  const [x] = canvasPos(e);
+  const g = mainGeom, xc = Math.max(g.padL, Math.min(g.w - g.padR, x));
+  S.drag = { x0: xc, x1: xc, start: canvasPos(e) };
+  mc.setPointerCapture(e.pointerId);
+});
+mc.addEventListener("pointermove", e => {
+  if (!S.drag) return;
+  const g = mainGeom;
+  S.drag.x1 = Math.max(g.padL, Math.min(g.w - g.padR, canvasPos(e)[0]));
+  render();
+});
+mc.addEventListener("pointerup", e => {
+  if (!S.drag) return;
+  const d = S.drag, g = mainGeom; S.drag = null;
+  const pw = g.w - g.padL - g.padR, ph = g.h - g.padT - g.padB;
+  if (Math.abs(d.x1 - d.x0) < 4) {
+    const c = Math.floor((d.start[1] - g.padT) / (ph / S.nShow));
+    if (c >= 0 && c < S.nShow) { S.focus = c; $("focus-ch").value = c; }
+  } else {
+    const toT = x => S.t0 + (x - g.padL) / pw * S.win;
+    S.sel = [toT(Math.min(d.x0, d.x1)), toT(Math.max(d.x0, d.x1))];
+    $("clear-sel").disabled = false;
+  }
+  render();
+});
+
+window.addEventListener("keydown", e => {
+  if (!S.rec || ["INPUT", "SELECT"].includes(e.target.tagName)) return;
+  const k = e.key;
+  if (k === "ArrowRight") setT0(S.t0 + S.win * 0.1);
+  else if (k === "ArrowLeft") setT0(S.t0 - S.win * 0.1);
+  else if (k === "PageDown") setT0(S.t0 + S.win);
+  else if (k === "PageUp") setT0(S.t0 - S.win);
+  else if (k === "Home") setT0(0);
+  else if (k === "End") setT0(maxT0());
+  else if (k === " ") S.playing ? stop() : play();
+  else if (k === "+" || k === "=") { S.uvDiv /= 2; render(); }
+  else if (k === "-") { S.uvDiv *= 2; render(); }
+  else if (k === "a" || k === "A") autoScale();
+  else if (k === "Escape" && S.sel) { S.sel = null; $("clear-sel").disabled = true; render(); }
+  else return;
+  e.preventDefault();
+});
+
+new ResizeObserver(render).observe(document.body);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+
+// When launched via usd_player.py with a file argument, the server offers it at /data.
+fetch("data").then(r => (r.ok ? r.text().then(txt => {
+  const name = decodeURIComponent(r.headers.get("X-Filename") || "recording.csv");
+  try { load(parseRecording(txt, name)); } catch (e) { $("status").textContent = e.message; }
+}) : null)).catch(() => {});
+</script>
+</body>
+</html>

@@ -57,3 +57,5 @@ python3 alpha_test.py --analyze recordings/<date_time>
 - Spectrogram: 2 s windows, 0.5 s step.
 
 Alpha amplitude varies a lot between people and sessions. The result shows the full system records a known physiological signal; it is not a spec to compare between devices.
+
+<sub><b>V1 boards:</b> before running this test, reflash with only CH1P as a BIAS input (register 0x0D BIAS_SENSP = <code>0b00000001</code>, 0x0E BIAS_SENSN = <code>0</code>). The stock V1 firmware feeds all 8 channels into BIAS, and unconnected, floating channels confuse the bias pin. V2 and 16CH firmware already use CH1 only.</sub>

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 470" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#222">
+  <rect width="820" height="470" fill="#fff"/>
+
+  <!-- ── Top view ── -->
+  <text x="200" y="28" text-anchor="middle" font-size="16" font-weight="600">Top view (nose at top)</text>
+  <g stroke="#222" stroke-width="2" fill="none" stroke-linejoin="round">
+    <ellipse cx="200" cy="215" rx="125" ry="145"/>
+    <polyline points="184,74 200,52 216,74"/>
+    <ellipse cx="68" cy="215" rx="10" ry="26"/>
+    <ellipse cx="332" cy="215" rx="10" ry="26"/>
+  </g>
+  <!-- 10% ring and midline (10-20 system construction lines) -->
+  <g stroke="#bbb" stroke-width="1.2" fill="none" stroke-dasharray="5 4">
+    <ellipse cx="200" cy="215" rx="105" ry="125"/>
+    <line x1="200" y1="70" x2="200" y2="360"/>
+    <line x1="75" y1="215" x2="325" y2="215"/>
+  </g>
+  <text x="200" y="44" text-anchor="middle" font-size="12" fill="#666">Nasion</text>
+  <text x="200" y="380" text-anchor="middle" font-size="12" fill="#666">Inion</text>
+  <circle cx="200" cy="215" r="4" fill="#bbb"/>
+  <text x="208" y="209" font-size="12" fill="#999">Cz</text>
+
+  <!-- Oz (landmark only), O1, O2 -->
+  <circle cx="200" cy="340" r="9" fill="#fff" stroke="#999" stroke-width="1.5"/>
+  <text x="200" y="344" text-anchor="middle" font-size="10" fill="#999">Oz</text>
+  <circle cx="168" cy="334" r="13" fill="#2a78c4"/>
+  <text x="168" y="339" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">O1</text>
+  <circle cx="232" cy="334" r="13" fill="#2a78c4"/>
+  <text x="232" y="339" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">O2</text>
+
+  <!-- Earlobes -->
+  <circle cx="68" cy="246" r="9" fill="#d9822b"/>
+  <circle cx="332" cy="246" r="9" fill="#2f8a4a"/>
+  <text x="54" y="250" text-anchor="end" font-size="12" font-weight="600" fill="#b5651d">SRB1</text>
+  <text x="346" y="250" font-size="12" font-weight="600" fill="#2f8a4a">BIAS</text>
+
+  <text x="40" y="414" font-size="12" fill="#666">Subject's LEFT</text>
+  <text x="360" y="414" text-anchor="end" font-size="12" fill="#666">Subject's RIGHT</text>
+
+  <!-- ── Back view ── -->
+  <text x="610" y="28" text-anchor="middle" font-size="16" font-weight="600">Back view</text>
+  <g stroke="#222" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M610 50 C 685 50, 720 110, 720 180 C 720 245, 690 290, 665 305 L 668 380"/>
+    <path d="M610 50 C 535 50, 500 110, 500 180 C 500 245, 530 290, 555 305 L 552 380"/>
+    <ellipse cx="493" cy="200" rx="9" ry="26"/>
+    <ellipse cx="727" cy="200" rx="9" ry="26"/>
+    <!-- inion bump -->
+    <path d="M596 300 Q 610 290 624 300"/>
+  </g>
+  <circle cx="493" cy="231" r="8" fill="#d9822b"/>
+  <circle cx="727" cy="231" r="8" fill="#2f8a4a"/>
+
+  <!-- Oz landmark, O1, O2 (≈3.5 cm above the inion, ≈2.5–3 cm either side) -->
+  <circle cx="610" cy="240" r="9" fill="#fff" stroke="#999" stroke-width="1.5"/>
+  <text x="610" y="244" text-anchor="middle" font-size="10" fill="#999">Oz</text>
+  <circle cx="570" cy="240" r="13" fill="#2a78c4"/>
+  <text x="570" y="245" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">O1</text>
+  <circle cx="650" cy="240" r="13" fill="#2a78c4"/>
+  <text x="650" y="245" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">O2</text>
+
+  <!-- Dimensions -->
+  <g stroke="#d14" stroke-width="1.3" fill="none">
+    <line x1="610" y1="251" x2="610" y2="292"/>
+    <polyline points="606,257 610,251 614,257"/>
+    <polyline points="606,286 610,292 614,286"/>
+    <line x1="650" y1="214" x2="610" y2="214"/>
+    <polyline points="616,210 610,214 616,218"/>
+    <polyline points="644,210 650,214 644,218"/>
+    <line x1="610" y1="218" x2="610" y2="229" stroke-dasharray="2 2"/>
+    <line x1="650" y1="218" x2="650" y2="225" stroke-dasharray="2 2"/>
+  </g>
+  <text x="602" y="268" text-anchor="end" font-size="12" fill="#d14">≈3–4 cm</text>
+  <text x="610" y="393" text-anchor="middle" font-size="11" fill="#d14">≈3–4 cm = 10% of the nasion-to-inion distance over the head</text>
+  <text x="630" y="204" text-anchor="middle" font-size="12" fill="#d14">≈2.5–3 cm each side</text>
+  <text x="610" y="322" text-anchor="middle" font-size="12" font-weight="600" fill="#666">Inion</text>
+  <text x="610" y="337" text-anchor="middle" font-size="11" fill="#666">bony bump at</text>
+  <text x="610" y="351" text-anchor="middle" font-size="11" fill="#666">base of skull</text>
+
+  <text x="470" y="414" font-size="12" fill="#666">Subject's LEFT</text>
+  <text x="750" y="414" text-anchor="end" font-size="12" fill="#666">Subject's RIGHT</text>
+
+  <!-- ── Legend ── -->
+  <line x1="20" y1="428" x2="800" y2="428" stroke="#ddd"/>
+  <circle cx="40" cy="452" r="8" fill="#2a78c4"/>
+  <text x="54" y="457">CH1+ = O1, CH2+ = O2</text>
+  <circle cx="270" cy="452" r="8" fill="#d9822b"/>
+  <text x="284" y="457">SRB1 (reference) = left earlobe clip</text>
+  <circle cx="560" cy="452" r="8" fill="#2f8a4a"/>
+  <text x="574" y="457">BIAS = right earlobe clip</text>
+</svg>

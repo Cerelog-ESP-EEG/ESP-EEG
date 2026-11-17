@@ -29,6 +29,7 @@
 
 - CMRR **25 dB (V2) and 30 dB (16CH) above** the ADS1299's 110 dB minimum spec
 - **18× (V2) and 32× (16CH) better** rejection than the best other open-source board we found
+- **Passes** the real-world eyes-open / eyes-closed alpha test ([section 4](#4-eyes-open--eyes-closed-alpha-test-real-world-performance-test-works-on-a-subject))
 
 [cerelog.com](https://cerelog.com)
 
@@ -37,6 +38,7 @@
 1. [1.19 µVrms Input Test](#1-119-µvrms-input-test)
 2. [Noise Floor](#2-noise-floor)
 3. [Common-Mode Rejection Ratio (CMRR)](#3-common-mode-rejection-ratio-cmrr)
+4. [Eyes-Open / Eyes-Closed Alpha Test (Real-World Performance Test: Works on a Subject)](#4-eyes-open--eyes-closed-alpha-test-real-world-performance-test-works-on-a-subject)
 
 ---
 
@@ -295,6 +297,39 @@ In each screenshot, **left:** function generator output, a 50 Hz sine at 2 V amp
 The 0.25 µV leakage is the FFT peak height, used directly as V<sub>leak</sub>. Any conversion of a peak reading to RMS would make V<sub>leak</sub> smaller and the CMRR higher, so 135 dB is a conservative figure. Similar performance was measured at 60 Hz on both the V2 and the 16CH, so the results hold at both mains frequencies. Remaining channels: testing in progress.
 
 **Why it's this high:** the ESP-EEG V2 and 16CH both use a common-mode and a differential input filter, the arrangement TI recommends for the ADS1299. A small capacitor to ground on each leg handles common-mode filtering, and one larger capacitor across CH+ and CH− does the differential filtering. Keeping the per-leg capacitors small means component tolerances turn far less common-mode signal into a differential error. Most ADS1299 boards filter each leg to ground only, and published measurements of other open-source ADS1299 boards range from about 80 to 110 dB ([ironbci](https://arxiv.org/abs/2111.03656), [Creamino](https://www.researchgate.net/publication/326818755_Creamino_A_Cost-Effective_Open-Source_EEG-Based_BCI_System), [BEATS](https://arxiv.org/abs/2203.02102)).
+
+---
+
+## 4. Eyes-Open / Eyes-Closed Alpha Test (Real-World Performance Test: Works on a Subject)
+
+The ESP-EEG V2 and 16CH were both tested in the real world on a user. On both boards, closing the eyes raised power in the 8–13 Hz alpha band of the power spectral density by **16–32×** compared with eyes open. Alpha switched on in every eyes-closed block (3 of 3) on both channels and switched off again each time the eyes opened, with a peak at about 10 Hz. This is a meaningful test that the device works: it records a known brain signal from a real head.
+
+| | ESP-EEG V2 | 16CH ESP-EEG |
+|---|---|---|
+| Alpha power ratio, closed ÷ open (O1 / O2) | **31.7× / 15.6×** | **24.0× / 23.7×** |
+| Alpha, eyes closed (O1 / O2) | 15.5 / 14.7 µVrms | 13.0 / 14.6 µVrms |
+| Peak alpha frequency (O1 / O2) | 10.0 / 9.75 Hz | 10.0 / 10.0 Hz |
+
+The two boards share the same ADS1299 front-end design. The differences between the two recordings come mainly from the electrodes being re-placed between tests and normal variation in the subject's alpha from one recording to the next. The eyes-closed alpha level is nearly the same on both boards; the ratio varies more because it compares power, so a small change in the eyes-open level moves it a lot.
+
+Setup: gold cup electrodes with Ten20 paste at O1 and O2, reference and bias on the earlobes, 3 cycles of 20 s eyes open / 20 s eyes closed, open room, no shielding, laptop on battery.
+
+<table>
+  <tr>
+    <th align="center">ESP-EEG V2</th>
+    <th align="center">16CH ESP-EEG</th>
+  </tr>
+  <tr>
+    <td align="center"><a href="v2_alpha_test.png"><img src="v2_alpha_test.png" alt="ESP-EEG V2 alpha test results. Alpha power ratio eyes closed ÷ eyes open: 31.7× on O1 and 15.6× on O2, peak alpha frequency 10.0 and 9.75 Hz. Spectra show a large 10 Hz peak with eyes closed only, and the spectrogram shows alpha switching on in each eyes-closed block." width="100%"></a></td>
+    <td align="center"><a href="16ch_alpha_test.png"><img src="16ch_alpha_test.png" alt="16CH ESP-EEG alpha test results. Alpha power ratio eyes closed ÷ eyes open: 24.0× on O1 and 23.7× on O2, peak alpha frequency 10 Hz. Spectra show a large 10 Hz peak with eyes closed only, and the spectrogram shows alpha switching on in each eyes-closed block." width="100%"></a></td>
+  </tr>
+  <tr>
+    <td>Results page from the <b>ESP-EEG V2</b> recording (250 SPS).</td>
+    <td>Results page from the <b>16CH ESP-EEG</b> recording (125 SPS).</td>
+  </tr>
+</table>
+
+Click an image to enlarge. The test tool, electrode placement and method are in [alpha_test](alpha_test/).
 
 ---
 

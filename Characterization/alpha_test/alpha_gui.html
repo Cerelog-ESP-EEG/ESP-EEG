@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ESP-EEG Alpha Test</title>
+<style>
+  :root {
+    --bg: #eef0f3; --panel: #ffffff; --ink: #18202a; --muted: #6a7482; --line: #dfe3e8;
+    --grid: #eef0f3; --trace: #26425f; --accent: #d2452f; --ok: #2f8a4a;
+    --eo: #2a78c4; --ec: #d9822b; --band: rgba(120, 130, 145, 0.14);
+    --btn: #f1f3f6; --btn-hover: #e5e8ec; --on: #18202a; --on-ink: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1116; --panel: #161b22; --ink: #e5e9ee; --muted: #8a94a2; --line: #262e38;
+      --grid: #1d232b; --trace: #9fc4e8; --accent: #ff7b5e; --ok: #5cc27a;
+      --eo: #6aaef0; --ec: #f0a050; --band: rgba(160, 170, 185, 0.12);
+      --btn: #1f262f; --btn-hover: #29313b; --on: #e5e9ee; --on-ink: #11161c;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  button, select, input, textarea { font: inherit; color: inherit; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+
+  header {
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+    background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 5;
+  }
+  .brand { font-weight: 650; letter-spacing: -0.01em; margin-right: 6px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
+  .chip { padding: 3px 9px; border-radius: 999px; background: var(--btn); color: var(--muted); white-space: nowrap; }
+  .chip b { color: var(--ink); font-weight: 600; }
+  .chip.warn { color: var(--accent); }
+  .chip.good { color: var(--ok); }
+
+  .btn { background: var(--btn); border: 1px solid var(--line); border-radius: 7px; padding: 5px 11px; cursor: pointer; }
+  .btn:hover { background: var(--btn-hover); }
+  .btn.primary { background: var(--on); color: var(--on-ink); border-color: var(--on); }
+  .btn.danger { color: var(--accent); }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .btn.big { padding: 9px 18px; font-weight: 600; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+  .seg button { background: var(--btn); border: 0; padding: 5px 11px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--on); color: var(--on-ink); }
+  select, input, textarea { background: var(--btn); border: 1px solid var(--line); border-radius: 7px; padding: 4px 7px; }
+  input[type=number] { width: 70px; }
+  textarea { width: 100%; resize: vertical; min-height: 54px; }
+
+  .tabs { display: flex; gap: 4px; padding: 10px 16px 0; }
+  .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 6px 12px; cursor: pointer; color: var(--muted); font-weight: 600; }
+  .tabs button.on { color: var(--ink); border-bottom-color: var(--ink); }
+  .tabs button:disabled { opacity: 0.4; cursor: default; }
+
+  main { padding: 12px 16px 24px; }
+  .view { display: none; }
+  .view.on { display: block; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr); gap: 12px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; }
+  .card h2 { font-size: 13px; margin: 0; padding: 9px 12px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 8px; }
+  .card h2 .sub { font-weight: 400; color: var(--muted); margin-left: auto; font-size: 12px; }
+  .pad { padding: 10px 12px; }
+  .plot { position: relative; height: 170px; }
+  .plot.tall { height: 260px; }
+  .plot canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .label { color: var(--muted); font-size: 12px; }
+  .form { display: grid; grid-template-columns: auto 1fr; gap: 7px 10px; align-items: center; }
+  .form .row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .hint { color: var(--muted); font-size: 12px; margin: 8px 0 0; }
+  .readouts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); }
+  .ro.head { grid-column: span 2; font-weight: 600; padding: 6px 12px; }
+  .ro { background: var(--panel); padding: 7px 12px; }
+  .ro .k { color: var(--muted); font-size: 11px; }
+  .ro .v { font-size: 15px; font-weight: 600; }
+  .ro .v small { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .flag { color: var(--accent); font-weight: 600; }
+
+  /* ── Cue ── */
+  .cue { text-align: center; padding: 22px 16px 18px; }
+  .cue .what { font-size: clamp(34px, 7vw, 72px); font-weight: 750; letter-spacing: -0.02em; line-height: 1.05; }
+  .cue .what.eo { color: var(--eo); }
+  .cue .what.ec { color: var(--ec); }
+  .cue .how { color: var(--muted); font-size: 15px; margin-top: 6px; min-height: 21px; }
+  .cue .count { font-size: 40px; font-weight: 650; margin-top: 10px; }
+  .fix { width: 18px; height: 18px; border-radius: 50%; background: var(--ink); margin: 14px auto 0; visibility: hidden; }
+  .fix.show { visibility: visible; }
+  .timeline { display: flex; gap: 2px; height: 14px; margin: 16px auto 4px; max-width: 900px; position: relative; }
+  .timeline i { flex: 1; border-radius: 2px; opacity: 0.35; }
+  .timeline i.eo { background: var(--eo); }
+  .timeline i.ec { background: var(--ec); }
+  .timeline i.done { opacity: 0.85; }
+  .timeline i.cur { opacity: 1; outline: 2px solid var(--ink); outline-offset: 1px; }
+  .fullcue { position: fixed; inset: 0; z-index: 20; background: var(--bg); display: none; flex-direction: column; justify-content: center; }
+  .fullcue.on { display: flex; }
+  .fullcue .what { font-size: clamp(48px, 12vw, 140px); }
+  .fullcue .exit { position: absolute; top: 12px; right: 16px; }
+
+  /* ── Results ── */
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .tablewrap { overflow-x: auto; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 14px; height: 3px; border-radius: 2px; vertical-align: 3px; margin-right: 5px; background: currentColor; }
+  .legend .eo { color: var(--eo); }
+  .legend .ec { color: var(--ec); }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+  .msg { padding: 8px 12px; border-radius: 7px; background: var(--btn); margin-bottom: 12px; display: none; }
+  .msg.on { display: block; }
+  .msg.err { color: var(--accent); }
+  details summary { cursor: pointer; color: var(--muted); }
+  .resbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<header>
+  <span class="brand">ESP-EEG Alpha Test</span>
+  <select id="port" title="Serial port"></select>
+  <button class="btn" id="refresh" title="Rescan serial ports">↻</button>
+  <div class="seg" id="version">
+    <button data-v="auto" class="on">Auto</button><button data-v="v1">V1</button><button data-v="v2">V2</button><button data-v="16ch">16CH</button>
+  </div>
+  <button class="btn primary" id="connect">Connect</button>
+  <button class="btn" id="disconnect" disabled>Disconnect</button>
+  <div class="chips" id="chips"><span class="chip">Not connected</span></div>
+</header>
+
+<div class="tabs">
+  <button data-view="record" class="on">Record</button>
+  <button data-view="results" id="tab-results" disabled>Results</button>
+</div>
+
+<main>
+  <div class="msg" id="msg"></div>
+
+  <!-- Cue sits above both views so it stays visible while checking the preview. -->
+    <div class="card" id="cue-card" style="display:none">
+      <div class="cue">
+        <div class="what" id="cue-what">Get ready</div>
+        <div class="how" id="cue-how"></div>
+        <div class="fix" id="cue-fix"></div>
+        <div class="count mono" id="cue-count"></div>
+        <div class="timeline" id="cue-timeline"></div>
+        <div class="label mono" id="cue-progress"></div>
+        <div style="margin-top:12px; display:flex; gap:8px; justify-content:center">
+          <button class="btn" id="fullscreen">Full-screen cue</button>
+          <button class="btn danger" id="abort">Abort run</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- ── Record view ── -->
+  <section class="view on" id="view-record">
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Live signal (Oscilloscope view) <span class="sub">last 5 s · filters are display only · saved data is unfiltered</span></h2>
+          <div class="pad" style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; border-bottom:1px solid var(--line)">
+            <label class="label">Band-pass
+              <select id="f-band">
+                <option value="1,60" selected>1–60 Hz</option>
+                <option value="1,40">1–40 Hz</option>
+                <option value="1,100">1–100 Hz</option>
+                <option value="0,0">Off (detrend only)</option>
+              </select></label>
+            <label class="label">Mains notch
+              <select id="f-notch">
+                <option value="50,60" selected>50 + 60 Hz</option>
+                <option value="60">60 Hz</option>
+                <option value="50">50 Hz</option>
+                <option value="">Off</option>
+              </select></label>
+            <label class="label">Scale
+              <select id="f-scale">
+                <option value="10">±10 µV</option>
+                <option value="20">±20 µV</option>
+                <option value="30" selected>±30 µV</option>
+                <option value="50">±50 µV</option>
+                <option value="100">±100 µV</option>
+                <option value="200">±200 µV</option>
+                <option value="500">±500 µV</option>
+                <option value="1000">±1000 µV</option>
+                <option value="auto">Auto (ignores blinks)</option>
+              </select></label>
+            <span class="label">4th-order Butterworth band-pass · mains band-stop ±3 Hz (4th order, plus harmonics)</span>
+          </div>
+          <div class="pad" style="padding-bottom:0"><span class="label" id="lbl-a">CH1</span></div>
+          <div class="plot"><canvas id="trace-a"></canvas></div>
+          <div class="pad" style="padding-bottom:0"><span class="label" id="lbl-b">CH2</span></div>
+          <div class="plot"><canvas id="trace-b"></canvas></div>
+        </div>
+        <div class="card">
+          <h2>Live Frequency vs Power Spectrum <span class="sub">last 4 s · same display filters · shaded band = alpha, 8–13 Hz</span></h2>
+          <div class="pad" style="padding-bottom:0"><div class="legend"><span class="eo" id="leg-a">CH1</span><span class="ec" id="leg-b">CH2</span></div></div>
+          <div class="plot tall"><canvas id="live-psd"></canvas></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Signal check <span class="sub">from the unfiltered signal · close your eyes and watch alpha rise</span></h2>
+          <div class="readouts" id="readouts"></div>
+        </div>
+
+        <div class="card">
+          <h2>Protocol</h2>
+          <div class="pad">
+            <div class="form">
+              <span class="label">Channel A</span>
+              <div class="row"><span>CH</span><input type="number" id="ch-a" min="1" max="16" value="1"><input id="lab-a" value="O1" style="width:80px" title="Electrode site"></div>
+              <span class="label">Channel B</span>
+              <div class="row"><span>CH</span><input type="number" id="ch-b" min="1" max="16" value="2"><input id="lab-b" value="O2" style="width:80px" title="Electrode site"></div>
+              <span class="label">Block length</span>
+              <div class="row"><input type="number" id="block-s" min="10" max="300" value="20"><span class="label">seconds per block</span></div>
+              <span class="label">Cycles</span>
+              <div class="row"><input type="number" id="cycles" min="1" max="20" value="3"><span class="label" id="total-time"></span></div>
+              <span class="label">Start with</span>
+              <div class="seg" id="first"><button data-v="EO" class="on">Eyes open</button><button data-v="EC">Eyes closed</button></div>
+              <span class="label">Discard</span>
+              <div class="row"><input type="number" id="settle-s" min="0" max="20" step="0.5" value="3"><span class="label">seconds after each switch</span></div>
+              <span class="label">Lead-in</span>
+              <div class="row"><input type="number" id="lead-s" min="0" max="60" value="5"><span class="label">seconds, not recorded</span></div>
+              <span class="label">Cues</span>
+              <div class="row"><label><input type="checkbox" id="tones" checked> tones</label><label><input type="checkbox" id="speech" checked> spoken</label><button class="btn" id="test-cue">Test</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Setup notes <span class="sub">saved in meta.json</span></h2>
+          <div class="pad">
+            <div class="form">
+              <span class="label">Subject ID</span><input id="subject" placeholder="e.g. S01">
+              <span class="label">Electrodes</span>
+              <select id="electrodes">
+                <option>Gold cup + Ten20 paste</option><option>Ag/AgCl cup + paste</option>
+                <option>Gel cap</option><option>Dry electrodes</option><option>Other (see notes)</option>
+              </select>
+              <span class="label">Reference (SRB1)</span><input id="ref" value="Left earlobe">
+              <span class="label">Bias</span><input id="bias" value="Right earlobe">
+              <span class="label">Power</span>
+              <select id="power">
+                <option>USB, laptop on battery</option><option>LiPo battery</option>
+              </select>
+            </div>
+            <textarea id="notes" placeholder="Notes: room, impedance if measured, anything unusual…" style="margin-top:8px"></textarea>
+            <div style="margin-top:10px; display:flex; gap:8px; align-items:center">
+              <button class="btn primary big" id="start" disabled>Start recording</button>
+              <span class="label" id="start-hint">Connect a board first</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Results view ── -->
+  <section class="view" id="view-results">
+    <div class="resbar" data-noshot>
+      <button class="btn" id="shot">Save screenshot</button>
+      <span class="label" id="shot-msg"></span>
+    </div>
+    <div class="card">
+      <h2>Summary <span class="sub mono" id="res-dir"></span></h2>
+      <div class="tablewrap"><table id="res-table"></table></div>
+      <div class="pad">
+        <p class="hint" id="res-method" style="margin:0"></p>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Frequency vs Power Spectrum: eyes open vs eyes closed <span class="sub">shaded band = alpha, 8–13 Hz</span></h2>
+      <div class="pad" style="padding-bottom:0"><div class="legend"><span class="eo">Eyes open</span><span class="ec">Eyes closed</span></div></div>
+      <div class="two pad" id="res-psd"></div>
+    </div>
+    <div class="card">
+      <h2>Spectrogram (frequency over time) <span class="sub">2 s window · 0.5 s step · bar on top = condition</span></h2>
+      <div class="pad" style="padding-bottom:0"><div class="legend"><span class="eo">Eyes open</span><span class="ec">Eyes closed</span></div></div>
+      <div class="pad" id="res-spec"></div>
+    </div>
+    <div class="card">
+      <h2>Alpha power per block <span class="sub">8–13 Hz, in µV²</span></h2>
+      <div class="pad" style="padding-bottom:0"><div class="legend"><span class="eo">Eyes open</span><span class="ec">Eyes closed</span></div></div>
+      <div class="two pad" id="res-blocks"></div>
+    </div>
+  </section>
+</main>
+
+<div class="fullcue" id="fullcue">
+  <button class="btn exit" id="fullcue-exit">Exit full screen</button>
+  <div class="cue">
+    <div class="what" id="fc-what"></div>
+    <div class="how" id="fc-how"></div>
+    <div class="fix" id="fc-fix"></div>
+    <div class="count mono" id="fc-count"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const fmt = (v, d = 2) => (v == null || !isFinite(v)) ? "—" : Number(v).toFixed(d);
+
+let board = null;           // {type, n_channels, fs, ...}
+let protocol = null;        // latest protocol status
+let lastBlock = null;
+let lastPhase = null;
+let results = null;
+let lastPreview = 0;
+let live = null;
+
+async function api(path, body) {
+  const opt = body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+  const r = await fetch(path, opt);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+function showMsg(text, err = false) {
+  const m = $("msg");
+  m.textContent = text || "";
+  m.className = "msg" + (text ? " on" : "") + (err ? " err" : "");
+}
+
+// ── Segmented controls / tabs ──
+function seg(id) {
+  const el = $(id);
+  el.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || b.disabled) return;
+    el.querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+    updateTotal();
+  });
+  return () => el.querySelector("button.on").dataset.v;
+}
+const versionVal = seg("version");
+const firstVal = seg("first");
+
+document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+function setView(v) {
+  document.querySelectorAll(".tabs button").forEach((x) => x.classList.toggle("on", x.dataset.view === v));
+  document.querySelectorAll(".view").forEach((x) => x.classList.toggle("on", x.id === "view-" + v));
+  if (v === "results") renderResults();
+}
+
+// ── Ports / connection ──
+async function loadPorts() {
+  const { ports } = await api("/api/ports");
+  const sel = $("port");
+  const prev = sel.value;
+  sel.innerHTML = "";
+  for (const p of ports) {
+    const o = document.createElement("option");
+    o.value = p.device;
+    o.textContent = (p.type ? `[${p.type}] ` : "") + p.device.replace("/dev/", "");
+    sel.appendChild(o);
+  }
+  if (!ports.length) sel.innerHTML = "<option value=''>No serial ports</option>";
+  if ([...sel.options].some((o) => o.value === prev)) sel.value = prev;
+}
+$("refresh").onclick = loadPorts;
+$("connect").onclick = async () => {
+  try { await api("/api/connect", { port: $("port").value, version: versionVal() }); }
+  catch (e) { showMsg(e.message, true); }
+};
+$("disconnect").onclick = () => api("/api/disconnect", {});
+
+// ── Protocol form ──
+function cfg() {
+  return {
+    channels: [+$("ch-a").value, +$("ch-b").value],
+    labels: [$("lab-a").value.trim(), $("lab-b").value.trim()],
+    block_s: +$("block-s").value, cycles: +$("cycles").value, first: firstVal(),
+    settle_s: +$("settle-s").value, lead_s: +$("lead-s").value,
+    subject: $("subject").value.trim(),
+    setup: { electrodes: $("electrodes").value, reference: $("ref").value, bias: $("bias").value, power: $("power").value },
+    notes: $("notes").value,
+  };
+}
+function updateTotal() {
+  const c = cfg();
+  const t = c.block_s * c.cycles * 2;
+  $("total-time").textContent = `= ${c.cycles * 2} blocks, ${Math.floor(t / 60)} min ${Math.round(t % 60)} s`;
+  const la = `CH${c.channels[0]} ${c.labels[0]}`, lb = `CH${c.channels[1]} ${c.labels[1]}`;
+  $("lbl-a").textContent = la; $("leg-a").textContent = la;
+  $("lbl-b").textContent = lb; $("leg-b").textContent = lb;
+}
+["block-s", "cycles", "ch-a", "ch-b", "lab-a", "lab-b"].forEach((id) => $(id).addEventListener("input", updateTotal));
+
+$("start").onclick = async () => {
+  unlockAudio();
+  showMsg("");
+  try { await api("/api/start", cfg()); }
+  catch (e) { showMsg(e.message, true); }
+};
+$("abort").onclick = () => api("/api/abort", {});
+
+// ── Audio / speech cues ──
+let audioCtx = null;
+function unlockAudio() {
+  if (!audioCtx) { try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audioCtx = null; } }
+  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+}
+function tone(freq, start, dur) {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime + start;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(0.25, t0 + 0.02);
+  g.gain.setValueAtTime(0.25, t0 + dur - 0.05);
+  g.gain.linearRampToValueAtTime(0, t0 + dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(t0); o.stop(t0 + dur + 0.02);
+}
+function say(text) {
+  if (!$("speech").checked || !window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.95;
+  speechSynthesis.speak(u);
+}
+// Distinct sounds, so a subject with their eyes closed knows which way to switch:
+// one low tone = close, two high tones = open, three = finished.
+function cue(kind) {
+  if ($("tones").checked) {
+    if (kind === "EC") tone(440, 0, 0.6);
+    else if (kind === "EO") { tone(880, 0, 0.15); tone(880, 0.25, 0.15); }
+    else { tone(660, 0, 0.15); tone(660, 0.25, 0.15); tone(880, 0.5, 0.4); }
+  }
+  say(kind === "EC" ? "Close your eyes" : kind === "EO" ? "Open your eyes" : "Finished. You can relax.");
+}
+$("test-cue").onclick = () => { unlockAudio(); cue("EC"); setTimeout(() => cue("EO"), 2200); };
+
+// ── Full-screen cue ──
+$("fullscreen").onclick = () => { $("fullcue").classList.add("on"); document.documentElement.requestFullscreen?.().catch(() => {}); };
+$("fullcue-exit").onclick = () => { $("fullcue").classList.remove("on"); if (document.fullscreenElement) document.exitFullscreen(); };
+
+const CUE_TEXT = {
+  EO: ["Eyes open", "Look at the dot. Keep still, relax your jaw."],
+  EC: ["Eyes closed", "Relax. Stay awake. Keep still."],
+};
+
+function renderCue(p) {
+  const card = $("cue-card");
+  const running = p && (p.phase === "lead_in" || p.phase === "running");
+  card.style.display = running ? "" : "none";
+  if (!running) { $("fullcue").classList.remove("on"); return; }
+
+  let what, how, cls = "", count, fix = false;
+  if (p.phase === "lead_in") {
+    what = "Get ready";
+    how = `First block: ${CUE_TEXT[p.first][0].toLowerCase()}`;
+    count = Math.ceil(p.remaining_s);
+  } else {
+    [what, how] = CUE_TEXT[p.condition];
+    cls = p.condition.toLowerCase();
+    count = Math.ceil(p.remaining_s);
+    fix = p.condition === "EO";
+  }
+  for (const [w, h, f, c] of [["cue-what", "cue-how", "cue-fix", "cue-count"], ["fc-what", "fc-how", "fc-fix", "fc-count"]]) {
+    $(w).textContent = what; $(w).className = "what " + cls;
+    $(h).textContent = how;
+    $(f).classList.toggle("show", fix);
+    $(c).textContent = count + " s";
+  }
+
+  const tl = $("cue-timeline");
+  if (tl.childElementCount !== p.n_blocks) {
+    tl.innerHTML = "";
+    const other = p.first === "EO" ? "EC" : "EO";
+    for (let i = 0; i < p.n_blocks; i++) {
+      const el = document.createElement("i");
+      el.className = (i % 2 === 0 ? p.first : other).toLowerCase();
+      tl.appendChild(el);
+    }
+  }
+  [...tl.children].forEach((el, i) => {
+    el.classList.toggle("done", p.phase === "running" && i < p.block - 1);
+    el.classList.toggle("cur", p.phase === "running" && i === p.block - 1);
+  });
+  $("cue-progress").textContent = p.phase === "running"
+    ? `Block ${p.block} / ${p.n_blocks} · ${fmtTime(p.elapsed_s)} of ${fmtTime(p.total_s)}`
+    : "Not recording yet";
+}
+const fmtTime = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+// ── Status polling ──
+async function pollStatus() {
+  try {
+    const st = await api("/api/status");
+    board = st.board && st.board.alive ? st.board : null;
+    protocol = st.protocol;
+
+    const chips = [];
+    if (st.connecting) chips.push(`<span class="chip">${st.connect_msg}</span>`);
+    else if (st.board) {
+      chips.push(`<span class="chip"><b>${st.board.type}</b> · ${st.board.n_channels} ch</span>`);
+      chips.push(`<span class="chip mono">${st.board.port.replace("/dev/", "")}</span>`);
+      if (live) chips.push(`<span class="chip ${Math.abs(live.rate - st.board.fs) > 0.05 * st.board.fs ? "warn" : ""}">${fmt(live.rate, 1)} / ${st.board.fs} SPS</span>`);
+      if (!st.board.alive) chips.push(`<span class="chip warn">${st.board.error || "stream stopped"}</span>`);
+    } else chips.push(`<span class="chip">${st.connect_msg || "Not connected"}</span>`);
+    $("chips").innerHTML = chips.join("");
+
+    const busy = protocol && ["lead_in", "running", "analyzing"].includes(protocol.phase);
+    $("connect").disabled = st.connecting || busy;
+    $("disconnect").disabled = !st.board || busy;
+    $("start").disabled = !board || busy;
+    $("start-hint").textContent = !board ? "Connect a board first" : busy ? "Run in progress" : "Lead-in, then the blocks start automatically";
+    if (board) { $("ch-a").max = $("ch-b").max = board.n_channels; }
+
+    renderCue(protocol);
+
+    // Cues fire on block changes, detected here.
+    const phase = protocol ? protocol.phase : null;
+    const block = protocol && protocol.phase === "running" ? protocol.block : null;
+    if (phase === "running" && block !== lastBlock) cue(protocol.condition);
+    // A preview is analysed after every completed block while the run continues.
+    const pv = protocol && phase === "running" ? protocol.preview_blocks : 0;
+    if (pv && pv !== lastPreview) await loadResults(false);
+    lastPreview = pv;
+    if (phase !== lastPhase) {
+      if (phase === "lead_in") { results = null; $("shot-msg").textContent = ""; $("tab-results").disabled = true; $("tab-results").textContent = "Results"; setView("record"); }
+      if (phase === "analyzing") { cue("done"); showMsg("Recording finished, analysing…"); }
+      if (phase === "done") {
+        showMsg(lastPhase ? "Recording saved." : "");
+        await loadResults();
+        // Only for a run that finished while this page was open, not on reload.
+        if (lastPhase) setTimeout(() => requestAnimationFrame(() => requestAnimationFrame(saveScreenshot)), 100);
+      }
+      if (phase === "aborted" || phase === "error") showMsg(`Run stopped: ${protocol.message}. Nothing was saved.`, true);
+    }
+    lastBlock = block; lastPhase = phase;
+  } catch (e) { /* server gone; keep polling */ }
+  setTimeout(pollStatus, 200);
+}
+
+// ── Live data ──
+async function pollLive() {
+  if (board) {
+    try {
+      const c = cfg();
+      const [hp, lp] = $("f-band").value.split(",");
+      live = await api(`/api/live?ch=${c.channels.join(",")}&hp=${hp}&lp=${lp}&notch=${$("f-notch").value}`);
+      drawLive();
+    } catch (e) { live = null; }
+  }
+  setTimeout(pollLive, 250);
+}
+
+function drawLive() {
+  if (!live) return;
+  const [a, b] = live.channels;
+  const colors = [css("--eo"), css("--ec")];
+  [a, b].forEach((c, i) => {
+    if (!c) return;
+    drawPlot($(i ? "trace-b" : "trace-a"), {
+      series: [{ x: c.trace.map((_, k) => k / live.fs), y: c.trace, color: css("--trace") }],
+      xLabel: "Time (seconds)", yLabel: "Amplitude (µV)", yAbs: traceScale(c.trace),
+      flag: c.railed ? "RAILED" : (c.p2p_uv != null && c.p2p_uv < 0.5 ? "FLAT" : null),
+    });
+  });
+  if (a && a.psd) {
+    drawPlot($("live-psd"), {
+      series: [a, b].filter((c) => c && c.psd).map((c, i) => ({ x: c.freqs, y: c.psd, color: colors[i] })),
+      yLog: true, xMin: 1, xMax: Math.min(+$("f-band").value.split(",")[1] || 100, live.fs / 2), band: [8, 13], xLabel: "Frequency (Hz)", yLabel: "Power (µV²/Hz)",
+    });
+  }
+  const cards = [];
+  const ro = (k, v, unit, flag = false) =>
+    `<div class="ro"><div class="k">${k}</div><div class="v mono${flag ? " flag" : ""}">${v} <small>${unit}</small></div></div>`;
+  [a, b].forEach((c, i) => {
+    if (!c) return;
+    const lab = i ? $("lab-b").value : $("lab-a").value;
+    cards.push(`<div class="ro head">CH${c.channel} ${lab}</div>`);
+    cards.push(ro("Alpha (8–13 Hz)", fmt(c.alpha_uvrms), "µVrms"));
+    cards.push(ro("Broadband (1–40 Hz)", fmt(c.rms_1_40_uvrms), "µVrms"));
+    cards.push(ro("Line noise at 50 Hz", fmt(c.line_50_uvrms), "µVrms", c.line_50_uvrms > 10));
+    cards.push(c.line_60_uvrms == null
+      ? ro("Line noise at 60 Hz", "n/a", "above Nyquist")
+      : ro("Line noise at 60 Hz", fmt(c.line_60_uvrms), "µVrms", c.line_60_uvrms > 10));
+    if (c.railed) cards.push(`<div class="ro" style="grid-column:span 2"><span class="flag">CH${c.channel} is railed at full scale: check the electrode, reference and bias.</span></div>`);
+  });
+  $("readouts").innerHTML = cards.join("");
+}
+
+// ── Plotting ──
+// Oscilloscope scale in µV (±value). Fixed by default so a blink or a bumped
+// lead runs off the plot instead of rescaling it. "Auto" sizes to the 95th
+// percentile of |signal|, rounded up to the next scale step, so a short spike
+// is ignored too.
+const SCALE_STEPS = [10, 20, 30, 50, 100, 200, 500, 1000, 2000, 5000];
+function traceScale(trace) {
+  const v = $("f-scale").value;
+  if (v !== "auto") return +v;
+  const abs = trace.map(Math.abs).sort((a, b) => a - b);
+  const p95 = abs[Math.floor(abs.length * 0.95)] || 0;
+  return SCALE_STEPS.find((s) => s >= p95 * 1.5) || SCALE_STEPS[SCALE_STEPS.length - 1];
+}
+function sizeCanvas(cv) {
+  const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, w: r.width, h: r.height };
+}
+
+// Full axis titles with units: x centred under the ticks, y rotated on the left.
+function axisTitles(ctx, m, pw, ph, h, xLabel, yLabel) {
+  ctx.save();
+  ctx.font = "600 12px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.fillStyle = css("--ink");
+  ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+  if (xLabel) ctx.fillText(xLabel, m.l + pw / 2, h - 2);
+  if (yLabel) { ctx.translate(12, m.t + ph / 2); ctx.rotate(-Math.PI / 2); ctx.textBaseline = "middle"; ctx.fillText(yLabel, 0, 0); }
+  ctx.restore();
+}
+
+function niceTicks(lo, hi, n = 5) {
+  const span = hi - lo || 1, step0 = span / n, mag = 10 ** Math.floor(Math.log10(step0));
+  // Closest nice step, not the next one up: rounding up can leave a ±16 range with only a 0 tick.
+  const step = [1, 2, 5, 10].map((m) => m * mag)
+    .reduce((a, b) => Math.abs(Math.log(b / step0)) < Math.abs(Math.log(a / step0)) ? b : a);
+  const out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+
+function drawPlot(cv, o) {
+  const { ctx, w, h } = sizeCanvas(cv);
+  const m = { l: 64, r: 12, t: 8, b: 38 };
+  const pw = w - m.l - m.r, ph = h - m.t - m.b;
+  ctx.clearRect(0, 0, w, h);
+  const xs = o.series.flatMap((s) => s.x);
+  if (!xs.length) return;
+  const xMin = o.xMin ?? Math.min(...xs), xMax = o.xMax ?? Math.max(...xs);
+  const tf = o.yLog ? (v) => Math.log10(Math.max(v, 1e-6)) : (v) => v;
+  let ys = [];
+  o.series.forEach((s) => s.x.forEach((x, i) => { if (x >= xMin && x <= xMax) ys.push(tf(s.y[i])); }));
+  let yMin = Math.min(...ys), yMax = Math.max(...ys);
+  if (o.yAbs) { yMin = -o.yAbs; yMax = o.yAbs; }
+  if (o.yLog) { yMin = Math.floor(yMin * 2) / 2; yMax = Math.ceil(yMax * 2) / 2; if (yMax - yMin < 1) yMax = yMin + 1; }
+  if (yMax === yMin) { yMax += 1; yMin -= 1; }
+  const X = (x) => m.l + (x - xMin) / (xMax - xMin) * pw;
+  const Y = (y) => m.t + (1 - (y - yMin) / (yMax - yMin)) * ph;
+
+  ctx.font = "11px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.fillStyle = css("--muted"); ctx.strokeStyle = css("--grid"); ctx.lineWidth = 1;
+  if (o.band) { ctx.fillStyle = css("--band"); ctx.fillRect(X(o.band[0]), m.t, X(o.band[1]) - X(o.band[0]), ph); ctx.fillStyle = css("--muted"); }
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (const t of niceTicks(xMin, xMax, Math.max(2, Math.floor(pw / 70)))) {
+    ctx.beginPath(); ctx.moveTo(X(t), m.t); ctx.lineTo(X(t), m.t + ph); ctx.stroke();
+    ctx.fillText(t, X(t), m.t + ph + 5);
+  }
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  let yt;
+  if (o.yLog) {
+    // One tick per decade (every other decade if the range is very wide).
+    const every = yMax - yMin > 7 ? 2 : 1;
+    yt = [];
+    for (let d = Math.ceil(yMin); d <= Math.floor(yMax); d += every) yt.push(d);
+  } else yt = niceTicks(yMin, yMax, Math.max(3, Math.floor(ph / 30)));
+  const logLabel = (d) => d >= -3 && d <= 3 ? String(+(10 ** d).toPrecision(1)) : `1e${d}`;
+  for (const t of yt) {
+    ctx.beginPath(); ctx.moveTo(m.l, Y(t)); ctx.lineTo(m.l + pw, Y(t)); ctx.stroke();
+    ctx.fillText(o.yLog ? logLabel(t) : t, m.l - 6, Y(t));
+  }
+  axisTitles(ctx, m, pw, ph, h, o.xLabel, o.yLabel);
+
+  ctx.save(); ctx.beginPath(); ctx.rect(m.l, m.t, pw, ph); ctx.clip();
+  ctx.lineWidth = 1.4; ctx.lineJoin = "round";
+  for (const s of o.series) {
+    ctx.strokeStyle = s.color; ctx.beginPath();
+    let started = false;
+    s.x.forEach((x, i) => {
+      if (x < xMin - 1e-9 || x > xMax + 1e-9) return;
+      const px = X(x), py = Y(tf(s.y[i]));
+      started ? ctx.lineTo(px, py) : ctx.moveTo(px, py); started = true;
+    });
+    ctx.stroke();
+  }
+  ctx.restore();
+  if (o.flag) { ctx.fillStyle = css("--accent"); ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.font = "600 12px -apple-system, sans-serif"; ctx.fillText(o.flag, m.l + 8, m.t + 4); }
+}
+
+function viridis(t) {
+  const stops = [[68, 1, 84], [59, 82, 139], [33, 145, 140], [94, 201, 98], [253, 231, 37]];
+  t = Math.min(1, Math.max(0, t)) * (stops.length - 1);
+  const i = Math.min(stops.length - 2, Math.floor(t)), f = t - i;
+  return stops[i].map((v, k) => Math.round(v + (stops[i + 1][k] - v) * f));
+}
+
+function drawSpectrogram(cv, s, blocks) {
+  const { ctx, w, h } = sizeCanvas(cv);
+  const m = { l: 64, r: 12, t: 12, b: 38 };
+  const pw = w - m.l - m.r, ph = h - m.t - m.b;
+  ctx.clearRect(0, 0, w, h);
+  const nT = s.db.length, nF = s.freqs.length;
+  const flat = s.db.flat().sort((a, b) => a - b);
+  const lo = flat[Math.floor(flat.length * 0.05)], hi = flat[Math.floor(flat.length * 0.99)];
+  const img = ctx.createImageData(nT, nF);
+  for (let t = 0; t < nT; t++) for (let f = 0; f < nF; f++) {
+    const [r, g, b] = viridis((s.db[t][f] - lo) / (hi - lo));
+    const k = ((nF - 1 - f) * nT + t) * 4;
+    img.data[k] = r; img.data[k + 1] = g; img.data[k + 2] = b; img.data[k + 3] = 255;
+  }
+  const off = document.createElement("canvas"); off.width = nT; off.height = nF;
+  off.getContext("2d").putImageData(img, 0, 0);
+  const tMax = blocks.length ? blocks[blocks.length - 1].stop_s : s.t0_s + nT * s.step_s;
+  const X = (t) => m.l + t / tMax * pw;
+  const fMin = s.freqs[0], fMax = s.freqs[nF - 1];
+  const Y = (f) => m.t + (1 - (f - fMin) / (fMax - fMin)) * ph;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(off, X(s.t0_s - s.step_s / 2), m.t, nT * s.step_s / tMax * pw, ph);
+  for (const b of blocks) {
+    ctx.fillStyle = b.condition === "EC" ? css("--ec") : css("--eo");
+    ctx.fillRect(X(b.start_s), 2, X(b.stop_s) - X(b.start_s) - 1, 7);
+  }
+  ctx.strokeStyle = "rgba(255,255,255,0.6)"; ctx.setLineDash([4, 4]);
+  for (const f of [8, 13]) { ctx.beginPath(); ctx.moveTo(m.l, Y(f)); ctx.lineTo(m.l + pw, Y(f)); ctx.stroke(); }
+  ctx.setLineDash([]);
+  ctx.font = "11px -apple-system, sans-serif"; ctx.fillStyle = css("--muted");
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  for (const f of [1, 8, 13, 20, 30, 40].filter((f) => f >= fMin && f <= fMax)) ctx.fillText(f, m.l - 6, Y(f));
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  for (const t of niceTicks(0, tMax, Math.max(2, Math.floor(pw / 70)))) ctx.fillText(t, X(t), m.t + ph + 5);
+  axisTitles(ctx, m, pw, ph, h, "Time (seconds)", "Frequency (Hz)");
+}
+
+function drawBlocks(cv, perBlock) {
+  const { ctx, w, h } = sizeCanvas(cv);
+  const m = { l: 64, r: 12, t: 8, b: 38 };
+  const pw = w - m.l - m.r, ph = h - m.t - m.b;
+  ctx.clearRect(0, 0, w, h);
+  const max = Math.max(...perBlock.map((b) => b.alpha_uv2)) * 1.1 || 1;
+  const Y = (v) => m.t + (1 - v / max) * ph;
+  ctx.font = "11px -apple-system, sans-serif"; ctx.fillStyle = css("--muted"); ctx.strokeStyle = css("--grid");
+  ctx.textAlign = "right"; ctx.textBaseline = "middle";
+  for (const t of niceTicks(0, max, 4)) { ctx.beginPath(); ctx.moveTo(m.l, Y(t)); ctx.lineTo(m.l + pw, Y(t)); ctx.stroke(); ctx.fillText(t, m.l - 6, Y(t)); }
+  const bw = pw / perBlock.length;
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  perBlock.forEach((b, i) => {
+    ctx.fillStyle = b.condition === "EC" ? css("--ec") : css("--eo");
+    const x = m.l + i * bw + bw * 0.15;
+    ctx.fillRect(x, Y(b.alpha_uv2), bw * 0.7, m.t + ph - Y(b.alpha_uv2));
+    ctx.fillStyle = css("--muted");
+    ctx.fillText(b.block, x + bw * 0.35, m.t + ph + 5);
+  });
+  axisTitles(ctx, m, pw, ph, h, "Block number", "Alpha power (µV²)");
+}
+
+// ── Results ──
+async function loadResults(switchView = true) {
+  try {
+    const r = await api("/api/results");
+    results = r;
+    const pv = r.result.preview;
+    $("tab-results").disabled = false;
+    $("tab-results").textContent = pv ? `Results (preview, ${pv.blocks_done}/${pv.n_blocks} blocks)` : "Results";
+    if (switchView) setView("results");
+    else if ($("view-results").classList.contains("on")) renderResults();
+  } catch (e) { showMsg(e.message, true); }
+}
+
+function renderResults() {
+  if (!results) return;
+  const res = results.result;
+  const pv = res.preview;
+  $("res-dir").textContent = pv
+    ? `Preview after block ${pv.blocks_done} of ${pv.n_blocks}. Still recording, nothing saved yet.`
+    : results.dir;
+  const ok = res.channels.filter((c) => !c.error);
+  const NAME = { EO: "eyes-open", EC: "eyes-closed" };
+  // A value for one condition, or a note when that condition has no block yet.
+  const val = (cond, get) => (c) => c[cond] ? get(c[cond]) : `<span class="label">after first ${NAME[cond]} block</span>`;
+  const both = (get) => (c) => c.EO && c.EC ? get(c) : `<span class="label">needs one block of each</span>`;
+  const rows = [
+    ["Alpha (8–13 Hz), eyes open", val("EO", (d) => `${fmt(d.alpha_uvrms)} µVrms`)],
+    ["Alpha (8–13 Hz), eyes closed", val("EC", (d) => `${fmt(d.alpha_uvrms)} µVrms`)],
+    ["Alpha power ratio, closed ÷ open", both((c) => `<b>${fmt(c.ratio_ec_eo)}×</b>`)],
+    ["Peak alpha frequency, eyes closed", val("EC", (d) => `${fmt(d.peak_hz)} Hz${d.peak_at_band_edge ? ' <span class="flag">at band edge</span>' : ""}`)],
+    ["Eyes-closed blocks above every eyes-open block", both((c) => c.ec_blocks_above_all_eo)],
+    ["Broadband (1–40 Hz), eyes open", val("EO", (d) => `${fmt(d.broadband_1_40_uvrms)} µVrms`)],
+    ["Broadband (1–40 Hz), eyes closed", val("EC", (d) => `${fmt(d.broadband_1_40_uvrms)} µVrms`)],
+    ["Data analysed, eyes open", val("EO", (d) => `${fmt(d.seconds_analyzed, 0)} seconds`)],
+    ["Data analysed, eyes closed", val("EC", (d) => `${fmt(d.seconds_analyzed, 0)} seconds`)],
+  ];
+  $("res-table").innerHTML =
+    `<tr><th></th>${ok.map((c) => `<th>CH${c.channel} ${c.label}</th>`).join("")}</tr>` +
+    rows.map(([k, f]) => `<tr><td>${k}</td>${ok.map((c) => `<td class="mono">${f(c)}</td>`).join("")}</tr>`).join("") +
+    res.channels.filter((c) => c.error).map((c) => `<tr><td colspan="9" class="flag">CH${c.channel}: ${c.error}</td></tr>`).join("");
+  const w = res.welch;
+  $("res-method").textContent =
+    `Method: Welch PSD, ${w.segment_s} s ${w.window} segments, ${w.overlap * 100}% overlap, ${w.detrend} detrend, ` +
+    `${res.fs} SPS. No filters applied. First ${res.settle_s} s of every block discarded. ` +
+    `Alpha power is the integral of the PSD over ${res.alpha_band_hz[0]}–${res.alpha_band_hz[1]} Hz.` +
+    (pv ? " PNG figures are saved when the run finishes."
+      : res.figures.length ? ` PNG figures saved: ${res.figures.join(", ")}.` : " Install matplotlib to also save PNG figures.");
+
+  $("res-psd").innerHTML = ok.map((c, i) => `<div><div class="label">CH${c.channel} ${c.label}</div><div class="plot tall"><canvas id="rpsd-${i}"></canvas></div></div>`).join("");
+  $("res-spec").innerHTML = ok.map((c, i) => `<div class="label">CH${c.channel} ${c.label}</div><div class="plot" style="height:190px;margin-bottom:10px"><canvas id="rspec-${i}"></canvas></div>`).join("");
+  $("res-blocks").innerHTML = ok.map((c, i) => `<div><div class="label">CH${c.channel} ${c.label}</div><div class="plot"><canvas id="rblk-${i}"></canvas></div></div>`).join("");
+  requestAnimationFrame(() => ok.forEach((c, i) => {
+    drawPlot($(`rpsd-${i}`), {
+      series: [["EO", "--eo"], ["EC", "--ec"]].filter(([k]) => c[k]).map(([k, col]) => ({ x: c.freqs, y: c[k].psd, color: css(col) })),
+      yLog: true, xMin: 1, xMax: Math.min(40, c.freqs[c.freqs.length - 1]), band: [8, 13], xLabel: "Frequency (Hz)", yLabel: "Power (µV²/Hz)",
+    });
+    drawSpectrogram($(`rspec-${i}`), c.spectrogram, res.blocks);
+    drawBlocks($(`rblk-${i}`), c.per_block);
+  }));
+}
+
+// ── Screenshot of the Results page ──
+// Redraws the visible Results view onto one canvas: card boxes, rules, every
+// word of text at its laid-out position, legend swatches and the plot canvases.
+// No libraries, so it works offline.
+function rasterizeResults() {
+  const root = $("view-results");
+  const scale = 2, pad = 20, headH = 58;
+  const box = root.getBoundingClientRect();
+  // Start at the first card so the button bar above it leaves no gap.
+  const top = root.querySelector(".card").getBoundingClientRect().top;
+  const W = Math.ceil(box.width) + 2 * pad, H = Math.ceil(box.bottom - top) + 2 * pad + headH;
+  const cv = document.createElement("canvas");
+  cv.width = W * scale; cv.height = H * scale;
+  const ctx = cv.getContext("2d");
+  ctx.scale(scale, scale);
+  ctx.fillStyle = css("--bg"); ctx.fillRect(0, 0, W, H);
+
+  // Title and run details, which are not part of the on-screen view.
+  const m = results.meta || {}, s = m.setup || {}, pv = results.result.preview;
+  ctx.fillStyle = css("--ink"); ctx.textBaseline = "top";
+  ctx.font = "650 18px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.fillText("ESP-EEG Alpha Test: eyes open vs eyes closed" + (pv ? `  (preview, ${pv.blocks_done}/${pv.n_blocks} blocks)` : ""), pad, pad);
+  ctx.font = "12px -apple-system, BlinkMacSystemFont, sans-serif"; ctx.fillStyle = css("--muted");
+  const p = m.protocol || {};
+  ctx.fillText([
+    m.started && m.started.replace("T", " "), m.board && `${m.board.type}, ${m.board.sample_rate_hz} SPS`,
+    m.subject && `Subject ${m.subject}`, s.electrodes, s.reference && `Ref ${s.reference}`, s.bias && `Bias ${s.bias}`, s.power,
+    p.block_s && `${p.cycles} cycles × ${p.block_s} s blocks`,
+  ].filter(Boolean).join("  ·  "), pad, pad + 26);
+
+  const ox = pad - box.left, oy = pad + headH - top;
+  const rel = (r) => ({ x: r.left + ox, y: r.top + oy, w: r.width, h: r.height });
+  const skip = (el) => el.closest("[data-noshot]");
+  const line = (x1, y1, x2, y2) => { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); };
+
+  ctx.lineWidth = 1; ctx.strokeStyle = css("--line");
+  root.querySelectorAll(".card").forEach((el) => {
+    const r = rel(el.getBoundingClientRect());
+    ctx.fillStyle = css("--panel");
+    ctx.beginPath(); ctx.roundRect(r.x, r.y, r.w, r.h, 10); ctx.fill(); ctx.stroke();
+  });
+  root.querySelectorAll(".card h2, tr").forEach((el) => {
+    const r = rel(el.getBoundingClientRect());
+    line(r.x, r.y + r.h - 0.5, r.x + r.w, r.y + r.h - 0.5);
+  });
+  root.querySelectorAll(".legend span").forEach((el) => {
+    const r = rel(el.getBoundingClientRect());
+    ctx.fillStyle = getComputedStyle(el).color;
+    ctx.fillRect(r.x, r.y + r.h / 2 - 1, 14, 3);
+  });
+  root.querySelectorAll("canvas").forEach((el) => {
+    const r = rel(el.getBoundingClientRect());
+    if (r.w && r.h) ctx.drawImage(el, r.x, r.y, r.w, r.h);
+  });
+
+  ctx.textBaseline = "middle";
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    const el = n.parentElement;
+    if (!el || skip(el) || !n.textContent.trim()) continue;
+    const cs = getComputedStyle(el);
+    if (cs.display === "none" || cs.visibility === "hidden") continue;
+    ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    ctx.fillStyle = cs.color;
+    for (const w of n.textContent.matchAll(/\S+/g)) {
+      range.setStart(n, w.index); range.setEnd(n, w.index + w[0].length);
+      const r = rel(range.getBoundingClientRect());
+      if (r.w) ctx.fillText(w[0], r.x, r.y + r.h / 2);
+    }
+  }
+  return cv;
+}
+
+async function saveScreenshot() {
+  if (!results) return;
+  if (!$("view-results").classList.contains("on")) setView("results");
+  await new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
+  const png = rasterizeResults().toDataURL("image/png");
+  const msg = $("shot-msg");
+  if (results.result.preview) {
+    // No recording folder exists yet, so hand the preview to the browser.
+    const a = document.createElement("a");
+    a.href = png; a.download = `alpha_preview_block${results.result.preview.blocks_done}.png`; a.click();
+    msg.textContent = "Preview screenshot downloaded by the browser.";
+    return;
+  }
+  try {
+    const r = await api("/api/screenshot", { png });
+    msg.textContent = `Saved ${r.path}`;
+  } catch (e) { msg.textContent = `Screenshot not saved: ${e.message}`; }
+}
+$("shot").onclick = saveScreenshot;
+
+window.addEventListener("resize", () => { drawLive(); if ($("view-results").classList.contains("on")) renderResults(); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawLive(); renderResults(); });
+
+updateTotal();
+loadPorts();
+pollStatus();
+pollLive();
+</script>
+</body>
+</html>

@@ -84,9 +84,13 @@ To record one channel of EMG data (e.g. forearm muscles):
 
 ### ⚠️ Not Using All 8 Channels?
 
-For best results, all 8 channels should be in use. If you are using fewer than 8 channels, you should either **tie the unused CH+ pins to one of the active CH+ pins** (connect them together physically), or **disable the unused channels in the firmware** and reflash the board.
+For best results, all 8 channels should be in use. If you are using fewer than 8 channels, you should either **tie the unused CH+ pins to one of the active CH+ pins** (connect them together physically), or **remove the unused channels from the BIAS input in the firmware** and reflash the board.
 
-If unused channels are left floating (unconnected and enabled), the BIAS pin will be less effective at eliminating noise, resulting in **poorer signal quality across all channels**.
+If unused channels are left floating (unconnected) and still feed the BIAS pin, the floating channels confuse the bias pin. It becomes less effective at eliminating noise, resulting in **poorer signal quality across all channels**.
+
+**How to remove channels from the BIAS input:** in [`firmware/V1_ESP_EEG_firmware.ino`](../firmware/V1_ESP_EEG_firmware.ino), find register `0x0D` (BIAS_SENSP) in the `ADS1299_REGISTER_LS` table. Each bit selects one channel's CH+ input into BIAS: bit 0 = CH1 … bit 7 = CH8. The default `0b11111111` feeds all 8 channels. Clear the bit of every unused channel, for example `0b00000011` if you only use CH1 and CH2. Always keep CH1 (bit 0) set, and leave `0x0E` (BIAS_SENSN) at `0b00000000`. Then reflash following the [firmware flashing instructions](../firmware/README.md).
+
+> **Note:** powering down or shorting an unused channel in firmware is not a substitute. Unless its bit in `0x0D` is cleared, the channel can still count toward the bias and weaken it.
 
 </details>
 

@@ -52,7 +52,7 @@ The test circuit is adapted from the test setup in the Texas Instruments ADS1299
 
 Function generators can't output microvolt-level signals cleanly; at that level their own noise is bigger than the signal. So the generator (Digilent Analog Discovery 2) was set to 250 µV amplitude and reduced with a precision resistive divider (÷148), followed by an RC low-pass filter that removes high-frequency noise and RF pickup from the generator. The signal was fed into channel 1, referenced to SRB1. Bias was not connected, since this is a direct input test.
 
-<img src="2uV_test_schematic.svg" alt="1.19 µVrms test circuit: function generator, 100 kΩ / 680 Ω voltage divider, 1 kΩ / 100 nF RC low-pass filter, into ESP-EEG Channel 1 input and SRB1" width="600">
+<img src="support_materials/2uV_test_schematic.svg" alt="1.19 µVrms test circuit: function generator, 100 kΩ / 680 Ω voltage divider, 1 kΩ / 100 nF RC low-pass filter, into ESP-EEG Channel 1 input and SRB1" width="600">
 
 <table>
   <tr>
@@ -60,8 +60,8 @@ Function generators can't output microvolt-level signals cleanly; at that level 
     <th align="center">16CH ESP-EEG setup</th>
   </tr>
   <tr>
-    <td align="center"><a href="setup.jpg"><img src="setup.jpg" alt="V2 bench setup: Digilent Analog Discovery 2 on the left, voltage divider and RC filter on a breadboard in the center, ESP-EEG V2 on the right" height="200"></a></td>
-    <td align="center"><a href="16ch_test_insetup.jpg"><img src="16ch_test_insetup.jpg" alt="16CH bench setup: Digilent Analog Discovery 2 on the left, voltage divider and RC filter on a breadboard in the center, 16-channel ESP-EEG on the right" height="200"></a></td>
+    <td align="center"><a href="support_materials/setup.jpg"><img src="support_materials/setup.jpg" alt="V2 bench setup: Digilent Analog Discovery 2 on the left, voltage divider and RC filter on a breadboard in the center, ESP-EEG V2 on the right" height="200"></a></td>
+    <td align="center"><a href="support_materials/16ch_test_insetup.jpg"><img src="support_materials/16ch_test_insetup.jpg" alt="16CH bench setup: Digilent Analog Discovery 2 on the left, voltage divider and RC filter on a breadboard in the center, 16-channel ESP-EEG on the right" height="200"></a></td>
   </tr>
 </table>
 
@@ -107,8 +107,8 @@ The filter sees the divider's 675 Ω source resistance in series with R3. At 20 
     <th align="center">16CH ESP-EEG</th>
   </tr>
   <tr>
-    <td align="center"><a href="v2_250uVin.jpg"><img src="v2_250uVin.jpg" alt="Left: function generator set to a 20 Hz, 250 µV amplitude sine. Right: ESP-EEG V2 recording on channel 1 reading 1.17 µVrms, with a single clear peak at 20 Hz in the FFT." width="100%"></a></td>
-    <td align="center"><a href="16ch_250u_Vin.png"><img src="16ch_250u_Vin.png" alt="Left: function generator set to a 20 Hz, 250 µV amplitude sine. Right: 16-channel ESP-EEG recording on channel 1 reading 1.15 µVrms, with a single clear peak at 20 Hz in the FFT." width="100%"></a></td>
+    <td align="center"><a href="support_materials/v2_250uVin.jpg"><img src="support_materials/v2_250uVin.jpg" alt="Left: function generator set to a 20 Hz, 250 µV amplitude sine. Right: ESP-EEG V2 recording on channel 1 reading 1.17 µVrms, with a single clear peak at 20 Hz in the FFT." width="100%"></a></td>
+    <td align="center"><a href="support_materials/16ch_250u_Vin.png"><img src="support_materials/16ch_250u_Vin.png" alt="Left: function generator set to a 20 Hz, 250 µV amplitude sine. Right: 16-channel ESP-EEG recording on channel 1 reading 1.15 µVrms, with a single clear peak at 20 Hz in the FFT." width="100%"></a></td>
   </tr>
   <tr>
     <td>Channel 1 reads <b>1.17 µVrms</b>. Channels 2–8 were turned off for a clean display. A 50/60 Hz notch filter was on in the GUI; the measured value is the same with it off.</td>
@@ -136,7 +136,7 @@ Every channel input, SRB1 and the BIAS pin are shorted together. BIAS holds the 
 
 **An easy way to do this:** every CHx− pin is connected to SRB1 on the PCB, so a jumper across each channel's CHx+ and CHx− pins shorts that channel's input to SRB1. A Y-splitter then connects BIAS to CH1, tying BIAS to the shorted inputs. The setup is identical on the V2 (8 channels) and the 16CH (16 channels).
 
-<a href="16ch_noise_floor.jpg"><img src="16ch_noise_floor.jpg" alt="Noise floor setup on the 16CH ESP-EEG: a jumper across each channel's CHx+ and CHx− pins, with SRB1 and BIAS shorted to the inputs" width="500"></a>
+<a href="support_materials/16ch_noise_floor.jpg"><img src="support_materials/16ch_noise_floor.jpg" alt="Noise floor setup on the 16CH ESP-EEG: a jumper across each channel's CHx+ and CHx− pins, with SRB1 and BIAS shorted to the inputs" width="500"></a>
 
 **Noise floor setup (16CH shown, V2 identical with 8 channels):** a jumper on each channel's CHx+/CHx− pins, and a Y-splitter connecting BIAS to CH1. Open bench, no shielded enclosure.
 
@@ -161,7 +161,7 @@ For an accurate result, **terminate every channel, not just the one under test.*
 
 #### ESP-EEG V2
 
-<a href="noise_short.jpg"><img src="noise_short.jpg" alt="ESP-EEG V2 recording with all inputs, SRB1 and BIAS shorted: all eight channels read between 0.12 and 0.14 µVrms on a ±1 µV scale." width="100%"></a>
+<a href="support_materials/noise_short.jpg"><img src="support_materials/noise_short.jpg" alt="ESP-EEG V2 recording with all inputs, SRB1 and BIAS shorted: all eight channels read between 0.12 and 0.14 µVrms on a ±1 µV scale." width="100%"></a>
 
 **ESP-EEG V2, all inputs shorted with BIAS connected, GUI filters off.** All eight channels read **0.12–0.14 µVrms** (±1 µV vertical scale, 1 s window).
 
@@ -171,7 +171,7 @@ For an accurate result, **terminate every channel, not just the one under test.*
 
 #### 16CH ESP-EEG
 
-<a href="16ch_noisefloor.jpg"><img src="16ch_noisefloor.jpg" alt="16-channel ESP-EEG recording with all inputs, SRB1 and BIAS shorted: all sixteen channels read between 0.08 and 0.13 µVrms on a ±1 µV scale." width="100%"></a>
+<a href="support_materials/16ch_noisefloor.jpg"><img src="support_materials/16ch_noisefloor.jpg" alt="16-channel ESP-EEG recording with all inputs, SRB1 and BIAS shorted: all sixteen channels read between 0.08 and 0.13 µVrms on a ±1 µV scale." width="100%"></a>
 
 **16CH ESP-EEG, all inputs shorted with BIAS connected, GUI filters off.** All sixteen channels read **0.08–0.13 µVrms** (±1 µV vertical scale, 1 s window).
 
@@ -222,7 +222,7 @@ CMRR measures that fraction: how much smaller the leaked signal is than the sign
 
 Channel 1 is a differential pair: the CH1 input is CH1+, and SRB1 is CH1−. The two are tied together and driven by the same sine wave, measured against the board's ground. CH1+ and CH1− then see an identical signal, so an ideal device would read zero. Whatever the ESP-EEG does read at the test frequency is the leakage.
 
-<img src="cmrr_test_schematic.svg" alt="CMRR test circuit: function generator drives Channel 1 input and SRB1 together, with its ground on ESP-EEG GND (mid-supply voltage, 0 V)" width="480">
+<img src="support_materials/cmrr_test_schematic.svg" alt="CMRR test circuit: function generator drives Channel 1 input and SRB1 together, with its ground on ESP-EEG GND (mid-supply voltage, 0 V)" width="480">
 
 <table>
   <tr>
@@ -230,8 +230,8 @@ Channel 1 is a differential pair: the CH1 input is CH1+, and SRB1 is CH1−. The
     <th align="center">16CH ESP-EEG setup</th>
   </tr>
   <tr>
-    <td align="center"><a href="cmrr_testset.jpg"><img src="cmrr_testset.jpg" alt="V2 CMRR bench setup: Digilent Analog Discovery 2 driving CH1 and SRB1 together on the ESP-EEG V2" width="100%"></a></td>
-    <td align="center"><a href="16chcmrrset.jpg"><img src="16chcmrrset.jpg" alt="16CH CMRR bench setup: Digilent Analog Discovery 2 driving CH1 and SRB1 together on the 16-channel ESP-EEG" width="100%"></a></td>
+    <td align="center"><a href="support_materials/cmrr_testset.jpg"><img src="support_materials/cmrr_testset.jpg" alt="V2 CMRR bench setup: Digilent Analog Discovery 2 driving CH1 and SRB1 together on the ESP-EEG V2" width="100%"></a></td>
+    <td align="center"><a href="support_materials/16chcmrrset.jpg"><img src="support_materials/16chcmrrset.jpg" alt="16CH CMRR bench setup: Digilent Analog Discovery 2 driving CH1 and SRB1 together on the 16-channel ESP-EEG" width="100%"></a></td>
   </tr>
 </table>
 
@@ -278,8 +278,8 @@ $$
     <th align="center">16CH ESP-EEG</th>
   </tr>
   <tr>
-    <td align="center"><a href="cmrr.jpg"><img src="cmrr.jpg" alt="Left: function generator set to a 50 Hz, 2 V amplitude sine applied to both CH1 inputs. Right: ESP-EEG V2 recording with GUI filters off, showing only a 0.25 µV peak at 50 Hz in the FFT." width="100%"></a></td>
-    <td align="center"><a href="16chcmrr.jpg"><img src="16chcmrr.jpg" alt="Left: function generator set to a 50 Hz, 2 V amplitude sine applied to both CH1 inputs. Right: 16-channel ESP-EEG recording with GUI filters off, with a 0.14 µV leakage at 50 Hz." width="100%"></a></td>
+    <td align="center"><a href="support_materials/cmrr.jpg"><img src="support_materials/cmrr.jpg" alt="Left: function generator set to a 50 Hz, 2 V amplitude sine applied to both CH1 inputs. Right: ESP-EEG V2 recording with GUI filters off, showing only a 0.25 µV peak at 50 Hz in the FFT." width="100%"></a></td>
+    <td align="center"><a href="support_materials/16chcmrr.jpg"><img src="support_materials/16chcmrr.jpg" alt="Left: function generator set to a 50 Hz, 2 V amplitude sine applied to both CH1 inputs. Right: 16-channel ESP-EEG recording with GUI filters off, with a 0.14 µV leakage at 50 Hz." width="100%"></a></td>
   </tr>
   <tr>
     <td>Only a <b>0.25 µV</b> peak appears at 50 Hz. Channels 2–8 were turned off.</td>
@@ -320,8 +320,8 @@ Setup: gold cup electrodes with Ten20 paste at O1 and O2, reference and bias on 
     <th align="center">16CH ESP-EEG</th>
   </tr>
   <tr>
-    <td align="center"><a href="v2_alpha_test.png"><img src="v2_alpha_test.png" alt="ESP-EEG V2 alpha test results. Alpha power ratio eyes closed ÷ eyes open: 31.7× on O1 and 15.6× on O2, peak alpha frequency 10.0 and 9.75 Hz. Spectra show a large 10 Hz peak with eyes closed only, and the spectrogram shows alpha switching on in each eyes-closed block." width="100%"></a></td>
-    <td align="center"><a href="16ch_alpha_test.png"><img src="16ch_alpha_test.png" alt="16CH ESP-EEG alpha test results. Alpha power ratio eyes closed ÷ eyes open: 24.0× on O1 and 23.7× on O2, peak alpha frequency 10 Hz. Spectra show a large 10 Hz peak with eyes closed only, and the spectrogram shows alpha switching on in each eyes-closed block." width="100%"></a></td>
+    <td align="center"><a href="support_materials/v2_alpha_test.png"><img src="support_materials/v2_alpha_test.png" alt="ESP-EEG V2 alpha test results. Alpha power ratio eyes closed ÷ eyes open: 31.7× on O1 and 15.6× on O2, peak alpha frequency 10.0 and 9.75 Hz. Spectra show a large 10 Hz peak with eyes closed only, and the spectrogram shows alpha switching on in each eyes-closed block." width="100%"></a></td>
+    <td align="center"><a href="support_materials/16ch_alpha_test.png"><img src="support_materials/16ch_alpha_test.png" alt="16CH ESP-EEG alpha test results. Alpha power ratio eyes closed ÷ eyes open: 24.0× on O1 and 23.7× on O2, peak alpha frequency 10 Hz. Spectra show a large 10 Hz peak with eyes closed only, and the spectrogram shows alpha switching on in each eyes-closed block." width="100%"></a></td>
   </tr>
   <tr>
     <td>Results page from the <b>ESP-EEG V2</b> recording (250 SPS).</td>
